@@ -1,0 +1,35 @@
+{
+  "schema_version": "1",
+  "status": "DRAFT_CANDIDATE_NOT_RUNTIME",
+  "purpose": "Phase 6 readiness planning only. This file does not activate products or change Assessment runtime behavior.",
+  "selection_basis": [
+    "Keep the six reviewed active Assessment products unchanged",
+    "Prefer mainstream products already covered by Bank Rules source structure",
+    "Require a current row in the reviewed Offer Timing source",
+    "Prioritize representative complex families so expansion exercises Chase, AMEX, Citi, Capital One, BofA and co-brand routing"
+  ],
+  "target_count": 20,
+  "products": [
+    {"product_id":"chase_sapphire_preferred","product_name":"Chase Sapphire Preferred","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CHASE-010"},
+    {"product_id":"amex_gold","product_name":"AMEX Gold","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-AMEX-002"},
+    {"product_id":"amex_platinum","product_name":"AMEX Platinum","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-AMEX-001"},
+    {"product_id":"bilt_palladium","product_name":"Bilt Palladium","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-BILTCOLUMN-011"},
+    {"product_id":"capital_one_venture_x","product_name":"Capital One Venture X","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CAPITALONE-013"},
+    {"product_id":"citi_strata_elite","product_name":"Citi Strata Elite","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CITI-015"},
+
+    {"product_id":"chase_sapphire_reserve","product_name":"Chase Sapphire Reserve","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-020","source_bank_rule_scope":"Sapphire / Chase issuer rules"},
+    {"product_id":"chase_freedom_flex","product_name":"Chase Freedom Flex","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-037","source_bank_rule_scope":"Chase issuer rules"},
+    {"product_id":"chase_world_of_hyatt","product_name":"World of Hyatt","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-019","source_bank_rule_scope":"CHASE-PROD-006 + Chase issuer rules"},
+    {"product_id":"chase_aeroplan","product_name":"Chase Aeroplan Card","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-033","source_bank_rule_scope":"CHASE-PROD-007/010 + Chase issuer rules"},
+    {"product_id":"chase_ihg_one_rewards_premier","product_name":"IHG One Rewards Premier","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-028","source_bank_rule_scope":"CHASE-PROD-001/002 + Chase issuer rules"},
+    {"product_id":"chase_marriott_bonvoy_boundless","product_name":"Marriott Bonvoy Boundless","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-012","source_bank_rule_scope":"Marriott Special Matrix + Chase issuer rules"},
+    {"product_id":"amex_marriott_bonvoy_brilliant","product_name":"Marriott Bonvoy Brilliant","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-AMEX-009","source_bank_rule_scope":"AMEX-FL-013 + Marriott Special Matrix + AMEX issuer rules"},
+    {"product_id":"amex_marriott_bonvoy_bevy","product_name":"Marriott Bonvoy Bevy","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-AMEX-014","source_bank_rule_scope":"AMEX-FL-012 + Marriott Special Matrix + AMEX issuer rules"},
+    {"product_id":"amex_hilton_aspire","product_name":"Hilton Aspire","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-AMEX-027","source_bank_rule_scope":"Hilton same-product logic + AMEX issuer rules"},
+    {"product_id":"amex_delta_gold","product_name":"Delta Gold","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-AMEX-003","source_bank_rule_scope":"Personal Delta family + AMEX issuer rules"},
+    {"product_id":"citi_strata_premier","product_name":"Citi Strata Premier","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CITI-031","source_bank_rule_scope":"CITI-PROD-008 + Citi issuer rules"},
+    {"product_id":"citi_aadvantage_executive","product_name":"Citi / AAdvantage Executive","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CITI-006","source_bank_rule_scope":"CITI-PROD-004 + Citi issuer rules"},
+    {"product_id":"bofa_atmos_rewards_summit","product_name":"Atmos Rewards Summit","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-BANKOFAMERICA-021","source_bank_rule_scope":"BOFA-PROD-001 + BofA issuer rules"},
+    {"product_id":"capital_one_venture","product_name":"Capital One Venture","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CAPITALONE-007","source_bank_rule_scope":"Venture family + Capital One issuer rules"}
+  ]
+}
