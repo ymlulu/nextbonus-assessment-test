@@ -35,7 +35,7 @@ def build(source_dir,output_dir):
  run(sys.executable,ROOT/'scripts/export_offer_timing.py',src['offer_timing'],'--output',output_dir/'offer-timing.json')
  history_input=output_dir.parent/registry['sources']['offer_timing'].get('export_file_name',registry['sources']['offer_timing']['file_name']);shutil.copy2(src['offer_timing'],history_input)
  run(sys.executable,ROOT/'scripts/export_offer_history.py',history_input,'--output-dir',output_dir)
- run(sys.executable,ROOT/'scripts/export_assessment_runtime.py','--approval',src['approval'],'--long-term',src['long_term'],'--orchestrator',src['orchestrator'],'--registry',src['report_templates'],'--out-dir',output_dir)
+ run(sys.executable,ROOT/'scripts/export_assessment_runtime_v2.py','--approval',src['approval'],'--long-term',src['long_term'],'--orchestrator',src['orchestrator'],'--registry',src['report_templates'],'--out-dir',output_dir)
 def compare(generated_dir):
  return [name for name in GENERATED if not (generated_dir/name).exists() or not (ROOT/'data'/name).exists() or (generated_dir/name).read_bytes()!=(ROOT/'data'/name).read_bytes()]
 def refresh_hash_metadata():
@@ -54,7 +54,7 @@ def main():
   out=Path(tmp)/'data';build(args.source_dir,out);differences=compare(out)
   if args.write:
    for name in GENERATED:shutil.copy2(out/name,ROOT/'data'/name)
-   refresh_hash_metadata();run(sys.executable,ROOT/'scripts/validate_runtime_data.py');print(json.dumps({'status':'PASS','mode':'write','generated':len(GENERATED),'changed_before_write':differences},ensure_ascii=False));return
+   refresh_hash_metadata();run(sys.executable,ROOT/'scripts/validate_runtime_data_v2.py');print(json.dumps({'status':'PASS','mode':'write','generated':len(GENERATED),'changed_before_write':differences},ensure_ascii=False));return
   if differences:raise SystemExit('runtime drift: '+', '.join(differences))
-  run(sys.executable,ROOT/'scripts/validate_runtime_data.py');print(json.dumps({'status':'PASS','mode':'check','generated':len(GENERATED),'differences':0},ensure_ascii=False))
+  run(sys.executable,ROOT/'scripts/validate_runtime_data_v2.py');print(json.dumps({'status':'PASS','mode':'check','generated':len(GENERATED),'differences':0},ensure_ascii=False))
 if __name__=='__main__':main()
