@@ -10,11 +10,15 @@ def walk(n):
  assert n.get('op') in {'EQ','NEQ','GT','GTE','LT','LTE','IN','NOT_IN','CONTAINS','AND','OR','NOT','ANY','EXISTS','MISSING','ALWAYS'}
  for x in n.get('args',[]):walk(x)
  if n.get('arg'):walk(n['arg'])
-manifest=load('data/runtime-manifest.json');lock=load(manifest['source_lock']['path']);registry=load('config/runtime-source-registry.json');contracts=load('config/source-contract-registry.json')
+manifest=load('data/runtime-manifest.json');lock=load(manifest['source_lock']['path']);registry=load('config/runtime-source-registry.json');contracts=load('config/source-contract-registry.json');qa_registry=load('config/qa-source-registry.json')
+assert lock['schema_version']=='2';assert manifest['source_lock']['schema_version']=='2';assert manifest['source_lock']['git_blob_sha']==blob(manifest['source_lock']['path'])
 assert set(registry['sources'])==set(lock['sources'])
 for k,m in registry['sources'].items():
  l=lock['sources'][k];assert m['file_name']==l['file_name'];assert m['source_kind']==l['source_kind'];assert str(m['snapshot'])==str(l['snapshot']);assert re.fullmatch(r'[0-9a-f]{64}',l['sha256'])
  if m.get('drive_id') is not None:assert m['drive_id']==l.get('drive_id')
+assert qa_registry['schema_version']=='1';assert qa_registry['authority']=='google_drive_reviewed_workbooks';assert set(qa_registry['sources'])==set(lock['qa_sources'])
+for k,m in qa_registry['sources'].items():
+ l=lock['qa_sources'][k];assert m==l;assert re.fullmatch(r'[0-9a-f]{64}',l['sha256'])
 for group in ('repo_contracts','generated_runtime'):
  for k,r in lock[group].items():
   assert (ROOT/r['path']).is_file(),r['path'];assert blob(r['path'])==r['git_blob_sha'],f'locked Git blob drift: {k}'
@@ -41,8 +45,7 @@ assert questions['cards']['capital_one_venture_x']['q5']['subs'][1]['system_gate
 assert frozen['products']['capital_one_venture_x']['COF_CAP1_30D_CLAUSE_STATE']=='PRESENT';assert frozen['products']['capital_one_venture_x']['COF_CAP1_OPEN_ACCOUNT_CAP_STATE']=='ABSENT';assert frozen['products']['capital_one_venture_x']['COF_CAP1_OPEN_ACCOUNT_CAP_LIMIT'] is None
 assert mapping['unknown_values']==['UNKNOWN']
 c=contracts['contracts'];assert contracts['schema_version']=='3';assert c['questions']['authority']=='google_drive_reviewed_docs';assert set(c['questions']['documents'])==ids;assert c['bank_rule_predicates']['authority']=='google_drive_reviewed_workbook_mirror';assert c['frozen_offer_facts']['authority']=='google_drive_reviewed_workbook_mirror'
-for key in ('approval','long_term','orchestrator','report_templates','report_render_policy','offer_timing'):
- assert c[key]['authority']=='google_drive_reviewed_workbook',key
+for key in ('approval','long_term','orchestrator','report_templates','report_render_policy','offer_timing'):assert c[key]['authority']=='google_drive_reviewed_workbook',key
 states={x['state'] for x in orch['runtime_priority']};assert states<=set(templates['final_templates']);assert states<=set(templates['cta']);assert 'WAIT_INFORMATION' in states
 for x in orch['runtime_priority']:walk(x['when'])
 assert templates['rule_variant_routing'] and templates['rule_suppression'] and templates['render_variable_bindings'];assert templates['approval_render_policy'] and templates['offer_render_routing'] and templates['long_term_render_routing']
@@ -50,6 +53,12 @@ for rows in templates['rule_variant_routing'].values():
  for x in rows:walk(x['when'])
 for x in templates['approval_render_policy']+templates['offer_render_routing']+templates['long_term_render_routing']:walk(x['when'])
 assert lock['generated_runtime']['offer_timing']['generation_mode']=='generated_from_reviewed_workbook'
-assert manifest['engine']['fact_normalizer']=='3.2';assert manifest['engine']['approval_engine']=='2.1';assert manifest['engine']['bank_rule_engine']=='2';assert manifest['engine']['report_renderer']=='3.0';assert manifest['engine']['assessment_runtime']=='3.2'
+assert manifest['release_id']=='assessment-phase5d-2026-09-13';assert manifest['engine']['fact_normalizer']=='3.2';assert manifest['engine']['approval_engine']=='2.1';assert manifest['engine']['bank_rule_engine']=='2';assert manifest['engine']['report_renderer']=='3.0';assert manifest['engine']['assessment_runtime']=='3.3'
+qa=load(qa_registry['fixture']['path']);qf=qa_registry['fixture'];assert qa['schema_version']==qf['schema_version'];assert qa['fixture_id']==qf['fixture_id'];assert qa['case_count']==qf['case_count']==120;assert qa['evaluation_date']==qf['evaluation_date']=='2026-09-12'
+for k,s in qa_registry['sources'].items():
+ p=qa['source_provenance'][k];assert p['file_name']==s['file_name'];assert p['drive_id']==s['drive_id'];assert p['sha256']==s['sha256']
+import gzip
+art=qa['artifact'];data=(ROOT/art['path']).read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==art['git_blob_sha'];assert hashlib.sha256(data).hexdigest()==art['sha256'];raw=gzip.decompress(data);assert len(data)==art['compressed_bytes'];assert len(raw)==art['uncompressed_bytes'];assert hashlib.sha256(raw).hexdigest()==art['uncompressed_sha256'];qa_payload=json.loads(raw);qa_cases=qa_payload['cases'];assert qa_payload['case_count']==len(qa_cases)==120;assert qa_payload['evaluation_date']==qa['evaluation_date'];assert all(x['evaluation_date']==qa['evaluation_date'] for x in qa_cases);assert {x['product_id'] for x in qa_cases}==ids;assert all(x['answers']['specific'].get('Q6C')=='NO' for x in qa_cases if x['product_id']=='chase_sapphire_preferred')
+
 index=(ROOT/'index.html').read_text(encoding='utf-8');assert 'src="assets/bootstrap-v3.js"' in index and 'src="engines/assessment-runtime-engine-v3.js"' in index
-print(json.dumps({'runtime_files':len(keys),'repo_contracts':len(lock['repo_contracts']),'rules':len(rules),'products':len(ids),'render_policies':len(templates['approval_render_policy'])+len(templates['offer_render_routing'])+len(templates['long_term_render_routing']),'status':'PASS'},ensure_ascii=False))
+print(json.dumps({'runtime_files':len(keys),'repo_contracts':len(lock['repo_contracts']),'qa_sources':len(lock['qa_sources']),'qa_cases':qa['case_count'],'rules':len(rules),'products':len(ids),'render_policies':len(templates['approval_render_policy'])+len(templates['offer_render_routing'])+len(templates['long_term_render_routing']),'status':'PASS'},ensure_ascii=False))

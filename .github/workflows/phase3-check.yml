@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install publication dependencies
+        run: python -m pip install --disable-pip-version-check openpyxl
       - name: Compile publication scripts
         run: python -m py_compile scripts/*.py
       - name: Validate committed runtime contracts
@@ -19,13 +21,17 @@ jobs:
       - name: Check active-product readiness
         run: python scripts/check_product_readiness.py
       - name: Check publication CLI
-        run: python scripts/build_runtime_data.py --help >/dev/null
+        run: |
+          python scripts/build_runtime_data.py --help >/dev/null
+          python scripts/export_acceptance_fixture.py --help >/dev/null
       - name: Verify Bank Rule key cases
         run: node tests/phase1-key-cases.cjs
       - name: Verify Phase 5B typed facts and applicability
         run: node tests/phase5b-contracts.cjs
       - name: Verify Phase 5C source-owned renderer/exporters
         run: node tests/phase5c-contracts.cjs
+      - name: Verify Phase 5D provenance and fixed-profile acceptance
+        run: node tests/fixed-profile-acceptance.cjs
       - name: Smoke-test every active product deterministically
         run: node tests/product-readiness-smoke.cjs
       - name: Compare Phase 2 and Phase 3 outputs
