@@ -1,0 +1,1353 @@
+{
+  "source_file": "Offer%20Timing.xlsx",
+  "source_sha256": "6928fb0f6322105ed180a7471b94be39930efcdf205022e6debd83fc90015e36",
+  "product_count": 98,
+  "history_count": 406,
+  "display_count": 350,
+  "warnings": [
+    {
+      "sheet": "Timing Output",
+      "row": 2,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 3,
+      "offer_timing_id": "OT-AMEX-002",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 4,
+      "offer_timing_id": "OT-AMEX-003",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 5,
+      "offer_timing_id": "OT-AMEX-004",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 6,
+      "offer_timing_id": "OT-AMEX-005",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 7,
+      "offer_timing_id": "OT-CITI-006",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 8,
+      "offer_timing_id": "OT-CAPITALONE-007",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 9,
+      "offer_timing_id": "OT-CITI-008",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 10,
+      "offer_timing_id": "OT-AMEX-009",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 11,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 12,
+      "offer_timing_id": "OT-BILTCOLUMN-011",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 13,
+      "offer_timing_id": "OT-CHASE-012",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 14,
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 15,
+      "offer_timing_id": "OT-AMEX-014",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 16,
+      "offer_timing_id": "OT-CITI-015",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 17,
+      "offer_timing_id": "OT-CHASE-016",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 18,
+      "offer_timing_id": "OT-CHASE-017",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 19,
+      "offer_timing_id": "OT-CHASE-018",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 20,
+      "offer_timing_id": "OT-CHASE-019",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 21,
+      "offer_timing_id": "OT-CHASE-020",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 22,
+      "offer_timing_id": "OT-BANKOFAMERICA-021",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 23,
+      "offer_timing_id": "OT-AMEX-022",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 24,
+      "offer_timing_id": "OT-AMEX-023",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 25,
+      "offer_timing_id": "OT-BANKOFAMERICA-024",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 26,
+      "offer_timing_id": "OT-AMEX-025",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 27,
+      "offer_timing_id": "OT-AMEX-026",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 28,
+      "offer_timing_id": "OT-AMEX-027",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 29,
+      "offer_timing_id": "OT-CHASE-028",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 30,
+      "offer_timing_id": "OT-BANKOFAMERICA-029",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 31,
+      "offer_timing_id": "OT-BANKOFAMERICA-030",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 32,
+      "offer_timing_id": "OT-CITI-031",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 33,
+      "offer_timing_id": "OT-WELLSFARGO-032",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 34,
+      "offer_timing_id": "OT-CHASE-033",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 35,
+      "offer_timing_id": "OT-CITI-034",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 36,
+      "offer_timing_id": "OT-AMEX-035",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 37,
+      "offer_timing_id": "OT-AMEX-036",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 38,
+      "offer_timing_id": "OT-CHASE-037",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 39,
+      "offer_timing_id": "OT-CHASE-038",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 40,
+      "offer_timing_id": "OT-CHASE-039",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 41,
+      "offer_timing_id": "OT-CHASE-040",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 42,
+      "offer_timing_id": "OT-CHASE-041",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 43,
+      "offer_timing_id": "OT-CHASE-042",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 44,
+      "offer_timing_id": "OT-CHASE-043",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 45,
+      "offer_timing_id": "OT-CHASE-044",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 46,
+      "offer_timing_id": "OT-CHASE-045",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 47,
+      "offer_timing_id": "OT-CHASE-046",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 48,
+      "offer_timing_id": "OT-CHASE-047",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 49,
+      "offer_timing_id": "OT-CITI-048",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 50,
+      "offer_timing_id": "OT-CAPITALONE-049",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 51,
+      "offer_timing_id": "OT-CAPITALONE-050",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 52,
+      "offer_timing_id": "OT-CAPITALONE-051",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 53,
+      "offer_timing_id": "OT-BANKOFAMERICA-052",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 54,
+      "offer_timing_id": "OT-BANKOFAMERICA-053",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 55,
+      "offer_timing_id": "OT-BANKOFAMERICA-054",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 56,
+      "offer_timing_id": "OT-U.S.BANK-055",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 57,
+      "offer_timing_id": "OT-U.S.BANK-056",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 58,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 59,
+      "offer_timing_id": "OT-U.S.BANK-058",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 60,
+      "offer_timing_id": "OT-WELLSFARGO-059",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 61,
+      "offer_timing_id": "OT-WELLSFARGO-060",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 62,
+      "offer_timing_id": "OT-WELLSFARGO-061",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 63,
+      "offer_timing_id": "OT-WELLSFARGO-062",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 64,
+      "offer_timing_id": "OT-DISCOVERCAPITALONE-063",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 65,
+      "offer_timing_id": "OT-BILTCOLUMN-064",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 66,
+      "offer_timing_id": "OT-BILTCOLUMN-065",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 67,
+      "offer_timing_id": "OT-BARCLAYS-066",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 68,
+      "offer_timing_id": "OT-BARCLAYS-067",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 69,
+      "offer_timing_id": "OT-BARCLAYS-068",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 70,
+      "offer_timing_id": "OT-BARCLAYS-069",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 71,
+      "offer_timing_id": "OT-CHASE-070",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 72,
+      "offer_timing_id": "OT-CHASE-071",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 73,
+      "offer_timing_id": "OT-CHASE-072",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 74,
+      "offer_timing_id": "OT-AMEX-073",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 75,
+      "offer_timing_id": "OT-AMEX-074",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 76,
+      "offer_timing_id": "OT-AMEX-075",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 77,
+      "offer_timing_id": "OT-CAPITALONE-076",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 78,
+      "offer_timing_id": "OT-CAPITALONE-077",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 79,
+      "offer_timing_id": "OT-CITI-078",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 80,
+      "offer_timing_id": "OT-AMEX-079",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 81,
+      "offer_timing_id": "OT-AMEX-080",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 82,
+      "offer_timing_id": "OT-AMEX-081",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 83,
+      "offer_timing_id": "OT-CHASE-082",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 84,
+      "offer_timing_id": "OT-CAPITALONE-083",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 85,
+      "offer_timing_id": "OT-CHASE-084",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 86,
+      "offer_timing_id": "OT-BANKOFAMERICA-085",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 87,
+      "offer_timing_id": "OT-CHASE-086",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 88,
+      "offer_timing_id": "OT-CHASE-087",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 89,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 90,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 91,
+      "offer_timing_id": "OT-CAPITALONE-090",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 92,
+      "offer_timing_id": "OT-CAPITALONE-091",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 93,
+      "offer_timing_id": "OT-AMEX-092",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 94,
+      "offer_timing_id": "OT-AMEX-093",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 95,
+      "offer_timing_id": "OT-CHASE-094",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 96,
+      "offer_timing_id": "OT-CHASE-095",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 97,
+      "offer_timing_id": "OT-U.S.BANK-096",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 98,
+      "offer_timing_id": "OT-WELLSFARGO-097",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Timing Output",
+      "row": 99,
+      "offer_timing_id": "OT-BARCLAYS-098",
+      "issue": "No cached formula output. Exported null; existing Assessment output remains authoritative, no recalculation."
+    },
+    {
+      "sheet": "Offer History",
+      "row": 4,
+      "offer_timing_id": "OT-AMEX-002",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 8,
+      "offer_timing_id": "OT-AMEX-003",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 8,
+      "offer_timing_id": "OT-AMEX-003",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 9,
+      "offer_timing_id": "OT-AMEX-003",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 9,
+      "offer_timing_id": "OT-AMEX-003",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 19,
+      "offer_timing_id": "OT-CITI-006",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 19,
+      "offer_timing_id": "OT-CITI-006",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 24,
+      "offer_timing_id": "OT-CAPITALONE-007",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 24,
+      "offer_timing_id": "OT-CAPITALONE-007",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 24,
+      "offer_timing_id": "OT-CAPITALONE-007",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 37,
+      "offer_timing_id": "OT-CHASE-012",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 37,
+      "offer_timing_id": "OT-CHASE-012",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 37,
+      "offer_timing_id": "OT-CHASE-012",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 53,
+      "offer_timing_id": "OT-CHASE-018",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 53,
+      "offer_timing_id": "OT-CHASE-018",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 53,
+      "offer_timing_id": "OT-CHASE-018",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 56,
+      "offer_timing_id": "OT-CHASE-019",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 56,
+      "offer_timing_id": "OT-CHASE-019",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 56,
+      "offer_timing_id": "OT-CHASE-019",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 78,
+      "offer_timing_id": "OT-AMEX-025",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 78,
+      "offer_timing_id": "OT-AMEX-025",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 78,
+      "offer_timing_id": "OT-AMEX-025",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 84,
+      "offer_timing_id": "OT-AMEX-026",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 84,
+      "offer_timing_id": "OT-AMEX-026",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 84,
+      "offer_timing_id": "OT-AMEX-026",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 91,
+      "offer_timing_id": "OT-AMEX-027",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 91,
+      "offer_timing_id": "OT-AMEX-027",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 91,
+      "offer_timing_id": "OT-AMEX-027",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 101,
+      "offer_timing_id": "OT-CITI-031",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 101,
+      "offer_timing_id": "OT-CITI-031",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 101,
+      "offer_timing_id": "OT-CITI-031",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 102,
+      "offer_timing_id": "OT-WELLSFARGO-032",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 110,
+      "offer_timing_id": "OT-AMEX-035",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 112,
+      "offer_timing_id": "OT-AMEX-035",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 112,
+      "offer_timing_id": "OT-AMEX-035",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 112,
+      "offer_timing_id": "OT-AMEX-035",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 115,
+      "offer_timing_id": "OT-AMEX-036",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 115,
+      "offer_timing_id": "OT-AMEX-036",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 115,
+      "offer_timing_id": "OT-AMEX-036",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 123,
+      "offer_timing_id": "OT-CHASE-038",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 141,
+      "offer_timing_id": "OT-CHASE-043",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 141,
+      "offer_timing_id": "OT-CHASE-043",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 141,
+      "offer_timing_id": "OT-CHASE-043",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 151,
+      "offer_timing_id": "OT-CHASE-046",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 151,
+      "offer_timing_id": "OT-CHASE-046",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 151,
+      "offer_timing_id": "OT-CHASE-046",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 171,
+      "offer_timing_id": "OT-BANKOFAMERICA-053",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 172,
+      "offer_timing_id": "OT-BANKOFAMERICA-053",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 174,
+      "offer_timing_id": "OT-BANKOFAMERICA-054",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 175,
+      "offer_timing_id": "OT-BANKOFAMERICA-054",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 183,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 183,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Comparable Value is not a finite number"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 183,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Missing or mismatched Comparison Unit"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 186,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 186,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 186,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 190,
+      "offer_timing_id": "OT-WELLSFARGO-060",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 190,
+      "offer_timing_id": "OT-WELLSFARGO-060",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 190,
+      "offer_timing_id": "OT-WELLSFARGO-060",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 210,
+      "offer_timing_id": "OT-AMEX-074",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 210,
+      "offer_timing_id": "OT-AMEX-074",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 210,
+      "offer_timing_id": "OT-AMEX-074",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 228,
+      "offer_timing_id": "OT-AMEX-081",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 247,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 247,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Comparable Value is not a finite number"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 247,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Missing or mismatched Comparison Unit"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 249,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Timing Eligible is not YES"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 249,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Comparable Value is not a finite number"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 249,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "issue": "Missing or mismatched Comparison Unit"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 251,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 251,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 252,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 252,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 253,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 253,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 254,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 254,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 278,
+      "offer_timing_id": "OT-CHASE-095",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 278,
+      "offer_timing_id": "OT-CHASE-095",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 278,
+      "offer_timing_id": "OT-CHASE-095",
+      "issue": "Benchmark/research-only record"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 279,
+      "offer_timing_id": "OT-U.S.BANK-096",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 279,
+      "offer_timing_id": "OT-U.S.BANK-096",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 374,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 374,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 375,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 375,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 376,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 376,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 377,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 377,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 378,
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 378,
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 379,
+      "offer_timing_id": "OT-AMEX-005",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 379,
+      "offer_timing_id": "OT-AMEX-005",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 381,
+      "offer_timing_id": "OT-WELLSFARGO-061",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 382,
+      "offer_timing_id": "OT-WELLSFARGO-061",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 385,
+      "offer_timing_id": "OT-WELLSFARGO-062",
+      "issue": "Confidence missing or not HIGH"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 399,
+      "offer_timing_id": "OT-BARCLAYS-066",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 401,
+      "offer_timing_id": "OT-BARCLAYS-067",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 403,
+      "offer_timing_id": "OT-BARCLAYS-098",
+      "issue": "Missing or unsupported/approximate date precision"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 375,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Duplicate of row 374"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 2,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Multiple labels at 2025-06-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 3,
+      "offer_timing_id": "OT-AMEX-001",
+      "issue": "Multiple labels at 2026-02-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 6,
+      "offer_timing_id": "OT-AMEX-002",
+      "issue": "Multiple labels at 2025-06-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 15,
+      "offer_timing_id": "OT-AMEX-005",
+      "issue": "Multiple labels at 2026-06-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 16,
+      "offer_timing_id": "OT-AMEX-005",
+      "issue": "Multiple labels at 2026-07-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 18,
+      "offer_timing_id": "OT-CITI-006",
+      "issue": "Multiple labels at 2026-08-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 26,
+      "offer_timing_id": "OT-CITI-008",
+      "issue": "Multiple labels at 2025-07-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 27,
+      "offer_timing_id": "OT-CITI-008",
+      "issue": "Conflicting values at 2025-10-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 319,
+      "offer_timing_id": "OT-CITI-008",
+      "issue": "Conflicting values at 2025-10-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 28,
+      "offer_timing_id": "OT-AMEX-009",
+      "issue": "Multiple labels at 2026-03-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 31,
+      "offer_timing_id": "OT-CHASE-010",
+      "issue": "Multiple labels at 2026-06-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 38,
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "issue": "Multiple labels at 2025-11-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 39,
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "issue": "Multiple labels at 2026-01-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 43,
+      "offer_timing_id": "OT-CITI-015",
+      "issue": "Multiple labels at 2025-10-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 44,
+      "offer_timing_id": "OT-CITI-015",
+      "issue": "Multiple labels at 2026-03-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 46,
+      "offer_timing_id": "OT-CHASE-016",
+      "issue": "Multiple labels at 2026-05-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 58,
+      "offer_timing_id": "OT-CHASE-020",
+      "issue": "Multiple labels at 2026-06-01 share equal value; retained together"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 152,
+      "offer_timing_id": "OT-CHASE-047",
+      "issue": "Conflicting values at 2025-07-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 153,
+      "offer_timing_id": "OT-CHASE-047",
+      "issue": "Conflicting values at 2025-07-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 176,
+      "offer_timing_id": "OT-U.S.BANK-055",
+      "issue": "Conflicting values at 2024-08-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 177,
+      "offer_timing_id": "OT-U.S.BANK-055",
+      "issue": "Conflicting values at 2024-08-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 181,
+      "offer_timing_id": "OT-U.S.BANK-056",
+      "issue": "Conflicting values at 2021-05-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 182,
+      "offer_timing_id": "OT-U.S.BANK-056",
+      "issue": "Conflicting values at 2021-05-01; all conflicting records excluded, no winner guessed"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 253,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Duplicate of row 251"
+    },
+    {
+      "sheet": "Offer History",
+      "row": 254,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "issue": "Duplicate of row 252"
+    }
+  ]
+}
