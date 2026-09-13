@@ -18,9 +18,10 @@ for p in plan['products']:
   'application_clear':pid in templates.get('application_clear',{}),
   'bonus_uncertain_copy':pid in templates.get('bonus_uncertain_by_product',{}),
  }
- required=['product_metadata','questions','fact_mapping','runtime_timing','long_term','frozen_offer_facts','application_clear']
+ # Frozen offer facts are conditional system facts, not a universal per-product requirement.
+ required=['product_metadata','questions','fact_mapping','runtime_timing','long_term','application_clear']
  missing=[k for k in required if not checks[k]]
- rows.append({'product_id':pid,'product_name':p['product_name'],'stage':p['stage'],'offer_timing_id':p['offer_timing_id'],'runtime_ready':not missing,'missing':missing,'checks':checks})
+ rows.append({'product_id':pid,'product_name':p['product_name'],'stage':p['stage'],'offer_timing_id':p['offer_timing_id'],'runtime_ready':not missing,'missing':missing,'conditional_system_facts_present':checks['frozen_offer_facts'],'checks':checks})
 assert len(rows)==plan['target_count']==len({x['product_id'] for x in rows})
 reviewed=[x for x in rows if x['stage']=='ACTIVE_REVIEWED'];candidates=[x for x in rows if x['stage']=='EXPANSION_CANDIDATE']
 assert {x['product_id'] for x in reviewed}==active,'ACTIVE_REVIEWED must exactly mirror current runtime products'
