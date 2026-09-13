@@ -38,8 +38,8 @@
     },
     "report_templates": {
       "file_name": "Full Report Template Registry V1.xlsx",
-      "source_kind": "reviewed_local_xlsx",
-      "drive_id": null,
+      "source_kind": "google_drive_xlsx",
+      "drive_id": "1JCZbg94yL2Wf6vIby8BiThFfSIkN7jIt",
       "snapshot": "2026-09-13",
       "sha256": "6182a0ce167d532b2df21fa0b9750b2717555cbe698c02bb2274abbd4cf70a5a"
     }
@@ -48,7 +48,8 @@
     "bank_rule_predicates": {"path": "data/bank-rule-predicates.json", "git_blob_sha": "8f25210e0539163334f5baeab64e6777cf924b61"},
     "products": {"path": "data/products.json", "git_blob_sha": "466560335cc92d7c2ca3ed22c81b18dd119fca45"},
     "questions": {"path": "data/questions.json", "git_blob_sha": "6b0e5dc9db8d600778be55c6f2ce2d05ba2ba696"},
-    "fact_mapping": {"path": "data/fact-mapping.json", "git_blob_sha": "a86c5b1a46969a88da876cda4d5b449338327c25"}
+    "fact_mapping": {"path": "data/fact-mapping.json", "git_blob_sha": "a86c5b1a46969a88da876cda4d5b449338327c25"},
+    "source_contract_registry": {"path": "config/source-contract-registry.json", "git_blob_sha": "d1560f23d25a289a52a4f270dbcb1a27db1a4394"}
   },
   "generated_runtime": {
     "bank_rules": {"path": "data/bank-rules.json", "source_keys": ["bank_rules"], "git_blob_sha": "6076c1a5ef1e414044086b95286358e48336f21a"},
@@ -56,7 +57,7 @@
     "offer_history": {"path": "data/offer-history.json", "source_keys": ["offer_timing"], "git_blob_sha": "9588813788d142a956d27d57e785bd4c043a0f84"},
     "offer_history_validation": {"path": "data/offer-history-validation.json", "source_keys": ["offer_timing"], "git_blob_sha": "5a504041d5a7c9474f6a0db2ef37aa6c2ec931b8"},
     "approval": {"path": "data/approval-config.json", "source_keys": ["approval"], "git_blob_sha": "f54d5892951be7da1bfcd4f663da990f1b200a3b"},
-    "long_term": {"path": "data/long-term.json", "source_keys": ["long_term", "report_templates"], "git_blob_sha": "abade555dbf9b26d04d5b027462787980d13d928"},
+    "long_term": {"path": "data/long-term.json", "source_keys": ["long_term", "report_templates"], "git_blob_sha": "abade555dbf9b26d04d5c1fe46d40166a8d471b65c88ca5d4eb85461cea750"},
     "orchestrator": {"path": "data/orchestrator.json", "source_keys": ["orchestrator"], "git_blob_sha": "5f3fb98757d241fbfafbf5b16c98d66c9e144cec"},
     "report_templates": {"path": "data/report-templates.json", "source_keys": ["report_templates"], "git_blob_sha": "6edeaf86603bfbc9f2cf262fc4d957b11d3e477f"}
   }
