@@ -1,4 +1,4 @@
-name: Phase 3 Regression
+name: Runtime + Regression
 
 on:
   pull_request:
@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validate committed runtime contracts
+        run: python scripts/validate_runtime_data.py
       - name: Compare Phase 2 and Phase 3 outputs
         run: node tests/phase3-regression.cjs
       - name: Verify AMEX empty-history semantics
