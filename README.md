@@ -27,6 +27,12 @@ Standalone test deployment for the NextBonus deterministic Assessment flow.
 - Hard WAIT/BLOCK rules still take priority when known.
 - Offer Detail summary remains separate from the Full Report.
 
+## Historical offer chart
+
+Full Report now adds a native SVG history chart below the existing current-offer text. The chart reads a checked-in static JSON export; it never recalculates Assessment decisions. See [OFFER_HISTORY.md](OFFER_HISTORY.md) for mapping, filters, source issues, tests and the reviewed update process.
+
+Open the [test website](https://ymlulu.github.io/nextbonus-assessment-test/) to use the chart. Offline direct-file use retains the text-only Assessment if static JSON cannot load.
+
 ## Important
 
 This repository contains client-side test logic. If the GitHub Pages site is publicly accessible, the HTML/JS and embedded rule logic are also publicly inspectable. Use a private repository / restricted Pages visibility if these rules should not be public.

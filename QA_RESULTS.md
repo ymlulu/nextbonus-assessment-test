@@ -1,5 +1,7 @@
 # QA results — 2026-09-13
 
+Offer-history increment: the supplied Excel sources have now been inspected for the chart integration. See [OFFER_HISTORY.md](OFFER_HISTORY.md) for the current source review, graph tests and unchanged-business-output verification. The original deployment notes below describe the earlier release.
+
 ## Status
 
 Published to https://ymlulu.github.io/nextbonus-assessment-test/ after explicit public-release authorization. GitHub Actions run 34728940718 succeeded. The smoke tests below were repeated on the live HTTPS site in Edge with the same results as local testing.
