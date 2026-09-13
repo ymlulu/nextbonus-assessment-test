@@ -6,6 +6,14 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const load = (ctx, rel) => vm.runInContext(fs.readFileSync(path.join(root, rel), 'utf8'), ctx);
 const readJson = name => JSON.parse(fs.readFileSync(path.join(root, 'data', name), 'utf8'));
+const mergeReport = (base, policy) => ({
+  ...base,
+  ...policy,
+  rule_templates: { ...(base.rule_templates || {}), ...(policy.rule_templates || {}) },
+  rule_template_index: { ...(base.rule_template_index || {}), ...(policy.rule_template_index || {}) },
+  offer_display: { ...(base.offer_display || {}), ...(policy.offer_display || {}) },
+  long_term_templates: { ...(base.long_term_templates || {}), ...(policy.long_term_templates || {}) },
+});
 
 function runtime() {
   const ctx = { window: {}, console };
@@ -27,6 +35,7 @@ function runtime() {
   const products = readJson('products.json');
   const longTerm = readJson('long-term.json');
   const timing = readJson('offer-timing.json');
+  const reportTemplates = mergeReport(readJson('report-templates.json'), readJson('report-render-policy.json'));
   const cards = {};
   for (const [id, product] of Object.entries(products.cards)) {
     const lt = longTerm.cards[id];
@@ -58,7 +67,8 @@ function runtime() {
     approval: readJson('approval-config.json'),
     longTerm,
     orchestrator: readJson('orchestrator.json'),
-    reportTemplates: readJson('report-templates.json'),
+    reportTemplates,
+    questions: readJson('questions.json'),
     factMapping: readJson('fact-mapping.json'),
     products,
     frozenOfferFacts: readJson('frozen-offer-facts.json'),

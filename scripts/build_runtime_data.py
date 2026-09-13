@@ -30,6 +30,7 @@ GENERATED = [
     "long-term.json",
     "orchestrator.json",
     "report-templates.json",
+    "report-render-policy.json",
 ]
 
 

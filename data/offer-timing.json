@@ -32,10 +32,10 @@
     "timing_result": {
       "rating": "史高",
       "wait": "不建议等待",
-      "maximum_offer_label": "100,000 MR",
       "historical_high_label": "100,000 MR",
       "historical_low_label": "60,000 MR",
-      "history_count": 4
+      "history_count": 4,
+      "maximum_offer_label": "100,000 MR"
     }
   },
   "amex_platinum": {
@@ -52,10 +52,10 @@
     "timing_result": {
       "rating": "史高",
       "wait": "不建议等待",
-      "maximum_offer_label": "175,000 MR",
       "historical_high_label": "175,000 MR",
       "historical_low_label": "75,000 MR",
-      "history_count": 4
+      "history_count": 4,
+      "maximum_offer_label": "175,000 MR"
     }
   },
   "bilt_palladium": {
