@@ -2,7 +2,7 @@
 
 ## Status
 
-Local Edge browser tests only. GitHub source upload and Pages activation were blocked by automatic approval review pending explicit authorization to disclose source and embedded rules publicly. The GitHub repository exists but is empty. Actions and live Pages checks have NOT run.
+Published to https://ymlulu.github.io/nextbonus-assessment-test/ after explicit public-release authorization. GitHub Actions run 34728940718 succeeded. The smoke tests below were repeated on the live HTTPS site in Edge with the same results as local testing.
 
 Source: supplied nextbonus-assessment-test.zip, VERSION V2.2. No separate NextBonus_Assessment_Offline_V2_2.html or Full Report Template Registry V1.xlsx was available; independent source comparison and Registry QA remain pending. Embedded sourceVersions QA claims are not independently verified.
 
@@ -24,7 +24,7 @@ Source: supplied nextbonus-assessment-test.zip, VERSION V2.2. No separate NextBo
 | 12 All answers blank, all six cards | PARTIAL: every report renders; approval and long-term 无法判断. Gold/Platinum incorrectly show bonus 可以; other four show 不确定 |
 | 13 Report → Offer → same report | PASS: exact report text preserved; engine replaced with throwing stub during return to detect any reassessment |
 
-Additional: local file load and refresh passed; no pageerror events; no HTTP runtime requests; 390px viewport has no horizontal overflow. Refresh returns to the questionnaire, not the prior report. External application links were not followed.
+Additional: local file and live HTTPS load and refresh passed; no pageerror events; no application API or external asset requests (live requests were page navigation / refresh only); 390px viewport has no horizontal overflow. Refresh returns to the questionnaire, not the prior report. External application links were not followed.
 
 ## Business issues — unchanged
 
@@ -41,6 +41,7 @@ This is smoke testing against the supplied snapshot, not certification of real b
 - No engine, rule, approval, timing, long-term calculation, recommendation or application URL changes.
 - Original root Pages workflow and .nojekyll retained. No framework or runtime dependency added.
 
-## Pending after public-release authorization
+## Deployment
 
-Push main, enable GitHub Pages with build_type=workflow, await successful Actions, verify HTTPS Pages / index.html / refresh and repeat smoke tests on deployed site.
+main branch; root static artifact; GitHub Pages build_type=workflow. No build framework or npm required. Repository: https://github.com/ymlulu/nextbonus-assessment-test
+
