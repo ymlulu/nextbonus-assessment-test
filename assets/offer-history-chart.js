@@ -145,7 +145,7 @@
     const stage = el('div', 'oh-stage');
     const details = el('div', 'oh-details');
     details.setAttribute('aria-live', 'polite');
-    const note = el('p', 'oh-note', '默认展示最近 24 个月；窗口起点会继承更早最近一条已收录奖励，使走势保持连续。奖励相对位置按可比口径计算；点击或聚焦节点查看详情。');
+    const note = el('p', 'oh-note', '默认展示最近 24 个月；窗口起点会优先继承更早最近一条已收录奖励，使走势保持连续；若没有更早记录，则从当前卡首条记录开始。奖励相对位置按可比口径计算；点击或聚焦节点查看详情。');
     host.append(stats, toolbar, stage, details, note);
 
     function show(p) {
@@ -195,12 +195,20 @@
       const top = 48;
       const bottom = height - 48;
       const all = carry ? [carry, ...points, current] : [...points, current];
-      const startTime = rangeMode === '24m' ? cutoff : Math.min(...points.map(p => Date.parse(p.date)));
+      const firstPointTime = points.length ? Date.parse(points[0].date) : null;
+      const startTime = rangeMode === '24m'
+        ? (carrySource ? cutoff : firstPointTime)
+        : firstPointTime;
       const scaleLow = lowPoint.comparable_value;
       const scaleHigh = highPoint.comparable_value;
-      const span = scaleHigh - scaleLow || Math.abs(scaleHigh) * .2 || 1;
+      const rawSpan = Math.abs(scaleHigh - scaleLow);
+      const lowPad = rawSpan > 0 ? rawSpan * .18 : Math.max(Math.abs(scaleLow) * .08, 1);
+      const highPad = rawSpan > 0 ? rawSpan * .08 : Math.max(Math.abs(scaleHigh) * .08, 1);
+      const visualLow = scaleLow - lowPad;
+      const visualHigh = scaleHigh + highPad;
+      const visualSpan = visualHigh - visualLow || 1;
       const x = p => p.current ? right : left + (Date.parse(p.date) - startTime) / (currentTime - startTime || 1) * (right - left);
-      const yValue = v => bottom - 12 - (v - scaleLow) / span * (bottom - top - 24);
+      const yValue = v => bottom - 12 - (v - visualLow) / visualSpan * (bottom - top - 24);
       const y = p => yValue(p.comparable_value);
       const root = svg('svg', { viewBox: `0 0 ${width} ${height}`, width: '100%', height, role: 'group', 'aria-label': '历史开卡奖励走势图，当前 ' + current.bonus_label });
 
