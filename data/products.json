@@ -13,6 +13,7 @@
       "product_id": "chase_sapphire_preferred",
       "name": "Chase Sapphire Preferred",
       "issuer": "CHASE",
+      "sensitivity": "MEDIUM",
       "offer_timing_id": "OT-CHASE-010",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-sapphire-preferred/",
       "application_url": "https://www.uscreditcards101.com/go/chase-sapphire-preferred"
@@ -21,6 +22,7 @@
       "product_id": "amex_gold",
       "name": "AMEX Gold",
       "issuer": "AMEX",
+      "sensitivity": "MEDIUM",
       "offer_timing_id": "OT-AMEX-002",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-prg-intro/",
       "application_url": "https://www.uscreditcards101.com/go/amex-gold"
@@ -29,6 +31,7 @@
       "product_id": "amex_platinum",
       "name": "AMEX Platinum",
       "issuer": "AMEX",
+      "sensitivity": "MEDIUM",
       "offer_timing_id": "OT-AMEX-001",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-platinum-intro/",
       "application_url": "https://www.uscreditcards101.com/go/amex-platinum"
@@ -37,6 +40,7 @@
       "product_id": "bilt_palladium",
       "name": "Bilt Palladium",
       "issuer": "BILT",
+      "sensitivity": "HIGH",
       "offer_timing_id": "OT-BILTCOLUMN-011",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/bilt-palladium-card-review/",
       "application_url": "https://www.uscreditcards101.com/go/bilt-palladium"
@@ -45,6 +49,7 @@
       "product_id": "capital_one_venture_x",
       "name": "Capital One Venture X",
       "issuer": "CAPITAL_ONE",
+      "sensitivity": "HIGH",
       "offer_timing_id": "OT-CAPITALONE-013",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/capital-one-venture-x-card-review/",
       "application_url": "https://www.uscreditcards101.com/go/capital-one-venture-x"
@@ -53,6 +58,7 @@
       "product_id": "citi_strata_elite",
       "name": "Citi Strata Elite",
       "issuer": "CITI",
+      "sensitivity": "HIGH",
       "offer_timing_id": "OT-CITI-015",
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/citi-strata-elite-review/",
       "application_url": "https://www.uscreditcards101.com/go/citi-strata-elite"
