@@ -24,6 +24,8 @@ jobs:
         run: node tests/phase1-key-cases.cjs
       - name: Verify Phase 5B typed facts and applicability
         run: node tests/phase5b-contracts.cjs
+      - name: Verify Phase 5C source-owned renderer/exporters
+        run: node tests/phase5c-contracts.cjs
       - name: Smoke-test every active product deterministically
         run: node tests/product-readiness-smoke.cjs
       - name: Compare Phase 2 and Phase 3 outputs
