@@ -145,7 +145,7 @@
     const stage = el('div', 'oh-stage');
     const details = el('div', 'oh-details');
     details.setAttribute('aria-live', 'polite');
-    const note = el('p', 'oh-note', '默认展示最近 24 个月。奖励相对位置按可比口径计算；点击或聚焦节点查看详情。');
+    const note = el('p', 'oh-note', '默认展示最近 24 个月；窗口起点会继承更早最近一条已收录奖励，使走势保持连续。奖励相对位置按可比口径计算；点击或聚焦节点查看详情。');
     host.append(stats, toolbar, stage, details, note);
 
     function show(p) {
@@ -173,7 +173,16 @@
     function draw() {
       const cutoff = monthStart(currentTime, -24);
       const points = rangeMode === '24m' ? cleanHistory.filter(p => Date.parse(p.date) >= cutoff) : cleanHistory.slice();
-      if (!points.length) {
+      const carrySource = rangeMode === '24m'
+        ? cleanHistory.filter(p => Date.parse(p.date) < cutoff).slice(-1)[0]
+        : null;
+      const carry = carrySource ? {
+        ...carrySource,
+        date: new Date(cutoff).toISOString().slice(0, 10),
+        date_label: monthLabel(cutoff),
+        carry: true
+      } : null;
+      if (!points.length && !carry) {
         stage.replaceChildren(el('p', 'oh-empty', '这个时间范围内可比较的历史奖励数据还比较少。'));
         return;
       }
@@ -185,7 +194,7 @@
       const right = width - (mobile ? 14 : 26);
       const top = 48;
       const bottom = height - 48;
-      const all = [...points, current];
+      const all = carry ? [carry, ...points, current] : [...points, current];
       const startTime = rangeMode === '24m' ? cutoff : Math.min(...points.map(p => Date.parse(p.date)));
       const scaleLow = lowPoint.comparable_value;
       const scaleHigh = highPoint.comparable_value;
@@ -239,6 +248,7 @@
       }
 
       for (const p of all) {
+        if (p.carry) continue;
         const rows = p.records || [p];
         const aria = `${p.current ? '当前，' : ''}${p.date_label}，${rows.map(r => r.bonus_label + (r.spend_requirement ? '，' + r.spend_requirement : '')).join('；')}`;
         const g = svg('g', { tabindex: 0, role: 'button', class: 'oh-node' + (p.current ? ' oh-now' : ''), 'aria-label': aria,
