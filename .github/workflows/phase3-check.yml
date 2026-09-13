@@ -16,8 +16,12 @@ jobs:
         run: python -m py_compile scripts/*.py
       - name: Validate committed runtime contracts
         run: python scripts/validate_runtime_data.py
+      - name: Check active-product readiness
+        run: python scripts/check_product_readiness.py
       - name: Check publication CLI
         run: python scripts/build_runtime_data.py --help >/dev/null
+      - name: Smoke-test every active product deterministically
+        run: node tests/product-readiness-smoke.cjs
       - name: Compare Phase 2 and Phase 3 outputs
         run: node tests/phase3-regression.cjs
       - name: Verify AMEX empty-history semantics
