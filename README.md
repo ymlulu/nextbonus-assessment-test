@@ -7,15 +7,31 @@ Standalone test deployment for the NextBonus deterministic Assessment flow.
 - Static single-page test app.
 - No GPT/API dependency at runtime.
 - Current UI file: `index.html`.
+- Active browser bootstrap: `assets/bootstrap-v3.js`.
+- Active assessment runtime: `engines/assessment-runtime-engine-v3.js`.
 - Intended only for isolated QA before integration into the main NextBonus app.
+
+## Source contract boundary
+
+The runtime must not silently invent or override reviewed business facts.
+
+- Google Drive reviewed workbooks are the formal source layer for Bank Rules, Offer Timing, Approval, Long-term, Orchestrator and Full Report Registry.
+- The six reviewed Google Drive Assessment question documents are the formal user-visible question specification. `data/questions.json` is their reviewed runtime mirror.
+- `data/products.json`, `data/fact-mapping.json` and `data/bank-rule-predicates.json` are currently explicit GitHub machine contracts. They remain temporary machine-side authorities until the Phase 5B canonical product metadata / typed-fact / applicability cleanup is complete.
+- `config/source-contract-registry.json` records these authority assignments and the six current question-document Drive IDs/revisions.
+- `config/runtime-source-registry.json` and `data/source-lock.json` register and freeze workbook provenance.
+
+The active six-card runtime behavior is unchanged by Phase 5 PR A. This phase only cleans source metadata, authority documentation, legacy paths and CI coverage.
 
 ## Deploy with GitHub Pages
 
-1. Push this repository to GitHub with default branch `main`.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-4. Push to `main` or run the workflow manually from **Actions**.
-5. The workflow publishes the site to the repository's GitHub Pages URL.
+1. Push changes on a feature/fix branch.
+2. Open a pull request targeting `main`.
+3. Require the repository CI checks to pass.
+4. Merge only after CI is green.
+5. GitHub Pages publishes from the merged `main` branch.
+
+Direct edits to `main` are not part of the supported workflow.
 
 ## Current test behavior
 
@@ -29,9 +45,13 @@ Standalone test deployment for the NextBonus deterministic Assessment flow.
 
 ## Historical offer chart
 
-Full Report now adds a native SVG history chart below the existing current-offer text. The chart reads a checked-in static JSON export; it never recalculates Assessment decisions. See [OFFER_HISTORY.md](OFFER_HISTORY.md) for mapping, filters, source issues, tests and the reviewed update process.
+Full Report adds a native SVG history chart below the current-offer text. The chart reads a checked-in static JSON export; it never recalculates Assessment decisions. See [OFFER_HISTORY.md](OFFER_HISTORY.md) for mapping, filters, source issues, tests and the reviewed update process.
 
 Open the [test website](https://ymlulu.github.io/nextbonus-assessment-test/) to use the chart. Offline direct-file use retains the text-only Assessment if static JSON cannot load.
+
+## Legacy files
+
+The old V2 loader and V2 assessment runtime implementation are archived under `legacy/`. Their former active paths contain non-executing migration stubs only. The production test page does not load those paths.
 
 ## Important
 

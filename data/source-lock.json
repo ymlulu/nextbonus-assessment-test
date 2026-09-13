@@ -38,8 +38,8 @@
     },
     "report_templates": {
       "file_name": "Full Report Template Registry V1.xlsx",
-      "source_kind": "reviewed_local_xlsx",
-      "drive_id": null,
+      "source_kind": "google_drive_xlsx",
+      "drive_id": "1JCZbg94yL2Wf6vIby8BiThFfSIkN7jIt",
       "snapshot": "2026-09-13",
       "sha256": "6182a0ce167d532b2df21fa0b9750b2717555cbe698c02bb2274abbd4cf70a5a"
     }
@@ -48,7 +48,8 @@
     "bank_rule_predicates": {"path": "data/bank-rule-predicates.json", "git_blob_sha": "8f25210e0539163334f5baeab64e6777cf924b61"},
     "products": {"path": "data/products.json", "git_blob_sha": "466560335cc92d7c2ca3ed22c81b18dd119fca45"},
     "questions": {"path": "data/questions.json", "git_blob_sha": "6b0e5dc9db8d600778be55c6f2ce2d05ba2ba696"},
-    "fact_mapping": {"path": "data/fact-mapping.json", "git_blob_sha": "a86c5b1a46969a88da876cda4d5b449338327c25"}
+    "fact_mapping": {"path": "data/fact-mapping.json", "git_blob_sha": "a86c5b1a46969a88da876cda4d5b449338327c25"},
+    "source_contract_registry": {"path": "config/source-contract-registry.json", "git_blob_sha": "d1560f23d25a289a52a4f270dbcb1a27db1a4394"}
   },
   "generated_runtime": {
     "bank_rules": {"path": "data/bank-rules.json", "source_keys": ["bank_rules"], "git_blob_sha": "6076c1a5ef1e414044086b95286358e48336f21a"},

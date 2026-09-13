@@ -1,0 +1,62 @@
+{
+  "schema_version": "1",
+  "policy": {
+    "business_source_layer": "Google Drive reviewed documents/workbooks",
+    "runtime_layer": "Committed GitHub JSON contracts and generated runtime data",
+    "rule": "A runtime mirror may not silently override its reviewed business source. Machine-only contracts must be explicitly identified until a reviewed Drive source is defined."
+  },
+  "contracts": {
+    "questions": {
+      "authority": "google_drive_reviewed_docs",
+      "runtime_mirror": "data/questions.json",
+      "sync_mode": "reviewed_manual_mirror",
+      "documents": {
+        "chase_sapphire_preferred": {
+          "title": "Assessment 问卷｜Chase Sapphire Preferred",
+          "drive_id": "1JjuMAC42Dlk9Yus2LhZ1e0S48hK2TDPBw3wUWaRn3dw",
+          "revision_id": "ANLCKQlsL6I8EZwILsa6ulu_sRs5ZesBwS389ByY2Yxn-0gISl712K5DpTmQqkIU6MxGZSQNho75bDlcLF52QmRT7po1A6MNPCbgbKmqpDY"
+        },
+        "amex_gold": {
+          "title": "Assessment 问卷｜AMEX Gold",
+          "drive_id": "17LaaW5utnlv5Kk8fz7AaiWSeo_zxVO82hw_uVCyP4Mo",
+          "revision_id": "ANLCKQnqotT-f6LPQx5YK8oap7bGtasewWHAeDjqO4QW0qSz9ywTMeWblcsgGZziJsXknEqSC67FUYgxOnC3s5g1_9fe5okUeUldmLt1l6w"
+        },
+        "amex_platinum": {
+          "title": "Assessment 问卷｜AMEX Platinum",
+          "drive_id": "1AQvgX2OKSytOkGj8OXlAnVRClevjCjhGwXc4_iTDMDg",
+          "revision_id": "ANLCKQnYvHfSQWEXcxErxv70WvlhC83IjKuYjOo8L8q6-t46ivELg4JR14TGX_G0zZ_Mn7HuzxoIparfeN7GSR8TIt0iiGVG-z1hbJvA_Fs"
+        },
+        "bilt_palladium": {
+          "title": "Assessment 问卷｜Bilt Palladium",
+          "drive_id": "1Mm67U4X2PGDNM9-YN-17WouUtv6T7UWj6IubzdkjBBg",
+          "revision_id": "ANLCKQnM9JxEolGBjQJYRx0TJ_WXIzzIISD-tW0tzbE8ROhHaaviSwWlfhuHaWWqYZeAII8nWnGHauiUgi2UaC0-0rMNmRAgr364IZLnKco"
+        },
+        "capital_one_venture_x": {
+          "title": "Assessment 问卷｜Capital One Venture X",
+          "drive_id": "1ZVZt2vAIBG_V1B1pXBNzVs_YlIwn0GJARRbMSQp1tTM",
+          "revision_id": "ANLCKQlHD1roF_8c41R1WUIidLiklLE_Ic__de7cbeHK1We1BHIlKAjfszKQketcNVIg8l1hpakk7OUJ5LZmf2vuQ3In10WXK7SmnL0yOmk"
+        },
+        "citi_strata_elite": {
+          "title": "Assessment 问卷｜Citi Strata Elite",
+          "drive_id": "1FGJyuO6RA8WDsdF9nZ8I2m-FVZJxGSrQUmm95erRKHM",
+          "revision_id": "ANLCKQnrNSS57C48kyVnI292eOkf_6HBvdGUH599OUZC6nZKe8LxBSWT35LN_ky7N8IJWZajzBiONXayPX_xfi-lFqWY749siUcUfqkhLqY"
+        }
+      }
+    },
+    "products": {
+      "authority": "github_machine_contract",
+      "path": "data/products.json",
+      "status": "temporary_explicit_contract_pending_phase5b_canonical_metadata_cleanup"
+    },
+    "fact_mapping": {
+      "authority": "github_machine_contract",
+      "path": "data/fact-mapping.json",
+      "status": "temporary_explicit_contract_pending_phase5b_typed_fact_cleanup"
+    },
+    "bank_rule_predicates": {
+      "authority": "github_machine_contract",
+      "path": "data/bank-rule-predicates.json",
+      "status": "temporary_explicit_contract_pending_phase5b_applicability_cleanup"
+    }
+  }
+}

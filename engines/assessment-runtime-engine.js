@@ -1,4 +1,2 @@
-(function(){'use strict';
-function evaluate(cardKey,a){const R=window.NBRuntime,C=window.NB_CONFIG,card=C.cards[cardKey],lt=R.longTerm.cards[cardKey],timing=R.timing[cardKey];if(!card||!lt||!timing)throw Error('Missing runtime config for '+cardKey);const facts=window.NBEngine.normalizeAssessmentFacts(cardKey,a),bank=BankRuleEngine.evaluate({targetProductId:cardKey,facts,evaluationDate:C.snapshotDate,rules:R.rules,predicates:R.predicates}),approval=ApprovalEngineV2.evaluate({cardKey,issuerCode:card.issuer,answers:a,config:R.approval}),longTerm=LongTermEngineV2.evaluate({cardKey,answers:a,config:R.longTerm}),output=OrchestratorEngineV2.evaluate({bank,approval,longTerm,timing,config:R.orchestrator,missingFactInfo:R.reportTemplates.missing_fact_info,finalTemplates:R.reportTemplates.final_templates}),report=ReportRendererV2.render({cardKey,cardName:card.name,answers:a,bank,approval,longTerm,output,timing,templates:R.reportTemplates,annualFee:lt.annual_fee});return{cardKey,card,answers:a,approval,bank,longTerm,output,incomplete:false,report}}
-window.AssessmentRuntimeEngineV2={evaluate,version:'assessment-runtime-2'};
-})();
+// Legacy V2 implementation moved to ../legacy/assessment-runtime-engine-v2.js.
+// Active runtime: engines/assessment-runtime-engine-v3.js.

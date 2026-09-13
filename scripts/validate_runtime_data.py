@@ -31,16 +31,22 @@ def walk(node):
 manifest = load("data/runtime-manifest.json")
 source_lock = load(manifest["source_lock"]["path"])
 source_registry = load("config/runtime-source-registry.json")
+source_contracts = load("config/source-contract-registry.json")
 
-# Every source registry entry must be intentionally locked to a reviewed source hash.
+# Every workbook registry entry must be intentionally locked to a reviewed source hash.
 assert set(source_registry["sources"]) == set(source_lock["sources"]), "source registry/lock keys differ"
 for key, meta in source_registry["sources"].items():
     locked = source_lock["sources"][key]
     assert meta["file_name"] == locked["file_name"], f"source filename mismatch: {key}"
+    assert meta["source_kind"] == locked["source_kind"], f"source kind mismatch: {key}"
     assert str(meta["snapshot"]) == str(locked["snapshot"]), f"source snapshot mismatch: {key}"
     assert re.fullmatch(r"[0-9a-f]{64}", locked["sha256"]), f"invalid source SHA256: {key}"
     if meta.get("drive_id") is not None:
         assert meta["drive_id"] == locked.get("drive_id"), f"Drive ID mismatch: {key}"
+
+report_source = source_registry["sources"]["report_templates"]
+assert report_source["source_kind"] == "google_drive_xlsx"
+assert report_source["drive_id"] == "1JCZbg94yL2Wf6vIby8BiThFfSIkN7jIt"
 
 # Git-blob hashes make committed runtime provenance reviewable without private Drive access.
 for group in ("repo_contracts", "generated_runtime"):
@@ -92,6 +98,28 @@ for name, ids in {
 }.items():
     assert ids == product_ids, f"product IDs differ in {name}"
 
+# Phase 5 source authority: reviewed Drive question docs are the formal question source;
+# Products / Fact Mapping / Predicates remain explicit GitHub machine contracts until Phase 5B.
+contracts = source_contracts["contracts"]
+assert contracts["questions"]["authority"] == "google_drive_reviewed_docs"
+assert contracts["questions"]["runtime_mirror"] == manifest["questions"]["path"]
+question_docs = contracts["questions"]["documents"]
+assert set(question_docs) == product_ids, "question source registry/product IDs differ"
+for product_id, rec in question_docs.items():
+    assert rec["drive_id"], f"missing question Drive ID: {product_id}"
+    assert rec["revision_id"], f"missing question revision: {product_id}"
+for key, path in {
+    "products": manifest["products"]["path"],
+    "fact_mapping": manifest["fact_mapping"]["path"],
+    "bank_rule_predicates": manifest["bank_rule_predicates"]["path"],
+}.items():
+    assert contracts[key]["authority"] == "github_machine_contract", f"unexpected authority: {key}"
+    assert contracts[key]["path"] == path, f"source contract path drift: {key}"
+
+# The reviewed CSP question source and runtime mirror both include current-holder Q6C.
+csp_q6_ids = {x["id"] for x in questions["cards"]["chase_sapphire_preferred"]["q6"]["subs"]}
+assert "Q6C" in csp_q6_ids, "CSP Q6C missing from runtime question mirror"
+
 seen_timing_ids = set()
 for product_id, product in products["cards"].items():
     assert product["product_id"] == product_id
@@ -125,11 +153,23 @@ match = re.search(r"version:'fact-normalizer-([^']+)'", normalizer_source)
 assert match, "could not read FactNormalizer version"
 assert manifest["engine"]["fact_normalizer"] == match.group(1), "FactNormalizer manifest version drift"
 
+# V2 code is archived; active entry points must stay on V3.
+index = (ROOT / "index.html").read_text(encoding="utf-8")
+assert 'src="assets/runtime-loader.js"' not in index
+assert 'src="engines/assessment-runtime-engine.js"' not in index
+assert 'src="assets/bootstrap-v3.js"' in index
+assert 'src="engines/assessment-runtime-engine-v3.js"' in index
+assert "legacy/runtime-loader-v2.js" in (ROOT / "assets/runtime-loader.js").read_text(encoding="utf-8")
+assert "legacy/assessment-runtime-engine-v2.js" in (ROOT / "engines/assessment-runtime-engine.js").read_text(encoding="utf-8")
+assert (ROOT / "legacy/runtime-loader-v2.js").is_file()
+assert (ROOT / "legacy/assessment-runtime-engine-v2.js").is_file()
+
 print(json.dumps({
     "runtime_files": len(manifest_data_keys),
     "locked_sources": len(source_lock["sources"]),
     "repo_contracts": len(source_lock["repo_contracts"]),
     "generated_runtime": len(source_lock["generated_runtime"]),
+    "question_sources": len(question_docs),
     "rules": len(rules),
     "products": len(product_ids),
     "status": "PASS"
