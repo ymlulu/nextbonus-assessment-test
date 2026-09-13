@@ -1,0 +1,128 @@
+{
+  "CHASE-001": {
+    "rule_id": "CHASE-001",
+    "name": "Chase 5/24",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CHASE-002": {
+    "rule_id": "CHASE-002",
+    "name": "Chase 2/30",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CHASE-003": {
+    "rule_id": "CHASE-003",
+    "name": "CSP 同卡奖励历史",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "CHASE-010": {
+    "rule_id": "CHASE-010",
+    "name": "Chase 5/24 副卡边界",
+    "dimension": "APPLICATION",
+    "impact": 0,
+    "hard_behavior": "NONE"
+  },
+  "CHASE-PROD-017": {
+    "rule_id": "CHASE-PROD-017",
+    "name": "CSP 当前持卡限制",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "AMEX-001": {
+    "rule_id": "AMEX-001",
+    "name": "AMEX 同产品持卡历史",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "AMEX-008": {
+    "rule_id": "AMEX-008",
+    "name": "AMEX Charge / Pay Over Time 卡数量",
+    "dimension": "APPLICATION",
+    "impact": 1,
+    "hard_behavior": "NONE"
+  },
+  "AMEX-011": {
+    "rule_id": "AMEX-011",
+    "name": "AMEX 同产品 90 天间隔",
+    "dimension": "APPLICATION",
+    "impact": 2,
+    "hard_behavior": "NONE"
+  },
+  "AMEX-FL-001": {
+    "rule_id": "AMEX-FL-001",
+    "name": "AMEX Platinum Family Rule",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "AMEX-FL-004": {
+    "rule_id": "AMEX-FL-004",
+    "name": "AMEX Gold Family Rule",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "BILT-001": {
+    "rule_id": "BILT-001",
+    "name": "Bilt 2.0 共享 Welcome Bonus 限制",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "BLOCK"
+  },
+  "BILT-003": {
+    "rule_id": "BILT-003",
+    "name": "Bilt 45 天重新申请间隔",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CAP1-001": {
+    "rule_id": "CAP1-001",
+    "name": "Capital One 近期申请信号",
+    "dimension": "APPLICATION",
+    "impact": 1,
+    "hard_behavior": "NONE"
+  },
+  "CAP1-002": {
+    "rule_id": "CAP1-002",
+    "name": "Capital One 30 天申请次数条款",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CAP1-004": {
+    "rule_id": "CAP1-004",
+    "name": "Venture X 48 个月奖励限制",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CITI-001": {
+    "rule_id": "CITI-001",
+    "name": "Citi 8 天申请节奏",
+    "dimension": "APPLICATION",
+    "impact": 2,
+    "hard_behavior": "NONE"
+  },
+  "CITI-002": {
+    "rule_id": "CITI-002",
+    "name": "Citi 2/65",
+    "dimension": "APPLICATION",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  },
+  "CITI-PROD-009": {
+    "rule_id": "CITI-PROD-009",
+    "name": "Strata Elite 48 个月奖励 / 转卡条款",
+    "dimension": "BONUS",
+    "impact": 3,
+    "hard_behavior": "WAIT"
+  }
+}

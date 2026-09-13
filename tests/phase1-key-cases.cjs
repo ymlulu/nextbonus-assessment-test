@@ -1,0 +1,15 @@
+const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
+const root=path.resolve(__dirname,'..'),ctx={window:{}};vm.createContext(ctx);vm.runInContext(fs.readFileSync(root+'/engines/bank-rule-engine.js','utf8'),ctx);
+const rules=JSON.parse(fs.readFileSync(root+'/data/bank-rules.json')),predicates=JSON.parse(fs.readFileSync(root+'/data/bank-rule-predicates.json'));
+const base={chase_24m:'LT_4',au_count:0,chase_30d:'LT_2',prior_csp_bonus:false,current_csp_holder:false,amex_recent_same:false,amex_charge_band:'LT_10',amex_history:[],prior_bilt:false,bilt_decline:'CLEAR',cap1_recent:false,cap1_30d:'LT_2',vx_bonus_48m:false,citi_8d:false,citi_65d:'LT_2',citi_bonus_48m:false,citi_converted:false,citi_source_bonus:false};
+function ids(product,overrides={}){return ctx.window.BankRuleEngine.evaluate({targetProductId:product,facts:{...base,...overrides},evaluationDate:'2026-09-12',rules,predicates}).triggeredRules}
+const cases=[
+ ['CSP normal','chase_sapphire_preferred',{},[]],['CSP 5/24','chase_sapphire_preferred',{chase_24m:'GE_5'},['CHASE-001']],['CSP 2/30','chase_sapphire_preferred',{chase_30d:'GE_2'},['CHASE-002']],['CSP prior bonus','chase_sapphire_preferred',{prior_csp_bonus:true},['CHASE-003']],['CSP holder','chase_sapphire_preferred',{current_csp_holder:true},['CHASE-PROD-017']],['CSP AU boundary','chase_sapphire_preferred',{chase_24m:'EQ_4',au_count:1},['CHASE-010']],
+ ['AMEX normal','amex_gold',{},[]],['Gold family','amex_gold',{amex_history:['AMEX Platinum']},['AMEX-001','AMEX-FL-004']],['Platinum family','amex_platinum',{amex_history:['AMEX Gold']},['AMEX-001','AMEX-FL-001']],['AMEX 8-9','amex_gold',{amex_charge_band:'LT_10'},[]],['AMEX 10+','amex_gold',{amex_charge_band:'GE_10'},['AMEX-008']],['AMEX recent','amex_gold',{amex_recent_same:true},['AMEX-011']],
+ ['Bilt normal','bilt_palladium',{},[]],['Bilt history','bilt_palladium',{prior_bilt:true},['BILT-001']],['Bilt decline','bilt_palladium',{bilt_decline:'LT_45'},['BILT-003']],
+ ['Venture X normal','capital_one_venture_x',{},[]],['Capital One recent','capital_one_venture_x',{cap1_recent:true},['CAP1-001']],['Capital One 30d','capital_one_venture_x',{cap1_30d:'GE_2'},['CAP1-002']],['Venture X 48m','capital_one_venture_x',{vx_bonus_48m:true},['CAP1-004']],
+ ['Citi normal','citi_strata_elite',{},[]],['Citi 8d','citi_strata_elite',{citi_8d:true},['CITI-001']],['Citi 2/65','citi_strata_elite',{citi_65d:'GE_2'},['CITI-002']],['Citi prior bonus','citi_strata_elite',{citi_bonus_48m:true},['CITI-PROD-009']],['Citi conversion','citi_strata_elite',{citi_converted:true,citi_source_bonus:true},['CITI-PROD-009']]
+];
+for(const [name,product,facts,expected] of cases)assert.deepEqual(Array.from(ids(product,facts)),expected,name);
+const missing=ctx.window.BankRuleEngine.evaluate({targetProductId:'citi_strata_elite',facts:{},evaluationDate:'2026-09-12',rules,predicates});assert(missing.missingUserFacts.length>0);assert.equal(missing.applicationHardBehavior,'NONE');assert.equal(missing.bonusHardBehavior,'NONE');
+console.log(JSON.stringify({key_cases:cases.length,unknown_missing_case:'PASS',status:'PASS'}));

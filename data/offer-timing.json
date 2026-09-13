@@ -1,0 +1,118 @@
+{
+  "chase_sapphire_preferred": {
+    "offer_timing_id": "OT-CHASE-010",
+    "product_id": "chase_sapphire_preferred",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "75,000 UR",
+      "offer_mechanism": "PUBLIC",
+      "comparable_value": 1200,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "一般",
+      "wait": "不建议等待",
+      "historical_high_label": "100,000 UR",
+      "historical_low_label": "60,000 UR",
+      "history_count": 4
+    }
+  },
+  "amex_gold": {
+    "offer_timing_id": "OT-AMEX-002",
+    "product_id": "amex_gold",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "最高可达 100,000 MR",
+      "offer_mechanism": "AS_HIGH_AS",
+      "comparable_value": 1500,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "史高",
+      "wait": "不建议等待",
+      "maximum_offer_label": "100,000 MR",
+      "historical_high_label": "100,000 MR",
+      "historical_low_label": "60,000 MR",
+      "history_count": 4
+    }
+  },
+  "amex_platinum": {
+    "offer_timing_id": "OT-AMEX-001",
+    "product_id": "amex_platinum",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "最高可达 175,000 MR",
+      "offer_mechanism": "AS_HIGH_AS",
+      "comparable_value": 2625,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "史高",
+      "wait": "不建议等待",
+      "maximum_offer_label": "175,000 MR",
+      "historical_high_label": "175,000 MR",
+      "historical_low_label": "75,000 MR",
+      "history_count": 4
+    }
+  },
+  "bilt_palladium": {
+    "offer_timing_id": "OT-BILTCOLUMN-011",
+    "product_id": "bilt_palladium",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "50,000 Bilt Points + $300 Bilt Cash",
+      "offer_mechanism": "PUBLIC",
+      "comparable_value": 1100,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "史高",
+      "wait": "不建议等待",
+      "historical_high_label": "50,000 Bilt Points + $300 Bilt Cash",
+      "historical_low_label": "50,000 Bilt Points + $300 Bilt Cash",
+      "history_count": 1
+    }
+  },
+  "capital_one_venture_x": {
+    "offer_timing_id": "OT-CAPITALONE-013",
+    "product_id": "capital_one_venture_x",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "75,000 miles",
+      "offer_mechanism": "PUBLIC",
+      "comparable_value": 975,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "一般",
+      "wait": "建议等待",
+      "historical_high_label": "100,000 miles",
+      "historical_low_label": "75,000 miles",
+      "history_count": 4
+    }
+  },
+  "citi_strata_elite": {
+    "offer_timing_id": "OT-CITI-015",
+    "product_id": "citi_strata_elite",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "75,000 TYP",
+      "offer_mechanism": "PUBLIC",
+      "comparable_value": 1125,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "一般",
+      "wait": "不建议等待",
+      "historical_high_label": "100,000 TYP",
+      "historical_low_label": "75,000 TYP",
+      "history_count": 3
+    }
+  }
+}
