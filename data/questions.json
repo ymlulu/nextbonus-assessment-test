@@ -1,0 +1,65 @@
+{
+  "snapshot_date": "2026-09-13",
+  "common": [
+    {"id":"a1","number":"A1","title":"你的第一张美国信用卡开了多久？","type":"single","options":["还没有美国信用卡","不到 6 个月","6–11 个月","1–2 年","2年以上","不确定"]},
+    {"id":"a2","number":"A2","title":"你目前的信用分大约是多少？","type":"single","options":["740+","700–739","670–699","670 以下","不知道"]},
+    {"id":"a3","number":"A3","title":"过去 12 个月，你一共获批了多少张美国信用卡？","type":"single","options":["0 张","1 张","2–3 张","4–5 张","6 张以上","不确定"]},
+    {"id":"a4","number":"A4","title":"过去 6 个月，你申请过几张美国信用卡？不管最后是否获批。","type":"single","options":["0 张","1 张","2–3 张","4–5 张","6 张以上","不确定"]}
+  ],
+  "benefit_questions": {
+    "q7_title": "下面哪些有明确金额的福利/报销你预计能实际用到？",
+    "q8_title": "除上述可量化福利外，下面哪些长期福利对你有实际价值？",
+    "none_option": "以上基本都用不到"
+  },
+  "cards": {
+    "chase_sapphire_preferred": {
+      "q5": {"number":"Q5","title":"过去 24 个月的开卡情况","type":"group","subs":[
+        {"id":"Q5A","title":"过去 24 个月内，你本人作为主卡人新开了多少张信用卡？","type":"single","options":["0–3 张","4 张","5 张或以上","不确定"]},
+        {"id":"Q5B","title":"过去 24 个月内，你有没有被添加为别人信用卡的副卡用户？","type":"single","options":["没有","有","不确定"],"number_when":"有","number_id":"Q5B_COUNT","number_label":"副卡数量（张）"}
+      ]},
+      "q6": {"number":"Q6","title":"你的 Chase / CSP 记录","type":"group","subs":[
+        {"id":"Q6A","title":"过去 30 天内，你已经获批了多少张 Chase 信用卡？","type":"single","options":["0 张","1 张","2 张或以上","不确定"]},
+        {"id":"Q6C","title":"你目前是否持有一张还没有关闭的 Chase Sapphire Preferred？","type":"single","options":["不是","是","不确定"]},
+        {"id":"Q6B","title":"你以前是否拿到过 Chase Sapphire Preferred 的新卡开卡奖励？","type":"single","options":["从来没有","拿到过","不确定"]}
+      ]}
+    },
+    "amex_gold": {
+      "q5": {"number":"Q5","title":"你的 AMEX Gold 近期申请和 AMEX 持卡情况","type":"group","subs":[
+        {"id":"Q5A","title":"过去 90 天内，你是否申请过或获批过 AMEX Gold？","type":"single","options":["没有","有","不确定"]},
+        {"id":"Q5B","title":"你目前一共持有多少张 AMEX Gold、Platinum、Green 这类卡？","type":"single","options":["0–4 张","5–7 张","8–9 张","10 张或以上","不确定"]}
+      ]},
+      "q6": {"number":"Q6","title":"你过去是否持有过以下任一张卡？","type":"multi","id":"Q6","options":["AMEX Gold","Premier Rewards Gold","AMEX Platinum","AMEX Platinum（Schwab）","AMEX Platinum（Morgan Stanley）","都没有","不确定"],"exclusive":["都没有","不确定"]}
+    },
+    "amex_platinum": {
+      "q5": {"number":"Q5","title":"这张卡的近期申请和 AMEX 持卡情况","type":"group","subs":[
+        {"id":"Q5A","title":"过去 90 天内，你是否申请过或获批过 AMEX Platinum？","type":"single","options":["没有","有","不确定"]},
+        {"id":"Q5B","title":"你目前一共持有多少张 AMEX Gold、Platinum、Green 这类卡？","type":"single","options":["0–4 张","5–7 张","8–9 张","10 张或以上","不确定"]}
+      ]},
+      "q6": {"number":"Q6","title":"你过去是否持有过以下任一张个人 Platinum 卡？","type":"multi","id":"Q6","options":["AMEX Platinum","AMEX Platinum（Schwab）","AMEX Platinum（Morgan Stanley）","都没有","不确定"],"exclusive":["都没有","不确定"]}
+    },
+    "bilt_palladium": {
+      "q5": {"number":"Q5","title":"你的 Bilt Card 2.0 持卡和开卡奖励历史是什么？","type":"single","id":"Q5","options":["从未持有过 Bilt Card 2.0，也没拿过 Bilt Card 2.0 开卡奖励","现在或过去持有过 Bilt Blue / Obsidian / Palladium，但没有拿过开卡奖励","曾经拿过任一张 Bilt Card 2.0 的开卡奖励","不确定"]},
+      "q6": {"number":"Q6","title":"你最近一次 Bilt Card 2.0 申请是否被拒？","type":"single","id":"Q6","options":["没有被拒","被拒且未满 45 天","被拒且已满 45 天","不确定"]}
+    },
+    "capital_one_venture_x": {
+      "q5": {"number":"Q5","title":"你的 Capital One 近期申请情况","type":"group","subs":[
+        {"id":"Q5A","title":"距离你最近一次申请或获批 Capital One 信用卡是否不足 6 个月？","type":"single","options":["不是","是","不确定"]},
+        {"id":"Q5B","title":"过去 30 天内，你申请过多少次 Capital One 信用卡？","type":"single","options":["0 次","1 次","2 次或以上","不确定"]}
+      ]},
+      "q6": {"number":"Q6","title":"你的 Venture X 奖励资格","type":"group","subs":[
+        {"id":"Q6A","title":"过去 48 个月内，你是否拿到过 Capital One Venture X 的新卡开卡奖励？","type":"single","options":["没有","有","不确定"]}
+      ]}
+    },
+    "citi_strata_elite": {
+      "q5": {"number":"Q5","title":"你的 Citi 近期申请情况","type":"group","subs":[
+        {"id":"Q5A","title":"过去 8 天内，你是否申请过 Citi 的个人信用卡？","type":"single","options":["没有","有","不确定"]},
+        {"id":"Q5B","title":"过去 65 天内，你一共提交过多少次 Citi 信用卡申请？","type":"single","options":["0 次","1 次","2 次或以上","不确定"]}
+      ]},
+      "q6": {"number":"Q6","title":"你的 Citi Strata Elite 奖励和转卡历史","type":"group","subs":[
+        {"id":"Q6A","title":"过去 48 个月内，你是否拿到过 Citi Strata Elite 的新卡开卡奖励？","type":"single","options":["没有","有","不确定"]},
+        {"id":"Q6B","title":"你是否曾把其他 Citi 信用卡转换成 Citi Strata Elite？","type":"single","options":["没有","有","不确定"]},
+        {"id":"Q6B_FOLLOWUP","title":"被转成 Citi Strata Elite 的那张 Citi 卡，开卡奖励是否在过去 48 个月内拿到？","type":"single","options":["是","否，已超过 48 个月","当时没有拿过","不确定"],"show_when":{"id":"Q6B","value":"有"}}
+      ]}
+    }
+  }
+}
