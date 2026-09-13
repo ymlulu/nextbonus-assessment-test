@@ -89,7 +89,8 @@ for (const productId of expected) {
   assert.equal(JSON.stringify(first), JSON.stringify(second), `${productId} is not deterministic for identical input`);
   assert.equal(first.cardKey, productId);
   assert.ok(first.report, `${productId} did not render a report`);
-  assert.ok(first.output && first.output.finalState, `${productId} did not produce a final state`);
+  assert.ok(first.output && first.output.internalState, `${productId} did not produce an orchestrator state`);
+  assert.ok(first.output.recommendedAction, `${productId} did not produce a recommended action`);
   checked.push(productId);
 }
 
