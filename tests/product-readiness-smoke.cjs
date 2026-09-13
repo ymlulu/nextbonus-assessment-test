@@ -35,6 +35,7 @@ function runtime() {
       key: id,
       name: product.name,
       issuer: product.issuer,
+      approvalIssuer: product.approval_issuer || product.issuer,
       sensitivity: product.sensitivity,
       annualFee: lt.annual_fee,
       article: product.article_url,
@@ -59,6 +60,8 @@ function runtime() {
     orchestrator: readJson('orchestrator.json'),
     reportTemplates: readJson('report-templates.json'),
     factMapping: readJson('fact-mapping.json'),
+    products,
+    frozenOfferFacts: readJson('frozen-offer-facts.json'),
   };
   ctx.NBRuntime = ctx.window.NBRuntime;
   ctx.TimingAdapter.hydrate(cards, timing);

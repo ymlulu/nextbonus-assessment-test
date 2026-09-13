@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "snapshot_date": "2026-09-13",
+  "products": {
+    "amex_gold": {
+      "snapshot_date": "2026-09-13",
+      "rule_clause_state": {
+        "AMEX-001": "PRESENT",
+        "AMEX-FL-004": "PRESENT"
+      }
+    },
+    "amex_platinum": {
+      "snapshot_date": "2026-09-13",
+      "rule_clause_state": {
+        "AMEX-001": "PRESENT",
+        "AMEX-FL-001": "PRESENT"
+      }
+    },
+    "capital_one_venture_x": {
+      "snapshot_date": "2026-09-12",
+      "COF_CAP1_30D_CLAUSE_STATE": "PRESENT",
+      "COF_CAP1_OPEN_ACCOUNT_CAP_STATE": "ABSENT",
+      "COF_CAP1_OPEN_ACCOUNT_CAP_LIMIT": null
+    }
+  }
+}
