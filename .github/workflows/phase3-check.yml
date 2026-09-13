@@ -20,6 +20,8 @@ jobs:
         run: python scripts/check_product_readiness.py
       - name: Check publication CLI
         run: python scripts/build_runtime_data.py --help >/dev/null
+      - name: Verify Bank Rule key cases
+        run: node tests/phase1-key-cases.cjs
       - name: Smoke-test every active product deterministically
         run: node tests/product-readiness-smoke.cjs
       - name: Compare Phase 2 and Phase 3 outputs
