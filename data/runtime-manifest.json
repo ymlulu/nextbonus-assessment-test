@@ -1,0 +1,22 @@
+{
+  "release_id": "assessment-phase1-2026-09-13",
+  "bank_rules": {
+    "snapshot": "2026-09-12",
+    "schema_version": "1",
+    "path": "data/bank-rules.json"
+  },
+  "bank_rule_predicates": {
+    "snapshot": "2026-09-12",
+    "schema_version": "1",
+    "path": "data/bank-rule-predicates.json"
+  },
+  "offer_timing": {
+    "snapshot": "2026-09-12",
+    "schema_version": "1",
+    "path": "data/offer-timing.json"
+  },
+  "engine": {
+    "bank_rule_engine": "1",
+    "timing_adapter": "1"
+  }
+}

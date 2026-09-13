@@ -16,6 +16,7 @@ const data=JSON.parse(fs.readFileSync(path.join(root,'data/offer-history.json'))
  page.on('pageerror',e=>errors.push(e.message));
  try {
  await page.goto(url);
+ await page.locator('#form').waitFor();
  async function report(card){
   await page.locator(`[data-card="${card}"]`).click();await page.locator('#clearBtn').click();
   await page.locator('button[type=submit]').click();await page.locator('.oh-stage svg').waitFor();
@@ -118,7 +119,7 @@ const data=JSON.parse(fs.readFileSync(path.join(root,'data/offer-history.json'))
  const failure=await browser.newPage();await failure.route('**/data/offer-history.json',r=>r.abort());
  await failure.goto(url);await failure.locator('button[type=submit]').click();await failure.locator('.report').waitFor();
  assert((await failure.locator('.report-text').allTextContents()).some(s=>s.includes('75,000 UR')));
- await failure.reload();assert(await failure.locator('#form').isVisible());await failure.close();
+ await failure.reload();await failure.locator('#form').waitFor();assert(await failure.locator('#form').isVisible());await failure.close();
  checks.push({test:'JSON failure preserves report; refresh',pass:true});
  assert.deepEqual(errors,[]);
  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({url,errors,checks},null,2));
