@@ -14,7 +14,7 @@ function runtime(){
 }
 function eq(actual,expected,label,run){assert.deepEqual(actual,expected,`${run} ${label}: expected ${JSON.stringify(expected)} got ${JSON.stringify(actual)}`)}
 const fixture=J('data/qa/fixed-profile-acceptance-manifest.json'),payload=JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(root,fixture.artifact.path))).toString('utf8')),cases=payload.cases,x=runtime(),m=x.NBRuntime.manifest;
-assert.equal(fixture.case_count,120);assert.equal(cases.length,120);assert.equal(fixture.evaluation_date,'2026-09-12');assert.equal(payload.evaluation_date,fixture.evaluation_date)
+assert.ok(Number.isInteger(fixture.case_count)&&fixture.case_count>0,'fixture case_count must be positive');assert.equal(cases.length,fixture.case_count);assert.equal(payload.case_count,fixture.case_count);assert.equal(payload.evaluation_date,fixture.evaluation_date)
 assert.throws(()=>x.AssessmentRuntimeEngineV3.evaluate(cases[0].product_id,cases[0].answers),/evaluationDate/i,'runtime must require explicit frozen evaluationDate');
 let checked=0;
 for(const c of cases){

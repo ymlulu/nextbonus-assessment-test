@@ -9,7 +9,6 @@ Assessment Acceptance register.
 from __future__ import annotations
 import argparse, hashlib, json, re
 from pathlib import Path
-from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -80,6 +79,7 @@ def main():
     ap.add_argument('--output-dir', type=Path, default=ROOT/'data/qa')
     ap.add_argument('--manifest-output', type=Path, default=ROOT/'data/qa/fixed-profile-acceptance-manifest.json')
     args=ap.parse_args()
+    from openpyxl import load_workbook
 
     registry=load_json(args.registry)
     sources=registry['sources']
@@ -107,7 +107,9 @@ def main():
         benefit_map[(d['Persona'],d['Card'])]={'q7':split_ids(d['Q7 Benefit IDs']),'q8':split_ids(d['Q8 Benefit IDs'])}
 
     expected={}
-    for d in rows_as_dicts(acceptance['Fixed Profile 120 Register']):
+    acceptance_sheet=registry['fixture'].get('acceptance_sheet') or f"Fixed Profile {registry['fixture']['case_count']} Register"
+    e2e_sheet=registry['fixture'].get('e2e_sheet') or f"{registry['fixture']['case_count']} E2E"
+    for d in rows_as_dicts(acceptance[acceptance_sheet]):
         expected[d['Run ID']]={
           'applicationImpact':d['Application Impact'],
           'applicationSoftImpact':d['Application Soft Impact'],
@@ -128,7 +130,7 @@ def main():
         }
 
     cases=[]
-    for d in rows_as_dicts(e2e['120 E2E']):
+    for d in rows_as_dicts(e2e[e2e_sheet]):
         run_id=d['Run ID']; card_name=d['Card']
         if card_name not in product_by_name:
             raise SystemExit(f"unknown card in E2E workbook: {card_name}")

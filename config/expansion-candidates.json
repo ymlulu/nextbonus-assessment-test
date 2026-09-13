@@ -3,7 +3,7 @@
   "status": "DRAFT_CANDIDATE_NOT_RUNTIME",
   "purpose": "Phase 6 readiness planning only. This file does not activate products or change Assessment runtime behavior.",
   "selection_basis": [
-    "Keep the six reviewed active Assessment products unchanged",
+    "Keep the seven reviewed active Assessment products aligned with runtime",
     "Prefer mainstream products already covered by Bank Rules source structure",
     "Require a current row in the reviewed Offer Timing source",
     "Prioritize representative complex families so expansion exercises Chase, AMEX, Citi, Capital One, BofA and co-brand routing"
@@ -11,13 +11,12 @@
   "target_count": 20,
   "products": [
     {"product_id":"chase_sapphire_preferred","product_name":"Chase Sapphire Preferred","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CHASE-010"},
+    {"product_id":"chase_sapphire_reserve","product_name":"Chase Sapphire Reserve","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CHASE-020","source_bank_rule_scope":"Sapphire / Chase issuer rules"},
     {"product_id":"amex_gold","product_name":"AMEX Gold","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-AMEX-002"},
     {"product_id":"amex_platinum","product_name":"AMEX Platinum","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-AMEX-001"},
     {"product_id":"bilt_palladium","product_name":"Bilt Palladium","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-BILTCOLUMN-011"},
     {"product_id":"capital_one_venture_x","product_name":"Capital One Venture X","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CAPITALONE-013"},
     {"product_id":"citi_strata_elite","product_name":"Citi Strata Elite","stage":"ACTIVE_REVIEWED","offer_timing_id":"OT-CITI-015"},
-
-    {"product_id":"chase_sapphire_reserve","product_name":"Chase Sapphire Reserve","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-020","source_bank_rule_scope":"Sapphire / Chase issuer rules"},
     {"product_id":"chase_freedom_flex","product_name":"Chase Freedom Flex","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-037","source_bank_rule_scope":"Chase issuer rules"},
     {"product_id":"chase_world_of_hyatt","product_name":"World of Hyatt","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-019","source_bank_rule_scope":"CHASE-PROD-006 + Chase issuer rules"},
     {"product_id":"chase_aeroplan","product_name":"Chase Aeroplan Card","stage":"EXPANSION_CANDIDATE","offer_timing_id":"OT-CHASE-033","source_bank_rule_scope":"CHASE-PROD-007/010 + Chase issuer rules"},
