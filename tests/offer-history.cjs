@@ -29,18 +29,56 @@ const data=JSON.parse(fs.readFileSync(path.join(root,'data/offer-history.json'))
   assert(nodes.filter(e=>e.current==='false').every(e=>pos(e.t)[0]<pos(cur.t)[0]));
   if(['OT-CHASE-010','OT-CAPITALONE-013','OT-CITI-015'].includes(id))assert(nodes.some(e=>pos(e.t)[1]<pos(cur.t)[1]));
   if(data[id].current.offer_mechanism==='AS_HIGH_AS'){
-   assert((await page.locator('.oh-current-label').innerText()).includes('最高可达'));
+   assert((await page.locator('.oh-stat-current .oh-stat-value').innerText()).includes('100k') || (await page.locator('.oh-stat-current .oh-stat-value').innerText()).includes('175k'));
    assert((await page.locator('.report-text').allTextContents()).some(s=>s.includes('实际申请时你看到的奖励可能低于最高值')));
   }
-  if(id==='OT-BILTCOLUMN-011')assert((await page.locator('.oh-current-label').innerText()).includes('$300 Bilt Cash'));
+  if(id==='OT-BILTCOLUMN-011')assert((await page.locator('.oh-stat-current .oh-stat-value').innerText()).includes('$300 Bilt Cash'));
   const first=page.locator('.oh-node').first();await first.hover();
   assert((await page.locator('.oh-details').innerText()).length>0);
   await first.focus();await page.keyboard.press('Enter');
   checks.push({test:card,pass:true,nodes:nodes.length});
-  if(['chase_sapphire_preferred','amex_gold','capital_one_venture_x'].includes(card)){
+  if(['chase_sapphire_preferred','amex_gold','bilt_palladium','capital_one_venture_x'].includes(card)){
    await page.locator('.report-section').filter({has:page.locator('#offerHistoryChart')}).screenshot({path:path.join(out,card+'.png')});
   }
  }
+
+ // 24-month start and vertical-scale behavior.
+ await report('chase_sapphire_preferred');
+ const csp24=await page.evaluate(()=>{
+  const d=document.querySelector('.oh-line').getAttribute('d');
+  const start=Number(d.match(/^M ([\d.]+)/)[1]);
+  const nodes=[...document.querySelectorAll('.oh-node:not(.oh-now)')].map(n=>Number(n.getAttribute('transform').match(/translate\(([\d.]+)/)[1]));
+  return{start,firstNode:Math.min(...nodes),firstTick:document.querySelector('.oh-x-label').textContent};
+ });
+ assert(csp24.firstNode>csp24.start);assert.equal(csp24.firstTick,'2024-09');
+ checks.push({test:'CSP 24m starts with hidden cutoff carry',pass:true,...csp24});
+
+ await report('bilt_palladium');
+ const bilt=await page.evaluate(()=>{
+  const d=document.querySelector('.oh-line').getAttribute('d');
+  const start=d.match(/^M ([\d.]+) ([\d.]+)/).slice(1).map(Number);
+  const first=document.querySelector('.oh-node:not(.oh-now)').getAttribute('transform').match(/translate\(([\d.]+) ([\d.]+)\)/).slice(1).map(Number);
+  return{start,first,firstTick:document.querySelector('.oh-x-label').textContent,height:Number(document.querySelector('.oh-stage svg').getAttribute('height'))};
+ });
+ assert.equal(bilt.start[0],bilt.first[0]);assert.equal(bilt.firstTick,'2026-01');
+ assert(bilt.first[1]>70&&bilt.first[1]<bilt.height-70);
+ checks.push({test:'Bilt starts at first real point and flat value has vertical padding',pass:true,...bilt});
+
+ await page.locator('.oh-range-btn').filter({hasText:'全部历史'}).click();
+ const allMode=await page.evaluate(()=>({firstTick:document.querySelector('.oh-x-label').textContent,nodes:document.querySelectorAll('.oh-node').length,
+  pathStart:Number(document.querySelector('.oh-line').getAttribute('d').match(/^M ([\d.]+)/)[1]),
+  firstNode:Number(document.querySelector('.oh-node:not(.oh-now)').getAttribute('transform').match(/translate\(([\d.]+)/)[1])}));
+ assert.equal(allMode.pathStart,allMode.firstNode);assert.equal(allMode.nodes,2);
+ checks.push({test:'All-history mode still starts at first real point',pass:true,...allMode});
+
+ const carryOnly=await page.evaluate(product=>{
+  const p=structuredClone(product);p.history=p.history.filter(e=>e.display_eligible&&Date.parse(e.date)<Date.UTC(2024,8,1)).slice(-1);
+  const host=document.getElementById('offerHistoryChart');host._historyObserver?.disconnect();OfferHistoryChart.render(host,p,'2026-09-13');
+  return{empty:!!host.querySelector('.oh-empty'),nodes:host.querySelectorAll('.oh-node').length,path:host.querySelector('.oh-line')?.getAttribute('d')};
+ },data['OT-CHASE-010']);
+ assert.equal(carryOnly.empty,false);assert.equal(carryOnly.nodes,1);assert(carryOnly.path);
+ checks.push({test:'No in-window changes: hidden carry connects to current',pass:true});
+
  await report('chase_sapphire_preferred');
  const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('nb_last_chase_sapphire_preferred')));
  await page.evaluate(()=>{NBEngine.evaluate=()=>{throw Error('Reassessment during navigation')}});
@@ -60,6 +98,7 @@ const data=JSON.parse(fs.readFileSync(path.join(root,'data/offer-history.json'))
  for(const kind of ['zero','one','unit','month','quarter','year','invalid']){
   const result=await page.evaluate(({kind,product})=>{
    const p=structuredClone(product);p.history=p.history.filter(e=>e.display_eligible).slice(0,1);
+   if(kind==='one'){p.history[0].date_label='2026-01';p.history[0].date='2026-01-01';p.history[0].date_precision='MONTH'}
    if(kind==='zero')p.history=[];
    if(kind==='unit')p.history[0].comparison_unit='OTHER';
    if(kind==='month'){p.history[0].date_label='2025-05';p.history[0].date='2025-05-01';p.history[0].date_precision='MONTH'}
