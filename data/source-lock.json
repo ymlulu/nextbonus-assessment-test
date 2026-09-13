@@ -57,7 +57,7 @@
     "offer_history": {"path": "data/offer-history.json", "source_keys": ["offer_timing"], "git_blob_sha": "9588813788d142a956d27d57e785bd4c043a0f84"},
     "offer_history_validation": {"path": "data/offer-history-validation.json", "source_keys": ["offer_timing"], "git_blob_sha": "5a504041d5a7c9474f6a0db2ef37aa6c2ec931b8"},
     "approval": {"path": "data/approval-config.json", "source_keys": ["approval"], "git_blob_sha": "f54d5892951be7da1bfcd4f663da990f1b200a3b"},
-    "long_term": {"path": "data/long-term.json", "source_keys": ["long_term", "report_templates"], "git_blob_sha": "abade555dbf9b26d04d5c1fe46d40166a8d471b65c88ca5d4eb85461cea750"},
+    "long_term": {"path": "data/long-term.json", "source_keys": ["long_term", "report_templates"], "git_blob_sha": "abade555dbf9b26d04d5b027462787980d13d928"},
     "orchestrator": {"path": "data/orchestrator.json", "source_keys": ["orchestrator"], "git_blob_sha": "5f3fb98757d241fbfafbf5b16c98d66c9e144cec"},
     "report_templates": {"path": "data/report-templates.json", "source_keys": ["report_templates"], "git_blob_sha": "6edeaf86603bfbc9f2cf262fc4d957b11d3e477f"}
   }
