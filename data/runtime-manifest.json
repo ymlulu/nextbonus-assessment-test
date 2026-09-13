@@ -1,5 +1,5 @@
 {
-  "release_id": "assessment-phase2-2026-09-13",
+  "release_id": "assessment-phase3-2026-09-13",
   "bank_rules": {"snapshot":"2026-09-12","schema_version":"1","path":"data/bank-rules.json"},
   "bank_rule_predicates": {"snapshot":"2026-09-12","schema_version":"1","path":"data/bank-rule-predicates.json"},
   "offer_timing": {"snapshot":"2026-09-12","schema_version":"1","path":"data/offer-timing.json"},
@@ -7,5 +7,8 @@
   "long_term": {"snapshot":"2026-09-11","schema_version":"1","path":"data/long-term.json"},
   "orchestrator": {"snapshot":"2026-09-12","schema_version":"1","path":"data/orchestrator.json"},
   "report_templates": {"snapshot":"2026-09-13","schema_version":"1","path":"data/report-templates.json"},
-  "engine": {"bank_rule_engine":"1","timing_adapter":"1","approval_engine":"2","long_term_engine":"2","orchestrator_engine":"2","report_renderer":"2","assessment_runtime":"2"}
+  "products": {"snapshot":"2026-09-13","schema_version":"1","path":"data/products.json"},
+  "questions": {"snapshot":"2026-09-13","schema_version":"1","path":"data/questions.json"},
+  "fact_mapping": {"snapshot":"2026-09-13","schema_version":"1","path":"data/fact-mapping.json"},
+  "engine": {"bank_rule_engine":"1","timing_adapter":"1","approval_engine":"2","long_term_engine":"2","orchestrator_engine":"2","report_renderer":"2","fact_normalizer":"3","assessment_runtime":"3"}
 }
