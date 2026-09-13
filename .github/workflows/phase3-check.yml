@@ -12,8 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Compile publication scripts
+        run: python -m py_compile scripts/*.py
       - name: Validate committed runtime contracts
         run: python scripts/validate_runtime_data.py
+      - name: Check publication CLI
+        run: python scripts/build_runtime_data.py --help >/dev/null
       - name: Compare Phase 2 and Phase 3 outputs
         run: node tests/phase3-regression.cjs
       - name: Verify AMEX empty-history semantics
