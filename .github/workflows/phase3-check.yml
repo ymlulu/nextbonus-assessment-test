@@ -17,13 +17,16 @@ jobs:
       - name: Compile publication scripts
         run: python -m py_compile scripts/*.py
       - name: Validate committed runtime contracts
-        run: python scripts/validate_runtime_data.py
+        run: python scripts/validate_runtime_data_v2.py
       - name: Check active-product readiness
         run: python scripts/check_product_readiness.py
       - name: Check publication CLI
         run: |
           python scripts/build_runtime_data.py --help >/dev/null
+          python scripts/export_assessment_runtime_v2.py --help >/dev/null
           python scripts/export_acceptance_fixture.py --help >/dev/null
+      - name: Verify Phase 5E architecture gate
+        run: node tests/phase5e-architecture-gate.cjs
       - name: Verify Bank Rule key cases
         run: node tests/phase1-key-cases.cjs
       - name: Verify Phase 5B typed facts and applicability
