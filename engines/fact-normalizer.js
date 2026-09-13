@@ -1,7 +1,7 @@
 (function(){'use strict';
 function clean(x){return String(x==null?'':x).trim()}
 function isUnknown(x,tokens){const s=clean(x);return !s||tokens.some(t=>s.includes(t))}
-function multiUnknown(v,tokens){return !Array.isArray(v)||v.length===0||v.some(x=>isUnknown(x,tokens))}
+function multiUnknown(v,tokens){return !Array.isArray(v)||v.some(x=>isUnknown(x,tokens))}
 function readSpec(answers,source){return (answers&&answers.specific&&answers.specific[source]!==undefined)?answers.specific[source]:null}
 function evalMapping(def,answers,tokens){const value=readSpec(answers,def.source);
   if(def.type==='boolean_equals'){if(isUnknown(value,tokens))return null;return clean(value)===def.true_when}
