@@ -40,11 +40,10 @@
     },
     "report_templates": {
       "file_name": "Full Report Template Registry V1.xlsx",
-      "source_kind": "reviewed_local_xlsx",
-      "drive_id": null,
+      "source_kind": "google_drive_xlsx",
+      "drive_id": "1JCZbg94yL2Wf6vIby8BiThFfSIkN7jIt",
       "snapshot": "2026-09-13",
-      "modified_time": null,
-      "note": "Current reviewed workbook is available to the build process, but its active Google Drive file ID was not verified through the connector. Do not infer or invent an ID."
+      "modified_time": "2026-09-13T12:15:27.447Z"
     }
   }
 }
