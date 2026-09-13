@@ -114,5 +114,24 @@
       "historical_low_label": "75,000 TYP",
       "history_count": 3
     }
+  },
+  "chase_sapphire_reserve": {
+    "offer_timing_id": "OT-CHASE-020",
+    "product_id": "chase_sapphire_reserve",
+    "snapshot_date": "2026-09-12",
+    "current_offer": {
+      "offer_label": "100,000 UR",
+      "offer_mechanism": "PUBLIC",
+      "comparable_value": 1600,
+      "comparison_unit": "USD_NORM",
+      "expiry": null
+    },
+    "timing_result": {
+      "rating": "一般",
+      "wait": "不建议等待",
+      "historical_high_label": "150,000 UR",
+      "historical_low_label": "50,000 UR",
+      "history_count": 6
+    }
   }
 }
