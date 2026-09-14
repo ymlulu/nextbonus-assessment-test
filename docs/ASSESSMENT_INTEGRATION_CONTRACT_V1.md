@@ -102,12 +102,19 @@ The stable v1 response contains:
 - `report`
   - application / bonus / offer / approval / long-term text
   - CTA
+- optional `offer_history`
+  - `offer_timing_id`
+  - source snapshot
+  - current comparable offer
+  - reviewed historical offer points safe for display
 - `provenance`
   - Assessment release
   - evaluation date
   - engine versions
   - runtime contract blobs
   - source lock
+
+`offer_history` is display data owned by Assessment. It is filtered to the same reviewed comparison unit, confidence and eligibility rules used by the standalone historical-offer chart. NextBonus may render this payload, but must not independently recalculate the Offer Timing rating or infer a new recommendation from the chart.
 
 The API intentionally does not expose normalized facts or rule predicates as required client inputs. Those remain Assessment implementation details.
 
@@ -148,7 +155,7 @@ getQuestionnaire(productId, locale)
 evaluate(request)
 ```
 
-No NextBonus page should import Bank Rule, Approval, Long-term, Orchestrator or report-renderer modules directly. No client code should duplicate decision rules.
+No NextBonus page should import Bank Rule, Approval, Long-term, Orchestrator or report-renderer modules directly. No client code should duplicate decision rules. Historical-offer rendering must consume `offer_history` from the Assessment response rather than reading Assessment runtime data directly.
 
 ## 10. Phase 6.1 acceptance
 
