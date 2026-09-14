@@ -32,11 +32,15 @@
   }
 
   function filterQuestionnaireNode(node,productId,runtime){
-    if(!node||typeof node!=='object')return node;
+    if(node==null||typeof node!=='object')return node;
     if(node.system_gate&&!systemGateOk(node.system_gate,productId,runtime))return null;
-    const copy=clone(node);
-    if(Array.isArray(copy.subs))copy.subs=copy.subs.map(child=>filterQuestionnaireNode(child,productId,runtime)).filter(Boolean);
-    delete copy.system_gate;
+    if(Array.isArray(node))return node.map(child=>filterQuestionnaireNode(child,productId,runtime)).filter(child=>child!==null);
+    const copy={};
+    for(const [key,value] of Object.entries(node)){
+      if(key==='system_gate')continue;
+      const filtered=filterQuestionnaireNode(value,productId,runtime);
+      if(filtered!==null)copy[key]=filtered;
+    }
     return copy;
   }
 
