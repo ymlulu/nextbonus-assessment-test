@@ -19,13 +19,35 @@
   function requireProduct(productId,runtime){requireRuntime(runtime);const product=(runtime.products.cards||{})[productId];if(!product)throw new AssessmentApiError('UNKNOWN_PRODUCT','Unknown product_id: '+productId,404);return product}
   function localeOf(locale){const value=locale||'zh-CN';if(!SUPPORTED_LOCALES.includes(value))throw new AssessmentApiError('UNSUPPORTED_LOCALE','Unsupported locale: '+value,400);return value}
 
-  function collectSpecificIds(node,out){
+  function valueAtPath(rootValue,path){
+    return String(path||'').split('.').filter(Boolean).reduce((value,key)=>value==null?undefined:value[key],rootValue);
+  }
+
+  function systemGateOk(gate,productId,runtime){
+    if(!gate)return true;
+    const facts=(((runtime||{}).frozenOfferFacts||{}).products||{})[productId]||{};
+    const actual=gate.fact?facts[gate.fact]:valueAtPath(facts,gate.path);
+    if(Object.prototype.hasOwnProperty.call(gate,'equals'))return actual===gate.equals;
+    return false;
+  }
+
+  function filterQuestionnaireNode(node,productId,runtime){
+    if(!node||typeof node!=='object')return node;
+    if(node.system_gate&&!systemGateOk(node.system_gate,productId,runtime))return null;
+    const copy=clone(node);
+    if(Array.isArray(copy.subs))copy.subs=copy.subs.map(child=>filterQuestionnaireNode(child,productId,runtime)).filter(Boolean);
+    delete copy.system_gate;
+    return copy;
+  }
+
+  function collectSpecificIds(node,out,productId,runtime){
     if(!node||typeof node!=='object')return out;
+    if(node.system_gate&&!systemGateOk(node.system_gate,productId,runtime))return out;
     if(node.id)out.add(node.id);
     if(node.number_id)out.add(node.number_id);
     for(const value of Object.values(node)){
-      if(Array.isArray(value))for(const child of value)collectSpecificIds(child,out);
-      else if(value&&typeof value==='object')collectSpecificIds(value,out);
+      if(Array.isArray(value))for(const child of value)collectSpecificIds(child,out,productId,runtime);
+      else if(value&&typeof value==='object')collectSpecificIds(value,out,productId,runtime);
     }
     return out;
   }
@@ -34,7 +56,7 @@
     const flat=flatAnswers&&typeof flatAnswers==='object'&&!Array.isArray(flatAnswers)?flatAnswers:{};
     const answers={specific:{},q7:[],q8:[]};
     for(const q of runtime.questions.common||[])answers[q.id]=Object.prototype.hasOwnProperty.call(flat,q.id)?flat[q.id]:null;
-    const specificIds=collectSpecificIds((runtime.questions.cards||{})[productId],new Set());
+    const specificIds=collectSpecificIds((runtime.questions.cards||{})[productId],new Set(),productId,runtime);
     for(const id of specificIds)if(Object.prototype.hasOwnProperty.call(flat,id))answers.specific[id]=clone(flat[id]);
     answers.q7Answered=Object.prototype.hasOwnProperty.call(flat,'q7');
     answers.q8Answered=Object.prototype.hasOwnProperty.call(flat,'q8');
@@ -116,7 +138,7 @@
       },
       questionnaire:{
         common:clone(q.common||[]),
-        specific:clone((q.cards||{})[productId]||{}),
+        specific:filterQuestionnaireNode((q.cards||{})[productId]||{},productId,runtime),
         benefits:{
           q7:benefitQuestion(7,'q7',(q.benefit_questions||{}).q7_title,lt.q7,(q.benefit_questions||{}).none_option),
           q8:benefitQuestion(8,'q8',(q.benefit_questions||{}).q8_title,lt.q8,(q.benefit_questions||{}).none_option)
@@ -202,6 +224,8 @@
     getProductAssessment,
     evaluate,
     toInternalAnswers,
+    systemGateOk,
+    filterQuestionnaireNode,
     errorBody,
     AssessmentApiError
   };
