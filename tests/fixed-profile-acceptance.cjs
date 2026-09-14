@@ -5,7 +5,7 @@ const load=(ctx,p)=>{vm.runInContext(fs.readFileSync(path.join(root,p),'utf8'),c
 const mergeReport=(base,policy)=>({...base,...policy,rule_templates:{...(base.rule_templates||{}),...(policy.rule_templates||{})},rule_template_index:{...(base.rule_template_index||{}),...(policy.rule_template_index||{})},offer_display:{...(base.offer_display||{}),...(policy.offer_display||{})},long_term_templates:{...(base.long_term_templates||{}),...(policy.long_term_templates||{})}});
 function runtime(){
  const x={window:{},console};vm.createContext(x);
- for(const f of ['engines/bank-rule-engine.js','engines/timing-engine.js','engines/fact-normalizer.js','engines/approval-engine.js','engines/long-term-engine.js','engines/orchestrator-engine.js','engines/report-renderer.js','engines/assessment-runtime-engine-v3.js'])load(x,f);
+ for(const f of ['engines/bank-rule-engine.js','engines/timing-engine.js','engines/fact-normalizer.js','engines/approval-engine.js','engines/long-term-engine.js','engines/orchestrator-engine.js','engines/report-renderer.js','engines/assessment-core-v1.js','engines/assessment-runtime-engine-v3.js'])load(x,f);
  const products=J('data/products.json'),longTerm=J('data/long-term.json'),timing=J('data/offer-timing.json'),cards={};
  for(const[id,p]of Object.entries(products.cards)){const lt=longTerm.cards[id];cards[id]={key:id,name:p.name,issuer:p.issuer,approvalIssuer:p.approval_issuer||p.issuer,sensitivity:p.sensitivity,annualFee:lt.annual_fee,article:p.article_url,applicationUrl:p.application_url,q7:lt.q7.map(v=>({id:v.id,label:v.label,annualValue:v.annual_value,short:v.short})),q8:lt.q8.map(v=>({id:v.id,label:v.label,short:v.short}))}}
  const reportTemplates=mergeReport(J('data/report-templates.json'),J('data/report-render-policy.json'));
