@@ -7,6 +7,7 @@
 
   const CONTRACT_VERSION='1';
   const SUPPORTED_LOCALES=['zh-CN'];
+  let offerHistoryPromise=null,offerHistoryLoadAttempted=false;
 
   class AssessmentApiError extends Error{
     constructor(code,message,status){super(message);this.name='AssessmentApiError';this.code=code;this.status=status||400}
@@ -126,6 +127,14 @@
 
   function evaluate({request,runtime,cards,engines}){
     requireRuntime(runtime);
+    if(!runtime.offerHistory&&!offerHistoryLoadAttempted&&typeof window!=='undefined'&&typeof fetch==='function'){
+      const path=runtime.manifest&&runtime.manifest.offer_history&&runtime.manifest.offer_history.path;
+      if(path){
+        offerHistoryLoadAttempted=true;
+        offerHistoryPromise=fetch(path,{cache:'no-store'}).then(response=>response.ok?response.json():null).catch(()=>null);
+        return offerHistoryPromise.then(data=>{if(data)runtime.offerHistory=data;return evaluate({request,runtime,cards,engines});});
+      }
+    }
     const body=request&&typeof request==='object'?request:{};
     const productId=body.product_id;
     const product=requireProduct(productId,runtime);
