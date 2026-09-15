@@ -2,7 +2,7 @@
   'use strict';
 
   const CHANNEL='nextbonus-assessment-v1';
-  const METHODS=new Set(['getVersion','getProductAssessment','evaluate']);
+  const METHODS=new Set(['getVersion','getProductAssessment','getOfferHistory','evaluate']);
   let runtimePromise=null;
 
   function allowedOrigin(origin){
@@ -36,14 +36,15 @@
     if(runtimePromise)return runtimePromise;
     runtimePromise=(async()=>{
       const manifest=await json('data/runtime-manifest.json');
-      const keys=['bank_rules','bank_rule_predicates','offer_timing','approval','long_term','orchestrator','report_templates','report_render_policy','products','questions','fact_mapping','frozen_offer_facts'];
+      const keys=['bank_rules','bank_rule_predicates','offer_timing','offer_history','approval','long_term','orchestrator','report_templates','report_render_policy','products','questions','fact_mapping','frozen_offer_facts'];
       const values=await Promise.all(keys.map(key=>json(manifest[key].path)));
-      const [rules,predicates,timing,approval,longTerm,orchestrator,reportBase,reportPolicy,products,questions,factMapping,frozenOfferFacts]=values;
+      const [rules,predicates,timing,offerHistory,approval,longTerm,orchestrator,reportBase,reportPolicy,products,questions,factMapping,frozenOfferFacts]=values;
       return{
         manifest,
         rules,
         predicates,
         timing,
+        offerHistory,
         approval,
         longTerm,
         orchestrator,
@@ -73,6 +74,7 @@
     const runtime=await loadRuntime();
     if(method==='getVersion')return AssessmentApiV1.getVersion({runtime});
     if(method==='getProductAssessment')return AssessmentApiV1.getProductAssessment({productId:params&&params.product_id,runtime,locale:params&&params.locale});
+    if(method==='getOfferHistory')return AssessmentApiV1.getOfferHistory({productId:params&&params.product_id,evaluationDate:params&&params.evaluation_date,runtime});
     return AssessmentApiV1.evaluate({request:params&&params.request,runtime,engines:engines()});
   }
 
