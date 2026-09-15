@@ -18,6 +18,7 @@
   function requireRuntime(runtime){if(!runtime||!runtime.products||!runtime.questions||!runtime.longTerm)throw new AssessmentApiError('RUNTIME_UNAVAILABLE','Assessment runtime is unavailable',503)}
   function requireProduct(productId,runtime){requireRuntime(runtime);const product=(runtime.products.cards||{})[productId];if(!product)throw new AssessmentApiError('UNKNOWN_PRODUCT','Unknown product_id: '+productId,404);return product}
   function localeOf(locale){const value=locale||'zh-CN';if(!SUPPORTED_LOCALES.includes(value))throw new AssessmentApiError('UNSUPPORTED_LOCALE','Unsupported locale: '+value,400);return value}
+  function evaluationDateOf(value){if(!value||!/^\d{4}-\d{2}-\d{2}$/.test(value))throw new AssessmentApiError('INVALID_EVALUATION_DATE','evaluation_date must be YYYY-MM-DD',400);return value}
 
   function valueAtPath(rootValue,path){
     return String(path||'').split('.').filter(Boolean).reduce((value,key)=>value==null?undefined:value[key],rootValue);
@@ -151,6 +152,12 @@
     };
   }
 
+  function getOfferHistory({productId,evaluationDate,runtime}){
+    requireProduct(productId,runtime);
+    const date=evaluationDateOf(evaluationDate);
+    return clone(offerHistoryFor(productId,date,runtime));
+  }
+
   function evaluate({request,runtime,cards,engines}){
     requireRuntime(runtime);
     if(!runtime.offerHistory&&!offerHistoryLoadAttempted&&typeof window!=='undefined'&&typeof fetch==='function'){
@@ -165,16 +172,16 @@
     const productId=body.product_id;
     const product=requireProduct(productId,runtime);
     const locale=localeOf(body.locale);
-    if(!body.evaluation_date||!/^\d{4}-\d{2}-\d{2}$/.test(body.evaluation_date))throw new AssessmentApiError('INVALID_EVALUATION_DATE','evaluation_date must be YYYY-MM-DD',400);
+    const evaluationDate=evaluationDateOf(body.evaluation_date);
     if(!body.answers||typeof body.answers!=='object'||Array.isArray(body.answers))throw new AssessmentApiError('INVALID_ANSWERS','answers must be an object keyed by questionnaire id',400);
     const answers=toInternalAnswers(productId,body.answers,runtime);
-    const result=Core.evaluate({productId,answers,runtime,cards,evaluationDate:body.evaluation_date,engines});
+    const result=Core.evaluate({productId,answers,runtime,cards,evaluationDate,engines});
     const timing=runtime.timing[productId];
     return{
       contract_version:CONTRACT_VERSION,
       release_id:releaseId(runtime),
       locale,
-      evaluation_date:body.evaluation_date,
+      evaluation_date:evaluationDate,
       product_id:productId,
       product_name:product.name,
       decision:{
@@ -211,7 +218,7 @@
         long_term_text:result.report.longText,
         cta:clone(result.report.cta)
       },
-      offer_history:offerHistoryFor(productId,body.evaluation_date,runtime),
+      offer_history:offerHistoryFor(productId,evaluationDate,runtime),
       provenance:clone(result.provenance)
     };
   }
@@ -226,6 +233,7 @@
     supportedLocales:[...SUPPORTED_LOCALES],
     getVersion,
     getProductAssessment,
+    getOfferHistory,
     evaluate,
     toInternalAnswers,
     systemGateOk,

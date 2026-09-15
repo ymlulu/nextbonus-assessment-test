@@ -33,6 +33,8 @@ jobs:
         run: node tests/phase6-1-integration-contract.cjs
       - name: Verify static bridge contract
         run: node tests/static-bridge-contract.cjs
+      - name: Verify reviewed offer history API
+        run: node tests/offer-history-api.cjs
       - name: Verify Bank Rule key cases
         run: node tests/phase1-key-cases.cjs
       - name: Verify Phase 5B typed facts and applicability
