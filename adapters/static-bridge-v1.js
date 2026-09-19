@@ -2,7 +2,7 @@
   'use strict';
 
   const CHANNEL='nextbonus-assessment-v1';
-  const METHODS=new Set(['getVersion','getProductAssessment','getOfferHistory','evaluate']);
+  const METHODS=new Set(['getVersion','getProductAssessment','getOfferHistory','getOfferTiming','evaluate']);
   let runtimePromise=null;
 
   function allowedOrigin(origin){
@@ -75,6 +75,7 @@
     if(method==='getVersion')return AssessmentApiV1.getVersion({runtime});
     if(method==='getProductAssessment')return AssessmentApiV1.getProductAssessment({productId:params&&params.product_id,runtime,locale:params&&params.locale});
     if(method==='getOfferHistory')return AssessmentApiV1.getOfferHistory({productId:params&&params.product_id,evaluationDate:params&&params.evaluation_date,runtime});
+    if(method==='getOfferTiming')return AssessmentApiV1.getOfferTiming({productId:params&&params.product_id,runtime});
     return AssessmentApiV1.evaluate({request:params&&params.request,runtime,engines:engines()});
   }
 
