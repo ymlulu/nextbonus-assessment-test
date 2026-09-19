@@ -158,6 +158,21 @@
     return clone(offerHistoryFor(productId,date,runtime));
   }
 
+  function getOfferTiming({productId,runtime}){
+    requireProduct(productId,runtime);
+    const timing=runtime.timing&&runtime.timing[productId];
+    if(!timing) throw new AssessmentApiError('PRODUCT_NOT_READY','Product is missing Offer Timing runtime data',409);
+    return{
+      contract_version:CONTRACT_VERSION,
+      release_id:releaseId(runtime),
+      product_id:productId,
+      offer_timing_id:timing.offer_timing_id||null,
+      snapshot_date:timing.snapshot_date||null,
+      current_offer:clone(timing.current_offer||null),
+      timing_result:clone(timing.timing_result||null)
+    };
+  }
+
   function evaluate({request,runtime,cards,engines}){
     requireRuntime(runtime);
     if(!runtime.offerHistory&&!offerHistoryLoadAttempted&&typeof window!=='undefined'&&typeof fetch==='function'){
@@ -234,6 +249,7 @@
     getVersion,
     getProductAssessment,
     getOfferHistory,
+    getOfferTiming,
     evaluate,
     toInternalAnswers,
     systemGateOk,
