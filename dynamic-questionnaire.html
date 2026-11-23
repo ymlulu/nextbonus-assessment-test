@@ -13,7 +13,7 @@ p{line-height:1.55}.muted{color:#697588}.small{color:#697588;font-size:12px}
 .header{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}
 .header p{margin:4px 0;color:#697588}.badge{background:#eaf1ff;color:#1a50a4;padding:6px 10px;border-radius:20px;font-size:12px}
 .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}select,input,button{font:inherit;border-radius:9px;padding:10px 12px;border:1px solid #cdd5e3;background:#fff}
-select{min-width:240px;max-width:100%}button{cursor:pointer;background:#1f61c2;color:#fff;border-color:#1f61c2}button.secondary{background:white;color:#27476b;border-color:#cdd5e3}
+select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candidate-controls[hidden]{display:none}button{cursor:pointer;background:#1f61c2;color:#fff;border-color:#1f61c2}button.secondary{background:white;color:#27476b;border-color:#cdd5e3}
 .question-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}.question-head strong{font-size:15px}.question-head span{font-size:11px}
 .input-row{display:flex;gap:8px;flex-wrap:wrap}.input-row input{flex:1;min-width:160px}
 .summary{background:#f0f5ff}details{margin-top:12px}summary{cursor:pointer}
@@ -24,16 +24,38 @@ select{min-width:240px;max-width:100%}button{cursor:pointer;background:#1f61c2;c
 <main class="wrap">
   <div class="header"><div><div class="small"><a href="./">Assessment 独立测试站</a> / 动态问卷</div><h1>动态申请问卷</h1>
     <p>独立问卷生成原型 · 不包含长期福利 Q7 / Q8</p></div><span class="badge">本机运行 · 不上传答案</span></div>
-  <div class="controls"><label for="product"><strong>选择信用卡：</strong></label><select id="product"></select>
+  <div class="controls"><label for="card-query"><strong>输入信用卡名称或链接：</strong></label>
+    <input id="card-query" type="text" aria-label="信用卡名称或链接" placeholder="例如 Chase Freedom Unlimited，或美卡101文章链接" />
+    <button id="generate" type="button">生成问卷</button>
     <button id="reset" class="secondary" type="button">清空本页答案</button></div>
-  <div class="summary"><strong id="summary">正在读取独立评估数据…</strong><p class="small" id="version"></p></div>
+  <div class="controls"><label for="issuer">发行银行：</label>
+    <select id="issuer" aria-label="发行银行">
+      <option value="">自动识别（不确定可选）</option>
+      <option value="AMEX">American Express</option><option value="CHASE">Chase</option>
+      <option value="CITI">Citi</option><option value="CAPITAL_ONE">Capital One</option>
+      <option value="BOFA">Bank of America</option><option value="US_BANK">U.S. Bank</option>
+      <option value="WELLS_FARGO">Wells Fargo</option><option value="BARCLAYS">Barclays</option>
+      <option value="COLUMN_NA">Bilt / Column</option><option value="DISCOVER">Discover</option>
+    </select>
+    <label for="customer-type">卡片类型：</label>
+    <select id="customer-type" aria-label="卡片类型"><option value="">自动识别</option>
+      <option value="PERSONAL">个人卡</option><option value="BUSINESS">商业卡</option></select>
+  </div>
+  <div id="candidate-controls" class="controls" hidden>
+    <label for="candidate">请确认具体产品：</label><select id="candidate"></select>
+    <button id="confirm" type="button">确认并生成</button>
+  </div>
+  <div class="summary"><strong id="summary">正在读取独立评估数据…</strong>
+    <p class="small" id="version"></p><p class="small" id="identity-note"></p></div>
   <div id="questions"></div>
   <div class="notes"><strong>原型边界</strong>
-    <p class="muted">这版只负责按 129 条规则索引生成需要问的问题。没有完成完整规则执行、没有计算获批可能性，也不会读取或修改 Discover。无法确认的银行条款保持「待核实」，不会向用户猜测。</p>
+    <p class="muted">这版可用卡名或网址匹配独立的 98 张卡片索引。历史记录只用于识别身份，不代表卡片仍开放申请或当前优惠有效。未知产品可以补充银行和个人/商业类型，只预览通用问题与确定可匹配的发行行规则。缺少的产品专属规则和条款保持待核实。不会读取或修改 Discover，也不会给出未经验证的获批评级。</p>
     <details><summary>查看规则匹配详情</summary><p class="small" id="scope"></p><p class="small" id="gaps"></p></details>
   </div>
 </main>
 <script src="adapters/dynamic-questionnaire-v1.js"></script>
+<script src="adapters/card-identity-v1.js"></script>
+<script src="adapters/card-questionnaire-facade-v1.js"></script>
 <script src="assets/dynamic-questionnaire-demo.js"></script>
 </body>
 </html>

@@ -1,0 +1,1831 @@
+{
+  "schema_version": "1",
+  "snapshot": "2026-09-13",
+  "source": {
+    "history": "data/offer-history.json",
+    "products": "data/products.json",
+    "expansion": "config/expansion-candidates.json",
+    "note": "Identifiers only; historical inclusion does not assert current issuance or offer terms"
+  },
+  "count": 98,
+  "products": [
+    {
+      "product_id": "amex_platinum",
+      "name": "AMEX Platinum",
+      "product_name": "The Platinum Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
+      "brand": "AMEX",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-AMEX-001",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "AMEX Platinum",
+        "American Express Platinum",
+        "Platinum",
+        "The Platinum Card"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-platinum-intro/",
+      "application_url": "https://www.uscreditcards101.com/go/amex-platinum"
+    },
+    {
+      "product_id": "amex_gold",
+      "name": "AMEX Gold",
+      "product_name": "Personal AMEX Gold",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
+      "brand": "AMEX",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-AMEX-002",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "AMEX Gold",
+        "American Express Gold",
+        "Gold",
+        "Personal AMEX Gold"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-prg-intro/",
+      "application_url": "https://www.uscreditcards101.com/go/amex-gold"
+    },
+    {
+      "product_id": "amex_delta_gold",
+      "name": "Delta Gold",
+      "product_name": "Delta Gold",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-003",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Delta Gold",
+        "American Express Delta Gold",
+        "AMEX Delta Gold"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_004",
+      "name": "American Express Delta Platinum",
+      "product_name": "Delta Platinum",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-004",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Delta Platinum",
+        "Delta Platinum",
+        "AMEX Delta Platinum"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_005",
+      "name": "American Express Delta Reserve",
+      "product_name": "Delta Reserve",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-005",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Delta Reserve",
+        "Delta Reserve",
+        "AMEX Delta Reserve"
+      ]
+    },
+    {
+      "product_id": "citi_aadvantage_executive",
+      "name": "Citi / AAdvantage Executive",
+      "product_name": "AAdvantage Executive",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-006",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Citi AAdvantage Executive",
+        "AAdvantage Executive"
+      ]
+    },
+    {
+      "product_id": "capital_one_venture",
+      "name": "Capital One Venture",
+      "product_name": "Venture",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-007",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Capital One Venture",
+        "Venture"
+      ]
+    },
+    {
+      "product_id": "history_ot_citi_008",
+      "name": "Citi AAdvantage Platinum",
+      "product_name": "AAdvantage Platinum",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-008",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Citi AAdvantage Platinum",
+        "AAdvantage Platinum"
+      ]
+    },
+    {
+      "product_id": "amex_marriott_bonvoy_brilliant",
+      "name": "Marriott Bonvoy Brilliant",
+      "product_name": "Marriott Bonvoy Brilliant",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-009",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Marriott Bonvoy Brilliant",
+        "American Express Marriott Bonvoy Brilliant",
+        "AMEX Marriott Bonvoy Brilliant"
+      ]
+    },
+    {
+      "product_id": "chase_sapphire_preferred",
+      "name": "Chase Sapphire Preferred",
+      "product_name": "Chase Sapphire Preferred",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": "CHASE_SAPPHIRE",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-CHASE-010",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "Chase Sapphire Preferred",
+        "Sapphire Preferred"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-sapphire-preferred/",
+      "application_url": "https://www.uscreditcards101.com/go/chase-sapphire-preferred"
+    },
+    {
+      "product_id": "bilt_palladium",
+      "name": "Bilt Palladium",
+      "product_name": "Bilt Palladium",
+      "issuer": "COLUMN_NA",
+      "approval_issuer": "BILT",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": "BILT",
+      "generation": "BILT_2_0",
+      "offer_timing_id": "OT-BILTCOLUMN-011",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "Bilt Palladium",
+        "Palladium"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/bilt-palladium-card-review/",
+      "application_url": "https://www.uscreditcards101.com/go/bilt-palladium"
+    },
+    {
+      "product_id": "chase_marriott_bonvoy_boundless",
+      "name": "Marriott Bonvoy Boundless",
+      "product_name": "Marriott Bonvoy Boundless",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-012",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Marriott Bonvoy Boundless",
+        "Chase Marriott Bonvoy Boundless"
+      ]
+    },
+    {
+      "product_id": "capital_one_venture_x",
+      "name": "Capital One Venture X",
+      "product_name": "Capital One Venture X",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": "CAPITAL_ONE_VENTURE",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-CAPITALONE-013",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "Capital One Venture X",
+        "Venture X"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/capital-one-venture-x-card-review/",
+      "application_url": "https://www.uscreditcards101.com/go/capital-one-venture-x"
+    },
+    {
+      "product_id": "amex_marriott_bonvoy_bevy",
+      "name": "Marriott Bonvoy Bevy",
+      "product_name": "Marriott Bonvoy Bevy",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-014",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Marriott Bonvoy Bevy",
+        "American Express Marriott Bonvoy Bevy",
+        "AMEX Marriott Bonvoy Bevy"
+      ]
+    },
+    {
+      "product_id": "citi_strata_elite",
+      "name": "Citi Strata Elite",
+      "product_name": "Citi Strata Elite",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": "CITI_STRATA",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-CITI-015",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "Citi Strata Elite",
+        "Strata Elite"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/citi-strata-elite-review/",
+      "application_url": "https://www.uscreditcards101.com/go/citi-strata-elite"
+    },
+    {
+      "product_id": "history_ot_chase_016",
+      "name": "Chase United Explorer",
+      "product_name": "United Explorer",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-016",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase United Explorer",
+        "United Explorer"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_017",
+      "name": "Chase United Quest",
+      "product_name": "United Quest",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-017",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase United Quest",
+        "United Quest"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_018",
+      "name": "Chase British Airways Visa Signature",
+      "product_name": "British Airways Visa Signature",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-018",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase British Airways Visa Signature",
+        "British Airways Visa Signature"
+      ]
+    },
+    {
+      "product_id": "chase_world_of_hyatt",
+      "name": "World of Hyatt",
+      "product_name": "World of Hyatt",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-019",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "World of Hyatt",
+        "Chase World of Hyatt"
+      ]
+    },
+    {
+      "product_id": "chase_sapphire_reserve",
+      "name": "Chase Sapphire Reserve",
+      "product_name": "Chase Sapphire Reserve",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": "CHASE_SAPPHIRE",
+      "generation": "CURRENT",
+      "offer_timing_id": "OT-CHASE-020",
+      "identity_source": "REVIEWED_PRODUCT",
+      "aliases": [
+        "Chase Sapphire Reserve",
+        "Sapphire Reserve"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-sapphire-reserve-card-review/",
+      "application_url": "https://www.uscreditcards101.com/go/chase-sapphire-reserve"
+    },
+    {
+      "product_id": "bofa_atmos_rewards_summit",
+      "name": "Atmos Rewards Summit",
+      "product_name": "Atmos Rewards Summit",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-021",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Atmos Rewards Summit",
+        "Bank of America Atmos Rewards Summit",
+        "BofA Atmos Rewards Summit"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_022",
+      "name": "American Express Platinum for Charles Schwab",
+      "product_name": "Platinum for Charles Schwab",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-022",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Platinum for Charles Schwab",
+        "Platinum for Charles Schwab",
+        "AMEX Platinum for Charles Schwab"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_023",
+      "name": "American Express Platinum for Morgan Stanley",
+      "product_name": "Platinum for Morgan Stanley",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-023",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Platinum for Morgan Stanley",
+        "Platinum for Morgan Stanley",
+        "AMEX Platinum for Morgan Stanley"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_024",
+      "name": "Bank of America Atmos Rewards Ascent",
+      "product_name": "Atmos Rewards Ascent",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-024",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Atmos Rewards Ascent",
+        "Atmos Rewards Ascent",
+        "BofA Atmos Rewards Ascent"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_025",
+      "name": "American Express Hilton Honors",
+      "product_name": "Hilton Honors",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-025",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Hilton Honors",
+        "Hilton Honors",
+        "AMEX Hilton Honors"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_026",
+      "name": "American Express Hilton Surpass",
+      "product_name": "Hilton Surpass",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-026",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Hilton Surpass",
+        "Hilton Surpass",
+        "AMEX Hilton Surpass"
+      ]
+    },
+    {
+      "product_id": "amex_hilton_aspire",
+      "name": "Hilton Aspire",
+      "product_name": "Hilton Aspire",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-027",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Hilton Aspire",
+        "American Express Hilton Aspire",
+        "AMEX Hilton Aspire"
+      ]
+    },
+    {
+      "product_id": "chase_ihg_one_rewards_premier",
+      "name": "IHG One Rewards Premier",
+      "product_name": "IHG One Rewards Premier",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-028",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "IHG One Rewards Premier",
+        "Chase IHG One Rewards Premier"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_029",
+      "name": "Bank of America Premium Rewards",
+      "product_name": "Premium Rewards",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-029",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Premium Rewards",
+        "Premium Rewards",
+        "BofA Premium Rewards"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_030",
+      "name": "Bank of America Premium Rewards Elite",
+      "product_name": "Premium Rewards Elite",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-030",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Premium Rewards Elite",
+        "Premium Rewards Elite",
+        "BofA Premium Rewards Elite"
+      ]
+    },
+    {
+      "product_id": "citi_strata_premier",
+      "name": "Citi Strata Premier",
+      "product_name": "Strata Premier",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-031",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Citi Strata Premier",
+        "Strata Premier"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_032",
+      "name": "Wells Fargo Autograph Journey",
+      "product_name": "Autograph Journey",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-032",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo Autograph Journey",
+        "Autograph Journey"
+      ]
+    },
+    {
+      "product_id": "chase_aeroplan",
+      "name": "Chase Aeroplan Card",
+      "product_name": "Aeroplan",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-033",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase Aeroplan Card",
+        "Chase Aeroplan",
+        "Aeroplan"
+      ]
+    },
+    {
+      "product_id": "history_ot_citi_034",
+      "name": "Citi AAdvantage Globe",
+      "product_name": "AAdvantage Globe",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-034",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Citi AAdvantage Globe",
+        "AAdvantage Globe"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_035",
+      "name": "American Express Blue Cash Everyday",
+      "product_name": "Blue Cash Everyday",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-035",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Blue Cash Everyday",
+        "Blue Cash Everyday",
+        "AMEX Blue Cash Everyday"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_036",
+      "name": "American Express Blue Cash Preferred",
+      "product_name": "Blue Cash Preferred",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-036",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Blue Cash Preferred",
+        "Blue Cash Preferred",
+        "AMEX Blue Cash Preferred"
+      ]
+    },
+    {
+      "product_id": "chase_freedom_flex",
+      "name": "Chase Freedom Flex",
+      "product_name": "Freedom Flex",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-037",
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase Freedom Flex",
+        "Freedom Flex"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_038",
+      "name": "Chase Freedom Unlimited",
+      "product_name": "Freedom Unlimited",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-038",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Freedom Unlimited",
+        "Freedom Unlimited"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_039",
+      "name": "Chase Freedom Rise",
+      "product_name": "Freedom Rise",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-039",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Freedom Rise",
+        "Freedom Rise"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_040",
+      "name": "Chase United Gateway",
+      "product_name": "United Gateway",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-040",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase United Gateway",
+        "United Gateway"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_041",
+      "name": "Chase Southwest Plus",
+      "product_name": "Southwest Plus",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-041",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Southwest Plus",
+        "Southwest Plus"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_042",
+      "name": "Chase Southwest Premier",
+      "product_name": "Southwest Premier",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-042",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Southwest Premier",
+        "Southwest Premier"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_043",
+      "name": "Chase Southwest Priority",
+      "product_name": "Southwest Priority",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-043",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Southwest Priority",
+        "Southwest Priority"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_044",
+      "name": "Chase IHG One Rewards Traveler",
+      "product_name": "IHG One Rewards Traveler",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-044",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase IHG One Rewards Traveler",
+        "IHG One Rewards Traveler"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_045",
+      "name": "Chase Marriott Bonvoy Bold",
+      "product_name": "Marriott Bonvoy Bold",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-045",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Marriott Bonvoy Bold",
+        "Marriott Bonvoy Bold"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_046",
+      "name": "Chase Marriott Bonvoy Bountiful",
+      "product_name": "Marriott Bonvoy Bountiful",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-046",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Marriott Bonvoy Bountiful",
+        "Marriott Bonvoy Bountiful"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_047",
+      "name": "Chase Amazon Prime Visa",
+      "product_name": "Amazon Prime Visa",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-047",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Amazon Prime Visa",
+        "Amazon Prime Visa"
+      ]
+    },
+    {
+      "product_id": "history_ot_citi_048",
+      "name": "Citi Double Cash",
+      "product_name": "Double Cash",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-048",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Citi Double Cash",
+        "Double Cash"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_049",
+      "name": "Capital One Savor",
+      "product_name": "Savor",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-049",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Savor",
+        "Savor"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_050",
+      "name": "Capital One Quicksilver",
+      "product_name": "Quicksilver",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-050",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Quicksilver",
+        "Quicksilver"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_051",
+      "name": "Capital One VentureOne",
+      "product_name": "VentureOne",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-051",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One VentureOne",
+        "VentureOne"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_052",
+      "name": "Bank of America Customized Cash Rewards",
+      "product_name": "Customized Cash Rewards",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-052",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Customized Cash Rewards",
+        "Customized Cash Rewards",
+        "BofA Customized Cash Rewards"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_053",
+      "name": "Bank of America Unlimited Cash Rewards",
+      "product_name": "Unlimited Cash Rewards",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-053",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Unlimited Cash Rewards",
+        "Unlimited Cash Rewards",
+        "BofA Unlimited Cash Rewards"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_054",
+      "name": "Bank of America Travel Rewards",
+      "product_name": "Travel Rewards",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-054",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Travel Rewards",
+        "Travel Rewards",
+        "BofA Travel Rewards"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_055",
+      "name": "U.S. Bank Cash+",
+      "product_name": "Cash+",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-055",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Cash+",
+        "Cash+",
+        "US Bank Cash+"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_056",
+      "name": "U.S. Bank Altitude Go",
+      "product_name": "Altitude Go",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-056",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Altitude Go",
+        "Altitude Go",
+        "US Bank Altitude Go"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_057",
+      "name": "U.S. Bank Altitude Connect",
+      "product_name": "Altitude Connect",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-057",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Altitude Connect",
+        "Altitude Connect",
+        "US Bank Altitude Connect"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_058",
+      "name": "U.S. Bank Smartly",
+      "product_name": "Smartly",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-058",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Smartly",
+        "Smartly",
+        "US Bank Smartly"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_059",
+      "name": "Wells Fargo Active Cash",
+      "product_name": "Active Cash",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-059",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo Active Cash",
+        "Active Cash"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_060",
+      "name": "Wells Fargo Autograph",
+      "product_name": "Autograph",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-060",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo Autograph",
+        "Autograph"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_061",
+      "name": "Wells Fargo One Key",
+      "product_name": "One Key",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-061",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo One Key",
+        "One Key"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_062",
+      "name": "Wells Fargo One Key+",
+      "product_name": "One Key+",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-062",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo One Key+",
+        "One Key+"
+      ]
+    },
+    {
+      "product_id": "history_ot_discovercapitalone_063",
+      "name": "Discover it Cash Back",
+      "product_name": "Discover it Cash Back",
+      "issuer": null,
+      "approval_issuer": null,
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": "DISCOVER",
+      "generation": null,
+      "offer_timing_id": "OT-DISCOVERCAPITALONE-063",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Discover it Cash Back",
+        "Discover Discover it Cash Back"
+      ]
+    },
+    {
+      "product_id": "history_ot_biltcolumn_064",
+      "name": "Bilt Blue",
+      "product_name": "Blue",
+      "issuer": "COLUMN_NA",
+      "approval_issuer": "BILT",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BILTCOLUMN-064",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bilt Blue",
+        "Blue"
+      ]
+    },
+    {
+      "product_id": "history_ot_biltcolumn_065",
+      "name": "Bilt Obsidian",
+      "product_name": "Obsidian",
+      "issuer": "COLUMN_NA",
+      "approval_issuer": "BILT",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BILTCOLUMN-065",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bilt Obsidian",
+        "Obsidian"
+      ]
+    },
+    {
+      "product_id": "history_ot_barclays_066",
+      "name": "Barclays Wyndham Earner",
+      "product_name": "Wyndham Earner",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BARCLAYS-066",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Barclays Wyndham Earner",
+        "Wyndham Earner"
+      ]
+    },
+    {
+      "product_id": "history_ot_barclays_067",
+      "name": "Barclays Wyndham Earner+",
+      "product_name": "Wyndham Earner+",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BARCLAYS-067",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Barclays Wyndham Earner+",
+        "Wyndham Earner+"
+      ]
+    },
+    {
+      "product_id": "history_ot_barclays_068",
+      "name": "Barclays Wyndham Earner Premier",
+      "product_name": "Wyndham Earner Premier",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BARCLAYS-068",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Barclays Wyndham Earner Premier",
+        "Wyndham Earner Premier"
+      ]
+    },
+    {
+      "product_id": "history_ot_barclays_069",
+      "name": "Barclays JetBlue Premier",
+      "product_name": "JetBlue Premier",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BARCLAYS-069",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Barclays JetBlue Premier",
+        "JetBlue Premier"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_070",
+      "name": "Chase Sapphire Reserve Business",
+      "product_name": "Sapphire Reserve Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-070",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Sapphire Reserve Business",
+        "Sapphire Reserve Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_071",
+      "name": "Chase Ink Business Unlimited",
+      "product_name": "Ink Business Unlimited",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-071",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Ink Business Unlimited",
+        "Ink Business Unlimited"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_072",
+      "name": "Chase Ink Business Cash",
+      "product_name": "Ink Business Cash",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-072",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Ink Business Cash",
+        "Ink Business Cash"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_073",
+      "name": "American Express Delta Gold Business",
+      "product_name": "Delta Gold Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-073",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Delta Gold Business",
+        "Delta Gold Business",
+        "AMEX Delta Gold Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_074",
+      "name": "American Express Delta Platinum Business",
+      "product_name": "Delta Platinum Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-074",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Delta Platinum Business",
+        "Delta Platinum Business",
+        "AMEX Delta Platinum Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_075",
+      "name": "American Express Delta Reserve Business",
+      "product_name": "Delta Reserve Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-075",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Delta Reserve Business",
+        "Delta Reserve Business",
+        "AMEX Delta Reserve Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_076",
+      "name": "Capital One Spark Cash Plus",
+      "product_name": "Spark Cash Plus",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-076",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Spark Cash Plus",
+        "Spark Cash Plus"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_077",
+      "name": "Capital One Spark Cash",
+      "product_name": "Spark Cash",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-077",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Spark Cash",
+        "Spark Cash"
+      ]
+    },
+    {
+      "product_id": "history_ot_citi_078",
+      "name": "Citi AAdvantage Platinum Business",
+      "product_name": "AAdvantage Platinum Business",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CITI-078",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Citi AAdvantage Platinum Business",
+        "AAdvantage Platinum Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_079",
+      "name": "American Express Business Gold",
+      "product_name": "Business Gold",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-079",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Business Gold",
+        "Business Gold",
+        "AMEX Business Gold"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_080",
+      "name": "American Express Business Platinum",
+      "product_name": "Business Platinum",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-080",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Business Platinum",
+        "Business Platinum",
+        "AMEX Business Platinum"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_081",
+      "name": "American Express Graphite Business",
+      "product_name": "Graphite Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-081",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Graphite Business",
+        "Graphite Business",
+        "AMEX Graphite Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_082",
+      "name": "Chase Ink Business Preferred",
+      "product_name": "Ink Business Preferred",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-082",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Ink Business Preferred",
+        "Ink Business Preferred"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_083",
+      "name": "Capital One Spark Cash Select",
+      "product_name": "Spark Cash Select",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-083",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Spark Cash Select",
+        "Spark Cash Select"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_084",
+      "name": "Chase World of Hyatt Business",
+      "product_name": "World of Hyatt Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-084",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase World of Hyatt Business",
+        "World of Hyatt Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_bankofamerica_085",
+      "name": "Bank of America Atmos Rewards Business",
+      "product_name": "Atmos Rewards Business",
+      "issuer": "BOFA",
+      "approval_issuer": "BOFA",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BANKOFAMERICA-085",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Bank of America Atmos Rewards Business",
+        "Atmos Rewards Business",
+        "BofA Atmos Rewards Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_086",
+      "name": "Chase United Business",
+      "product_name": "United Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-086",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase United Business",
+        "United Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_087",
+      "name": "Chase United Club Business",
+      "product_name": "United Club Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-087",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase United Club Business",
+        "United Club Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_088",
+      "name": "U.S. Bank Triple Cash Rewards Business",
+      "product_name": "Triple Cash Rewards Business",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-088",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Triple Cash Rewards Business",
+        "Triple Cash Rewards Business",
+        "US Bank Triple Cash Rewards Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_089",
+      "name": "U.S. Bank Altitude Connect Business",
+      "product_name": "Altitude Connect Business",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-089",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Altitude Connect Business",
+        "Altitude Connect Business",
+        "US Bank Altitude Connect Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_090",
+      "name": "Capital One Venture Business",
+      "product_name": "Venture Business",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-090",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Venture Business",
+        "Venture Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_capitalone_091",
+      "name": "Capital One Venture X Business",
+      "product_name": "Venture X Business",
+      "issuer": "CAPITAL_ONE",
+      "approval_issuer": "CAPITAL_ONE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CAPITALONE-091",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Capital One Venture X Business",
+        "Venture X Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_092",
+      "name": "American Express Marriott Bonvoy Business",
+      "product_name": "Marriott Bonvoy Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-092",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Marriott Bonvoy Business",
+        "Marriott Bonvoy Business",
+        "AMEX Marriott Bonvoy Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_amex_093",
+      "name": "American Express Hilton Business",
+      "product_name": "Hilton Business",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-AMEX-093",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "American Express Hilton Business",
+        "Hilton Business",
+        "AMEX Hilton Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_094",
+      "name": "Chase IHG One Rewards Premier Business",
+      "product_name": "IHG One Rewards Premier Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-094",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase IHG One Rewards Premier Business",
+        "IHG One Rewards Premier Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_chase_095",
+      "name": "Chase Southwest Performance Business",
+      "product_name": "Southwest Performance Business",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-CHASE-095",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Chase Southwest Performance Business",
+        "Southwest Performance Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_u_s_bank_096",
+      "name": "U.S. Bank Altitude Power Business",
+      "product_name": "Altitude Power Business",
+      "issuer": "US_BANK",
+      "approval_issuer": "US_BANK",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-U.S.BANK-096",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "U.S. Bank Altitude Power Business",
+        "Altitude Power Business",
+        "US Bank Altitude Power Business"
+      ]
+    },
+    {
+      "product_id": "history_ot_wellsfargo_097",
+      "name": "Wells Fargo Signify Business Cash",
+      "product_name": "Signify Business Cash",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-WELLSFARGO-097",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Wells Fargo Signify Business Cash",
+        "Signify Business Cash"
+      ]
+    },
+    {
+      "product_id": "history_ot_barclays_098",
+      "name": "Barclays Wyndham Earner Business",
+      "product_name": "Wyndham Earner Business",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": "OT-BARCLAYS-098",
+      "identity_source": "HISTORY_ONLY",
+      "aliases": [
+        "Barclays Wyndham Earner Business",
+        "Wyndham Earner Business"
+      ]
+    }
+  ]
+}

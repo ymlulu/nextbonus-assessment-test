@@ -27,6 +27,12 @@ The active six-card runtime behavior is unchanged by Phase 5 PR A. This phase on
 
 Open [the separate local-only questionnaire preview](dynamic-questionnaire.html). It routes the reviewed 129-rule index to deduplicated questions without including long-term benefits, scoring decisions, Discover code or answer uploads. Details and safety limits: [Dynamic Questionnaire API v1](docs/DYNAMIC_QUESTIONNAIRE_PROTOTYPE_V1.md).
 
+## Enter any card name or URL (independent beta)
+
+The [dynamic questionnaire QA page](dynamic-questionnaire.html) now accepts a card name or URL. Its identity search covers 98 distinct cards from the **independent Assessment** offer-history index, including seven reviewed products; additional cards still require exact confirmation or minimal issuer and customer-type input. It does not scrape external URLs or claim a current offer is verified. For unknown cards, it can show common questions and issuer-level questions, with product-specific rules left unresolved.
+
+All matching and questionnaire generation stays on-device in the browser. Answers never leave the page. This is **not** a remote HTTP scoring API, not the full 129-rule executable evaluator, and not wired into Discover. See [scope and limitations](docs/DYNAMIC_QUESTIONNAIRE_PROTOTYPE_V1.md).
+
 ## Deploy with GitHub Pages
 
 1. Push changes on a feature/fix branch.
