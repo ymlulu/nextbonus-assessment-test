@@ -22,7 +22,7 @@
         return {status:'INVALID_CUSTOMER_TYPE',identity:lookupResult,questionnaire:null};
       if(confirm_product_id&&(!candidate||
         (lookupResult.product?.product_id!==candidate.product_id&&
-         !(lookupResult.candidates||lookupResult.suggestions||[])
+         ![...(lookupResult.candidates||[]),...(lookupResult.suggestions||[])]
            .some(p=>p.product_id===candidate.product_id))))
         return {status:'INVALID_CONFIRMATION',identity:lookupResult,questionnaire:null};
       let product=null;
