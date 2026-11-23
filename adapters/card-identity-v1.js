@@ -94,8 +94,8 @@
         const p=matched[0];
         // Short, generic labels cannot establish an issuer or product,
         // even when a historical catalog happens to contain one match.
-        const unqualified=!isVerifiedUrl&&
-          (GENERIC.has(key)||key.split(' ').length===1&&key.length<8);
+        const unqualified=(url&&!isVerifiedUrl)||
+          (!isVerifiedUrl&&(GENERIC.has(key)||key.split(' ').length===1&&key.length<8));
         if(unqualified||!p.issuer)return {status:'NEEDS_CONFIRMATION',
           candidates:[describe(p)],suggestions:suggestions(key,{issuer})};
         return {status:'MATCHED',product:describe(p),candidates:[]};
