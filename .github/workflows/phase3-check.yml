@@ -31,6 +31,8 @@ jobs:
         run: node tests/phase5e-architecture-gate.cjs
       - name: Verify standalone dynamic questionnaire routing and privacy
         run: node tests/dynamic-questionnaire-v1.cjs
+      - name: Verify name / link identity and standalone questionnaire safety
+        run: node tests/card-name-to-questionnaire-v1.cjs
       - name: Verify Phase 6.1 integration contract
         run: node tests/phase6-1-integration-contract.cjs
       - name: Verify static bridge contract
