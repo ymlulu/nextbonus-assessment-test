@@ -48,7 +48,8 @@ assert.equal(gateState('frozen_offer.rule_clause_state["AMEX-001"] = PRESENT',
   {rule_clause_state:{'AMEX-001':'ABSENT'}}),false);
 assert.equal(gateState('frozen_offer.rule_clause_state["AMEX-001"] = PRESENT',{}),null);
 assert.equal(gateState('frozen_offer.exact_target_terms_state = KNOWN',{}),null);
-assert.ok(amex.diagnostics.unresolved_system_gates.length>=1,
+const amexWithoutOfferTerms=planner.getQuestionnaire({product_id:'amex_platinum',offer_facts:{}});
+assert.ok(amexWithoutOfferTerms.diagnostics.unresolved_system_gates.some(x=>x.rule_id==='AMEX-001'),
   'missing offer clauses produce system gaps, never invented answers');
 assert.ok(amex.diagnostics.applicable_rule_ids.includes('AMEX-008'));
 assert.ok(!csp.diagnostics.applicable_rule_ids.includes('AMEX-008'));
