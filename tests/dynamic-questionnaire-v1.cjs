@@ -31,7 +31,8 @@ assert.equal(csp.questionnaire.specific.filter(q=>q.id==='F01_RECENT_NEW_ACCOUNT
   'Chase 5/24 and other issuer rules dedupe the requested fact');
 assert.ok(!csp.questionnaire.specific.some(q=>q.id==='F06_AU_BREAKDOWN'),
   'AU breakdown is not requested until 5/24 boundary can be affected');
-assert.ok(csp.diagnostics.applicable_rule_ids.includes('CHASE-010'));
+assert.ok(!csp.diagnostics.applicable_rule_ids.includes('CHASE-010'),
+  'CHASE-010 is executable meta, not a standalone restriction or question source');
 const followup=planner.getQuestionnaire({product_id:'chase_sapphire_preferred',
   known_facts:{F01_RECENT_NEW_ACCOUNTS:5,a1:'Y2_PLUS'}});
 assert.ok(followup.questionnaire.specific.some(q=>q.id==='F06_AU_BREAKDOWN'));
