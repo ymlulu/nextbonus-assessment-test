@@ -40,3 +40,31 @@ The current Approval Engine still uses its existing A1–A4 model. An independen
 ## Test and release
 
 Run `node tests/dynamic-questionnaire-v1.cjs`. PR CI runs this alongside the existing frozen-runtime regression suite. Source changes to reviewed datasets require the existing source-lock publication workflow. Merge only after CI passes.
+
+## 2026-11-23 — Name or URL input and 98-card lookup
+
+The isolated card identity service is in `adapters/card-identity-v1.js`. It uses a compact audited-source-derived index (`data/card-identity-index.json`) of **98 distinct historical offer identities**, of which 7 are reviewed runtime products, 13 are expansion candidates and 78 have offer-history identity only. Historical identity **never proves** a currently issued card, live offer, application terms or actual credit approval.
+
+`adapters/card-questionnaire-facade-v1.js` wraps identity resolution and the existing local planner:
+
+```js
+const identity = NextBonusCardIdentityV1.createLookup(cardIdentityIndex);
+const planner = NextBonusQuestionnairePlannerV1.makePlanner({
+  ruleIndex, products, baseQuestions: questions.common, frozenOfferFacts
+});
+const client = NextBonusQuestionnaireFacadeV1.createFacade({lookup:identity,planner});
+client.search({input:'Chase Freedom Unlimited'});
+client.plan({input:'Chase Freedom Unlimited',known_facts:{}});
+client.plan({input:'A new unindexed card',issuer:'CHASE',customer_type:'PERSONAL'});
+```
+
+- Exact, unique card names and locally reviewed URLs resolve to a catalog identity. Generic names (e.g. `Gold`) and third-party URL slugs require the user to **confirm** the suggested identity.
+- Unknown cards can preview the universal questions and safely matched issuer-level rules **only when the user explicitly supplies issuer and personal/business type**. They do not inherit made-up product names, card-family metadata, or current offer facts.
+- Missing product metadata, unknown rule target expressions and unknown system gates are reported as knowledge gaps, not treated as an eligibility PASS.
+- When an identity comes only from history/expansion, the questionnaire remains `evaluation_ready: false`; no new products are silently activated in the reviewed seven-product decision engine.
+- No live web scraping or external link fetching occurs in the identity library. If the exact card isn't available, user confirmation or a separate reviewed product-metadata source is still required.
+- `dynamic-questionnaire.html` allows names or URLs, optional issuer/type clarification, and explicit candidate selection. Only static JSON assets are fetched. Personal answers are stored in page memory and never uploaded.
+
+This is a **local function API**, not an HTTP endpoint. Existing `/assessment/v1/...` routes are still future transport design, and remote answer evaluation is incompatible with the current promise that answers/results stay on-device.
+
+Regression test: `node tests/card-name-to-questionnaire-v1.cjs`.
