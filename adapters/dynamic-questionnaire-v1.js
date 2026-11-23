@@ -88,9 +88,10 @@
       return Object.keys(catalog).map(id=>({product_id:id,name:catalog[id].name||catalog[id].product_name,
         issuer:catalog[id].approval_issuer||catalog[id].issuer}));
     }
-    function getQuestionnaire({product_id,known_facts={},offer_facts}={}){
-      const product=catalog[product_id];
-      if(!product)throw Error('UNKNOWN_PRODUCT');
+    function getQuestionnaireForProduct({product,known_facts={},offer_facts}={}){
+      if(!product||!product.product_id||product.product_type!=='CREDIT_CARD')
+        throw Error('INVALID_PRODUCT_METADATA');
+      const product_id=product.product_id;
       // Caller-owned facts remain in memory: the planner returns a schema only,
       // never echoes personal values into its result.
       const facts=known_facts&&typeof known_facts==='object'&&!Array.isArray(known_facts)?known_facts:{};
@@ -138,7 +139,13 @@
         evaluation_ready:false,
         note:'Questionnaire preview only. No eligibility or approval decision is calculated.'});
     }
-    return Object.freeze({getVersion,listProducts,getQuestionnaire});
+    function getQuestionnaire({product_id,known_facts={},offer_facts}={}){
+      const product=catalog[product_id];
+      if(!product)throw Error('UNKNOWN_PRODUCT');
+      return getQuestionnaireForProduct({product,known_facts,
+        offer_facts:offer_facts===undefined?(frozenOfferFacts.products?.[product_id]||{}):offer_facts});
+    }
+    return Object.freeze({getVersion,listProducts,getQuestionnaire,getQuestionnaireForProduct});
   }
   return Object.freeze({contractVersion:CONTRACT_VERSION,targetState,gateState,
     makePlanner});
