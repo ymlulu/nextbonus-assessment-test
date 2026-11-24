@@ -69,6 +69,14 @@ const spg=evalCard('history_ot_amex_092',undefined);
 assert.ok(spg.questionnaire.questionnaire.specific.some(q=>q.id==='F03_CARD_HISTORY'&&
  q.options.some(v=>v.value==='以前的 SPG Business'&&v.label.includes('SPG Business'))),
  'named predecessor stays independently selectable');
+const spgHeld=evalCard('history_ot_amex_092',['以前的 SPG Business']);
+assert.equal(spgHeld.evaluation.bonus.status,'LIKELY_RESTRICTED');
+assert.ok(spgHeld.evaluation.bonus.triggered_rules.includes('AMEX-BIZ-005'),
+ 'named historical SPG Business predecessor must change reward eligibility');
+const spgLuxHeld=evalCard('amex_marriott_bonvoy_brilliant',['以前的 SPG Luxury']);
+assert.equal(spgLuxHeld.evaluation.bonus.status,'LIKELY_RESTRICTED');
+assert.ok(spgLuxHeld.evaluation.bonus.triggered_rules.includes('AMEX-FL-013'),
+ 'named historical SPG Luxury predecessor must change reward eligibility');
 const noHoldings=evalCard('history_ot_amex_004',['NONE']);
 assert.equal(noHoldings.evaluation.bonus.status,'NO_TRIGGER_FOUND');
 assert.equal(noHoldings.evaluation.review_only,true);
