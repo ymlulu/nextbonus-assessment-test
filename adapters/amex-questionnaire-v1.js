@@ -47,7 +47,6 @@
         if(q.id==='F02_ISSUER_APPLICATION_HISTORY'&&output.fields){
           const needed=new Set(q.rule_ids.map(id=>({
             'AMEX-006':'approved_revolving_90d',
-            'AMEX-010':'approved_revolving_5d',
             'AMEX-011':'same_product_applied_or_approved_90d'
           })[id]).filter(Boolean));
           output.fields=output.fields.filter(f=>needed.has(f.id));
