@@ -11,7 +11,108 @@
     if(text!=null)n.textContent=text;
     return n;
   }
-  function optionsForQuestion(item){
+  function rememberQuestion(q){
+    const old=seenQuestions.get(q.id);
+    if(!old){seenQuestions.set(q.id,{...q});return;}
+    const mergeById=(a,b,key)=>
+      [...new Map([...(a||[]),...(b||[])].map(x=>[x[key],x])).values()];
+    seenQuestions.set(q.id,{...old,...q,
+      fields:mergeById(old.fields,q.fields,'id'),
+      options:mergeById(old.options,q.options,'value'),
+      rule_ids:[...new Set([...(old.rule_ids||[]),...(q.rule_ids||[])])]});
+  }
+  const ruleStates={MISSING:'待补充',REVIEW:'待核实',
+    TRIGGERED:'触发限制',CLEAR:'未触发'};
+  const riskStates={HIGH:'相对较好',MEDIUM:'一般',
+    HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'资料不足'};
+  const outcomeStates={MODEL_ONLY:'已检查',INSUFFICIENT_DATA:'尚未完成',
+    ELEVATED_RISK:'发现风险',
+    NO_TRIGGER_FOUND:'未发现奖励限制',NEEDS_REVIEW:'奖励待确认',
+    LIKELY_RESTRICTED:'可能受限'};
+  const structuredRuleIds={
+    approved_revolving_90d:['AMEX-006'],
+    approved_revolving_5d:['AMEX-010'],
+    same_product_applied_or_approved_90d:['AMEX-011']
+  };
+  function minusAnswer(item,field){
+    const previous={...answers};
+    if(item.type==='structured'&&field){
+      const previousFields={...(answers[item.id]||{})};
+      delete previousFields[field];
+      if(Object.keys(previousFields).length)previous[item.id]=previousFields;
+      else delete previous[item.id];
+    }else if(item.type==='structured_marriott'&&field){
+      const previousGroups={...(answers.F07_MARRIOTT_DETAILS||{})};
+      const previousFields={...(previousGroups[item.prior_id]||{})};
+      delete previousFields[field];
+      if(Object.keys(previousFields).length)previousGroups[item.prior_id]=previousFields;
+      else delete previousGroups[item.prior_id];
+      if(Object.keys(previousGroups).length)
+        previous.F07_MARRIOTT_DETAILS=previousGroups;
+      else delete previous.F07_MARRIOTT_DETAILS;
+    }else delete previous[item.id];
+    return previous;
+  }
+  function hasAnswer(item,field){
+    if(item.type==='structured')return answers[item.id]?.[field]!==undefined &&
+      answers[item.id]?.[field]!=='';
+    if(item.type==='structured_marriott')
+      return !!answers.F07_MARRIOTT_DETAILS?.[item.prior_id]?.[field];
+    const value=answers[item.id];
+    return value!==undefined&&value!==''&&value!==null&&
+      (!Array.isArray(value)||value.length>0);
+  }
+  // The red copy is derived from the actual BEFORE and AFTER evaluation,
+  // never from an option label or an invented approval-probability estimate.
+  function impactFor(item,current,field){
+    if(!hasAnswer(item,field)||!facade||!selectedProductId)return '';
+    const previous=facade.plan({product_id:selectedProductId,
+      known_facts:minusAnswer(item,field),
+      offer_variant:$('offer-variant').value});
+    const a=previous.evaluation,b=current.evaluation;
+    if(!a||!b)return '';
+    const effects=[];
+    if(item.id.startsWith('a')&&/^a[1-4]$/.test(item.id)){
+      if(a.application.base_risk!==b.application.base_risk)
+        effects.push('基础档位：'+(riskStates[a.application.base_risk]||'待计算')+
+          ' → '+(riskStates[b.application.base_risk]||'待计算'));
+    }
+    const oldMap=new Map((a.rule_results||[]).map(x=>[x.rule_id,x]));
+    const newMap=new Map((b.rule_results||[]).map(x=>[x.rule_id,x]));
+    const scoped=field&&structuredRuleIds[field]?
+      structuredRuleIds[field]:(item.rule_ids||[]);
+    const matching=id=>!scoped.length?false:scoped.some(rid=>
+      rid==='MARRIOTT-MATRIX'?
+        id==='MARRIOTT-MATRIX'||id.startsWith('MARRIOTT-MATRIX:'):
+        id===rid||id.startsWith(rid+':'));
+    const all=[...new Set([...oldMap.keys(),...newMap.keys()])]
+      .filter(matching);
+    for(const id of all){
+      const before=oldMap.get(id)?.status||'MISSING';
+      const after=newMap.get(id)?.status||'MISSING';
+      if(before!==after)effects.push(id+'：'+
+        (ruleStates[before]||'未适用')+' → '+(ruleStates[after]||'未适用'));
+    }
+    const oldApp=a.application.status,newApp=b.application.status;
+    const oldBonus=a.bonus.status,newBonus=b.bonus.status;
+    if(oldApp!==newApp)
+      effects.push('申请规则：'+(outcomeStates[oldApp]||oldApp)+
+        ' → '+(outcomeStates[newApp]||newApp));
+    if(oldBonus!==newBonus)
+      effects.push('奖励结果：'+(outcomeStates[oldBonus]||oldBonus)+
+        ' → '+(outcomeStates[newBonus]||newBonus));
+    if(!effects.length)return '';
+    return effects.slice(0,3).join('；')+
+      (effects.length>3?'；另有 '+(effects.length-3)+' 项变化':'');
+  }
+  function feedback(item,result,field){
+    if(!hasAnswer(item,field))return null;
+    const summary=impactFor(item,result,field);
+    if(summary)return el('span','rule-delta',summary);
+    return el('span','rule-unchanged',
+      result.evaluation?'当前不改变已计算的规则状态':'此银行尚未接入完整结果比较');
+  }
+  function optionsForQuestion(item,result){
     const select=el('select');
     const empty=el('option','','请选择（可跳过）');empty.value='';
     select.append(empty);
@@ -25,137 +126,158 @@
       else delete answers[item.id];
       render();
     });
+    const row=el('div','choice-inline');
+    row.append(select);
+    const note=feedback(item,result);
+    if(note)row.append(note);
+    return row;
+  }
+  function numericOptions(max){
+    const values=[];
+    for(let n=0;n<=Math.min(15,max);n++)values.push(n);
+    for(const n of [16,17,18,19,20,25,30,40,50,60,75,99])
+      if(n<=max&&!values.includes(n))values.push(n);
+    return values.sort((a,b)=>a-b);
+  }
+  function countSelector({value,max=30,commit}){
+    const select=el('select');
+    select.append(option('','请选择数量'));
+    for(const n of numericOptions(max))select.append(option(String(n),n+' 张'));
+    select.append(option('OTHER','其他数量…'));
+    const chosen=value===undefined||value===null?'':String(value);
+    select.value=chosen&&numericOptions(max).includes(Number(chosen))?chosen:
+      chosen?'OTHER':'';
+    const number=el('input');number.type='number';number.min='0';
+    number.max=String(max);number.step='1';number.placeholder='输入准确数量';
+    number.value=chosen&&!numericOptions(max).includes(Number(chosen))?chosen:'';
+    number.hidden=select.value!=='OTHER';
+    select.addEventListener('change',()=>{
+      number.hidden=select.value!=='OTHER';
+      if(select.value==='OTHER')return;
+      commit(select.value===''?null:Number(select.value));
+    });
+    number.addEventListener('change',()=>{
+      if(!/^\d+$/.test(number.value)||Number(number.value)>max)return;
+      commit(Number(number.value));
+    });
+    const row=el('div','count-picker');row.append(select,number);
+    return row;
+  }
+  function yesNoOptions({options,value,commit}){
+    const select=el('select');
+    select.append(option('','请选择'));
+    for(const item of options||[])select.append(option(item.value,item.label));
+    select.value=value||'';
+    select.addEventListener('change',()=>commit(select.value||null));
     return select;
   }
-  function question(item,common=false){
+  function question(item,common=false,result,active=true){
     const card=el('section','question');
     const head=el('div','question-head');
     head.append(el('strong','',item.title));
-    head.append(el('span','muted',common?'基础评分':'规则自动匹配'));
+    head.append(el('span','muted',!active?'已展示 · 当前无需再追问':
+      common?'基础评分':'规则自动匹配'));
     card.append(head);
     if(item.description)card.append(el('p','small',item.description));
     if(item.type==='structured_marriott'&&Array.isArray(item.fields)){
       const stored=answers.F07_MARRIOTT_DETAILS||{};
       const prior=stored[item.prior_id]||{};
-      const fields=[];
       for(const def of item.fields){
+        const line=el('div','field-line');
         const label=el('label','structured-field',def.label);
-        const control=el('select');
-        const empty=el('option','','请选择');empty.value='';control.append(empty);
-        for(const option of def.options||[]){
-          const node=el('option','',option.label);node.value=option.value;
-          if(prior[def.id]===option.value)node.selected=true;
-          control.append(node);
-        }
-        label.append(control);card.append(label);
-        fields.push({def,control});
+        const select=yesNoOptions({options:def.options,value:prior[def.id],
+          commit:value=>{
+            const next={...(answers.F07_MARRIOTT_DETAILS?.[item.prior_id]||{})};
+            if(value)next[def.id]=value;
+            else delete next[def.id];
+            answers.F07_MARRIOTT_DETAILS={
+              ...(answers.F07_MARRIOTT_DETAILS||{}),[item.prior_id]:next};
+            render();
+          }});
+        label.append(select);line.append(label);
+        const note=feedback(item,result,def.id);
+        if(note)line.append(note);
+        card.append(line);
       }
-      const button=el('button','secondary','保存并继续判断');
-      button.type='button';
-      button.addEventListener('click',()=>{
-        const values={...prior};
-        for(const {def,control} of fields){
-          if(control.value)values[def.id]=control.value;
-        }
-        answers.F07_MARRIOTT_DETAILS={
-          ...(answers.F07_MARRIOTT_DETAILS||{}),[item.prior_id]:values
-        };
-        render();
-      });
-      card.append(button);
     }else if(item.type==='structured'&&Array.isArray(item.fields)){
       const entry=answers[item.id]&&typeof answers[item.id]==='object'?answers[item.id]:{};
-      const controls=[];
       for(const field of item.fields){
+        const line=el('div','field-line');
         const label=el('label','structured-field',field.label);
-        let control;
-        if(field.type==='number'){
-          control=el('input');control.type='number';control.min=String(field.min??0);
-          control.max=String(field.max??30);control.step='1';
-          control.value=entry[field.id]===undefined?'':String(entry[field.id]);
-        }else{
-          control=el('select');
-          const empty=el('option','','请选择');empty.value='';control.append(empty);
-          for(const choice of field.options||[]){
-            const opt=el('option','',choice.label);opt.value=choice.value;
-            if(entry[field.id]===choice.value)opt.selected=true;
-            control.append(opt);
-          }
-        }
-        label.append(control);card.append(label);
-        controls.push({field,control});
+        const commit=value=>{
+          const next={...(answers[item.id]||{})};
+          if(value===null||value==='')delete next[field.id];
+          else next[field.id]=value;
+          if(Object.keys(next).length)answers[item.id]=next;
+          else delete answers[item.id];
+          render();
+        };
+        const control=field.type==='number'?
+          countSelector({value:entry[field.id],max:field.max??30,commit}):
+          yesNoOptions({options:field.options,value:entry[field.id],commit});
+        label.append(control);line.append(label);
+        const note=feedback(item,result,field.id);
+        if(note)line.append(note);
+        card.append(line);
       }
-      const button=el('button','secondary','保存并更新问卷');
-      button.type='button';
-      button.addEventListener('click',()=>{
-        const data={};
-        for(const {field,control} of controls){
-          const value=control.value;
-          if(!value)continue;
-          if(field.type==='number'){
-            if(!/^\d+$/.test(value)||Number(value)>field.max)return;
-            data[field.id]=Number(value);
-          }else data[field.id]=value;
-        }
-        if(Object.keys(data).length)answers[item.id]=data;
-        else delete answers[item.id];
-        render();
-      });
-      card.append(button);
     }else if((common||item.type==='single')&&item.options?.length){
-      card.append(optionsForQuestion(item));
+      card.append(optionsForQuestion(item,result));
     }else if(item.type==='multi'&&item.options?.length){
       const options=el('div','choice-list');
-      const boxes=[];
-      for(const option of item.options){
+      const existing=Array.isArray(answers[item.id])?answers[item.id]:[];
+      const values=[...item.options,...(item.allow_none?
+        [{value:'NONE',label:'以上都没有'}]:[])];
+      for(const choice of values){
         const label=el('label','check-option');
-        const box=el('input');box.type='checkbox';box.value=option.value;
-        const existing=Array.isArray(answers[item.id])?answers[item.id]:[];
-        box.checked=existing.includes(option.value);
-        label.append(box,document.createTextNode(option.label));
-        options.append(label);boxes.push(box);
-      }
-      if(item.allow_none){
-        const label=el('label','check-option');
-        const box=el('input');box.type='checkbox';box.value='NONE';
-        label.append(box,document.createTextNode('以上都没有'));
-        options.append(label);boxes.push(box);
+        const box=el('input');box.type='checkbox';box.value=choice.value;
+        box.checked=existing.includes(choice.value);
         box.addEventListener('change',()=>{
-          if(box.checked)boxes.filter(x=>x!==box).forEach(x=>{x.checked=false;});
+          const selected=new Set(Array.isArray(answers[item.id])?answers[item.id]:[]);
+          if(box.checked){
+            if(choice.value==='NONE')selected.clear();
+            else selected.delete('NONE');
+            selected.add(choice.value);
+          }else selected.delete(choice.value);
+          if(selected.size)answers[item.id]=[...selected];
+          else delete answers[item.id];
+          render();
         });
-        for(const other of boxes.filter(x=>x!==box)){
-          other.addEventListener('change',()=>{if(other.checked)box.checked=false;});
+        label.append(box,document.createTextNode(choice.label));
+        if(box.checked){
+          const note=feedback(item,result);
+          if(note)label.append(note);
         }
+        options.append(label);
       }
-      const button=el('button','secondary','确认选择并继续');
-      button.type='button';
-      button.addEventListener('click',()=>{
-        const selected=boxes.filter(x=>x.checked).map(x=>x.value);
-        if(selected.length)answers[item.id]=selected;
-        else delete answers[item.id];
-        render();
-      });
-      card.append(options,button);
+      card.append(options);
+    }else if(item.type==='number'){
+      const row=el('div','choice-inline');
+      row.append(countSelector({value:answers[item.id],max:item.max??99,
+        commit:value=>{
+          if(value===null)delete answers[item.id];
+          else answers[item.id]=value;
+          render();
+        }}));
+      const note=feedback(item,result);if(note)row.append(note);
+      card.append(row);
     }else{
-      const input=el('input');
-      input.type=item.type==='number'?'number':'text';
-      if(item.type==='number'){input.min=String(item.min??0);input.max=String(item.max??99);}
-      input.placeholder=item.id==='F01_RECENT_NEW_ACCOUNTS'
-        ?'可填写数量，例如 5':item.type==='number'?'请输入数量':'试填答案（仅页面内存）';
+      // Unstructured facts in the 129-rule source cannot safely be invented
+      // as Yes/No questions. Retain their source-owned free-text fallback.
+      const input=el('input');input.type='text';
+      input.placeholder='补充具体事实（仅在本机）';
       input.value=String(answers[item.id]??'');
-      const button=el('button','secondary','填好并更新问题');
-      button.type='button';
+      const button=el('button','secondary','保存并更新');button.type='button';
       button.addEventListener('click',()=>{
-        const value=input.value.trim();
-        if(item.type==='number'&&value&&!/^\d+$/.test(value))return;
-        if(value)answers[item.id]=(item.type==='number'||
-          item.id==='F01_RECENT_NEW_ACCOUNTS'&&/^\d+$/.test(value))?Number(value):value;
+        if(input.value.trim())answers[item.id]=input.value.trim();
         else delete answers[item.id];
         render();
       });
-      const row=el('div','input-row');row.append(input,button);card.append(row);
+      const row=el('div','input-row');row.append(input,button);
+      const note=feedback(item,result);if(note)row.append(note);
+      card.append(row);
     }
-    if(item.rule_ids?.length)card.append(el('p','small','依据规则：'+item.rule_ids.join('、')));
+    if(item.rule_ids?.length)
+      card.append(el('p','small','依据规则：'+item.rule_ids.join('、')));
     return card;
   }
   const ISSUER_LABELS={
