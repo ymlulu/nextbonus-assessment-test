@@ -84,6 +84,47 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(get('assessment-result').children.length>0,'evaluation renders for Amex');
  assert.equal(get('offer-variant').value,'STANDARD');
  assert.equal(get('amex-offer-settings').hidden,false);
+ // Answer all four A1-A4 baseline questions with real selector events.
+ // They must remain editable and visible, not disappear after becoming known.
+ const walk=n=>[n,...(n.children||[]).flatMap(walk)];
+ function optionSelector(value){
+   return walk(get('questions')).find(n=>n.tag==='select'&&
+     n.options.some(o=>o.value===value));
+ }
+ for(const value of ['Y1_2','SCORE_700_739','N0']){
+   const select=optionSelector(value);
+   assert.ok(select,'answer option rendered '+value);
+   select.value=value;select.fire('change');
+ }
+ // A3 and A4 both offer N0; after A3 is filled choose the next unanswered N0.
+ const a4=walk(get('questions')).filter(n=>n.tag==='select'&&
+   n.options.some(o=>o.value==='N0')&&n.value==='')[0];
+ assert.ok(a4,'fourth base question remains present');
+ a4.value='N0';a4.fire('change');
+ const questionCards=walk(get('questions')).filter(n=>n.tag==='section'&&
+   n.className==='question');
+ assert.ok(questionCards.length>=4,'all four baseline questions persist after answering');
+ const redNotes=walk(get('questions')).filter(n=>n.className==='rule-delta');
+ assert.ok(redNotes.some(n=>/基础档位：资料不足 → 一般/.test(n.textContent)),
+   'selected baseline answer displays actual rule change in red');
+ const answeredSelect=optionSelector('Y1_2');
+ assert.equal(answeredSelect.value,'Y1_2','first answer remains visible/editable');
+ assert.ok(redNotes.every(n=>!n.textContent.includes('保证获批')),
+   'no fabricated approval guarantees in inline feedback');
+ // The AMEX same-card 90-day fact is a structured choice, not free text.
+ const appAnswered=optionSelector('NO');
+ assert.ok(appAnswered,'Yes/No options rendered for structured application activity');
+ appAnswered.value='NO';appAnswered.fire('change');
+ assert.ok(walk(get('questions')).some(n=>n.tag==='select'&&n.value==='NO'),
+   'completed activity question must still show its chosen option');
+ assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
+   /AMEX-010：待补充 → 未触发/.test(n.textContent)),
+   'rule-specific answer must show its exact source rule status transition in red');
+ // The question should remain even though the planner removed the answered
+ // F02 fact from its still-pending question list.
+ const selectedQuestion=walk(get('questions')).find(n=>n.tag==='section'&&
+   walk(n).some(c=>c.tag==='select'&&c.value==='NO'));
+ assert.ok(selectedQuestion,'answered Amex field remains editable after rebuild');
  get('offer-variant').value='NLL';
  get('offer-variant').fire('change');
  assert.match(get('identity-note').textContent,/NLL/);
