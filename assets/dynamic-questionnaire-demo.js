@@ -499,7 +499,21 @@
          !window.NextBonusAmexOfferContextV1||!window.NextBonusAmexDecisionV1||
          !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1)
         throw Error('评估引擎文件未完全加载，请刷新页面');
-      baseQuestionLibrary=questions.common||[];
+      // Display-only copy. Runtime-owned questions.json is locked and must
+      // never be rewritten just to change reader-facing wording.
+      const commonTitles={
+        a1:'你的第一张美国信用卡，开卡到现在有多久了？',
+        a2:'你目前的信用分大约是多少？',
+        a3:'过去 12 个月，你一共获批过几张美国信用卡？',
+        a4:'过去 6 个月，你一共申请过几张美国信用卡？没批的也算。'
+      };
+      baseQuestionLibrary=(questions.common||[]).map(q=>({
+        ...q,title:commonTitles[q.id]||q.title,
+        options:(q.options||[]).map(x=>({...x,label:
+          x.value==='Y2_PLUS'?'2 年或更久':
+          x.value==='N6_PLUS'?'6 张或更多':
+          x.value==='UNKNOWN'?'记不清了':x.label}))
+      }));
       const planner=window.NextBonusQuestionnairePlannerV1.makePlanner({
         ruleIndex,products,baseQuestions:questions.common,frozenOfferFacts
       });
