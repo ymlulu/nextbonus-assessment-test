@@ -10,7 +10,7 @@
     'US_BANK','BARCLAYS','WELLS_FARGO','COLUMN_NA','DISCOVER']);
   const TYPES=new Set(['PERSONAL','BUSINESS']);
   const FORMS=new Set(['REVOLVING_CREDIT','CHARGE_OR_PAY_OVER_TIME']);
-  function createFacade({planner,lookup}){
+  function createFacade({planner,lookup,amexEnricher}){
     if(!planner?.getQuestionnaireForProduct||!lookup?.resolve||!lookup?.findById)
       throw Error('QUESTIONNAIRE_DEPENDENCY_MISSING');
     function plan({input,issuer,customer_type,known_facts={},confirm_product_id}={}){
@@ -57,20 +57,26 @@
         card_form:FORMS.has(product.card_form)?product.card_form:null};
       // Exact offer facts only exist in the independently reviewed seven-card
       // runtime. History rows do NOT prove today's offer eligibility terms.
-      const plan=identitySource==='REVIEWED_PRODUCT'
+      const initialPlan=identitySource==='REVIEWED_PRODUCT'
         ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
         :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
+      const plan=amexEnricher&&metadata.issuer==='AMEX'
+        ?amexEnricher.enrich({plan:initialPlan,product:metadata})
+        :initialPlan;
       return {
         status,identity:{product_id:metadata.product_id,
           name:product.name||String(input||'').trim(),issuer:metadata.issuer,
           customer_type:metadata.customer_type,source:identitySource,
-          metadata_completeness:identitySource==='REVIEWED_PRODUCT'?'REVIEWED':'PARTIAL'},
+          metadata_completeness:identitySource==='REVIEWED_PRODUCT'?'REVIEWED':
+          metadata.formal_nb_card_id?'FORMAL_IDENTITY_ONLY':'PARTIAL',
+          formal_nb_card_id:metadata.formal_nb_card_id||null},
         questionnaire:plan,limitations:{
           full_eligibility_result_available:false,
           offer_terms_verified:identitySource==='REVIEWED_PRODUCT',
           product_specific_rules_verified:identitySource==='REVIEWED_PRODUCT',
           long_term_benefits_included:false,
-          user_answers_uploaded:false
+          user_answers_uploaded:false,
+          application_availability_verified:false
         }
       };
     }
