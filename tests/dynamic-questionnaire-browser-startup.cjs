@@ -91,7 +91,7 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    return walk(get('questions')).find(n=>n.tag==='select'&&
      n.options.some(o=>o.value===value));
  }
- for(const value of ['Y2_PLUS','SCORE_700_739','N0']){
+ for(const value of ['Y1_2','SCORE_700_739','N0']){
    const select=optionSelector(value);
    assert.ok(select,'answer option rendered '+value);
    select.value=value;select.fire('change');
@@ -107,8 +107,8 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  const redNotes=walk(get('questions')).filter(n=>n.className==='rule-delta');
  assert.ok(redNotes.some(n=>/基础档位：资料不足 → 一般/.test(n.textContent)),
    'selected baseline answer displays actual rule change in red');
- const answeredSelect=optionSelector('Y2_PLUS');
- assert.equal(answeredSelect.value,'Y2_PLUS','first answer remains visible/editable');
+ const answeredSelect=optionSelector('Y1_2');
+ assert.equal(answeredSelect.value,'Y1_2','first answer remains visible/editable');
  assert.ok(redNotes.every(n=>!n.textContent.includes('保证获批')),
    'no fabricated approval guarantees in inline feedback');
  // The AMEX same-card 90-day fact is a structured choice, not free text.
