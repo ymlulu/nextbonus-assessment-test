@@ -11,7 +11,7 @@
       throw Error('AMEX_31_RULE_POLICY_REQUIRED');
     const scoped=new Set(policy.source.rule_ids);
     const templates=policy.question_templates||{};
-    function enrich({plan,product}){
+    function enrich({plan,product,known_facts={}}){
       if(!product||product.issuer!=='AMEX')return plan;
       if(!plan?.questionnaire||!plan?.diagnostics)
         throw Error('QUESTIONNAIRE_PLAN_REQUIRED');
@@ -19,7 +19,11 @@
       const specific=original.specific.map(q=>{
         const template=templates[q.id];
         if(!template)return q;
-        const output={...q,...template,rule_ids:q.rule_ids};
+        const marriottFamilyIds=(plan.diagnostics.applicable_rule_ids||[])
+          .filter(id=>['AMEX-FL-012','AMEX-FL-013','AMEX-BIZ-005'].includes(id));
+        const extended=q.id==='F03_CARD_HISTORY'
+          ?[...new Set([...q.rule_ids,...marriottFamilyIds])]:q.rule_ids;
+        const output={...q,...template,rule_ids:extended};
         if(q.id==='F02_ISSUER_APPLICATION_HISTORY'&&output.fields){
           const needed=new Set(q.rule_ids.map(id=>({
             'AMEX-006':'approved_revolving_90d',
@@ -30,7 +34,7 @@
         }
         if(q.id==='F03_CARD_HISTORY'){
           const choices=new Set();
-          for(const rid of q.rule_ids){
+          for(const rid of output.rule_ids){
             if(!scoped.has(rid))continue;
             for(const name of policy.history_choices_by_rule?.[rid]||[]){
               choices.add(name==='$TARGET'?product.product_name:name);
@@ -58,6 +62,29 @@
         }
         return output;
       });
+      // Marriott family clauses use held-card history, separately from the
+      // cross-issuer matrix's dated F07 history. NLL never removes a retained
+      // family clause. Deduplicate F03 if already present.
+      const marriottFamily=(plan.diagnostics.applicable_rule_ids||[])
+        .filter(id=>['AMEX-FL-012','AMEX-FL-013','AMEX-BIZ-005'].includes(id));
+      const alreadyPresent=plan.questionnaire.specific.some(q=>q.id==='F03_CARD_HISTORY');
+      const knownHistory=known_facts&&Object.prototype.hasOwnProperty.call(known_facts,'F03_CARD_HISTORY')&&
+        Array.isArray(known_facts.F03_CARD_HISTORY)&&known_facts.F03_CARD_HISTORY.length>0;
+      if(marriottFamily.length&&!alreadyPresent&&!knownHistory){
+        const options=new Set();
+        for(const id of marriottFamily){
+          for(const name of policy.history_choices_by_rule?.[id]||[])options.add(name);
+        }
+        if(options.size){
+          // A standalone F03 is needed only if the planner did not already
+          // generate one for same-target lifetime rules.
+          specific.push({id:'F03_CARD_HISTORY',type:'multi',
+            title:templates.F03_CARD_HISTORY?.title||'你的相关 Marriott 持卡历史',
+            description:templates.F03_CARD_HISTORY?.description||'包含过去曾持有的旧版本',
+            options:[...options].map(value=>({value,label:value})),
+            allow_none:true,rule_ids:marriottFamily});
+        }
+      }
       const pending=(plan.diagnostics.unresolved_system_gates||[])
         .filter(x=>scoped.has(x.rule_id)).map(x=>({
           rule_id:x.rule_id,

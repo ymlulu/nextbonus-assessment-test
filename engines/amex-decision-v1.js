@@ -27,12 +27,23 @@ function approvalBase(a,config){
  const levels=['HIGH','MEDIUM','HIGH_RISK'],idx=levels.indexOf(base);
  return {rating:idx<0?base:levels[Math.min(2,idx+delta)],activity};
 }
-function evaluate({plan,product,answers={},policy,approvalConfig,offerContext}={}){
+function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,marriottResult}={}){
  if(product?.issuer!=='AMEX'||!plan?.questionnaire||!policy?.history_choices_by_rule||!approvalConfig)
   throw Error('AMEX_EVALUATION_INPUT_REQUIRED');
  const ids=new Set(plan.diagnostics?.applicable_rule_ids||[]),listed=new Set(policy.source.rule_ids);
  const a=answers&&typeof answers==='object'&&!Array.isArray(answers)?answers:{};
- const held=history(a.F03_CARD_HISTORY),marriott=history(a.F07_MARRIOTT_HISTORY);
+ const held=history(a.F03_CARD_HISTORY);
+ const reportedMarriott=Array.isArray(a.F07_MARRIOTT_HISTORY)?
+   a.F07_MARRIOTT_HISTORY:[];
+ const knownMarriottNames=new Set([
+   ...((held===null)?[]:held),
+   ...reportedMarriott.map(x=>({
+     'AMEX Marriott Bonvoy Bevy':'Marriott Bonvoy Bevy',
+     'AMEX Marriott Bonvoy Brilliant':'Marriott Bonvoy Brilliant'
+   })[x]).filter(Boolean)
+ ]);
+ const ambiguousLegacyBusiness=reportedMarriott.includes(
+   'AMEX Marriott Bonvoy Business / Legacy SPG Business');
  const activity=a.F02_ISSUER_APPLICATION_HISTORY&&typeof a.F02_ISSUER_APPLICATION_HISTORY==='object'
   ?a.F02_ISSUER_APPLICATION_HISTORY:{};
  const events=[];
@@ -40,16 +51,37 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext}={
   if(!listed.has(id)||!APP.has(id)&&!BONUS.has(id))continue;
   const dim=APP.has(id)?'APPLICATION':'BONUS';
   if(BONUS.has(id)){
+   // AMEX Marriott lifetime/family restrictions use prior AMEX holdings.
+   // Cross-issuer 30/90/24 windows are resolved independently by the
+   // source-backed target-by-history Marriott matrix.
    if(id==='AMEX-FL-012'||id==='AMEX-FL-013'||id==='AMEX-BIZ-005'){
-    events.push(result(id,marriott===null?'MISSING':marriott.length?'REVIEW':'CLEAR',dim,
-      marriott===null?'需要 Marriott/Ritz-Carlton 持卡历史':
-      marriott.length?'涉及跨产品或跨银行历史，需要具体开户和奖励日期':'未报告相关 Marriott 持卡历史'));
+    const scope=(policy.history_choices_by_rule[id]||[]);
+    const matches=scope.filter(x=>knownMarriottNames.has(x));
+    if(matches.length){
+      events.push(result(id,matches.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',
+        dim,'标准 Offer 家族条款下曾持有：'+matches.join('、')));
+    }else if(id==='AMEX-BIZ-005'&&ambiguousLegacyBusiness){
+      events.push(result(id,'TRIGGERED',dim,
+        '已确认持有 Marriott Bonvoy Business 或其旧版 SPG Business；标准 Offer 均包含此历史'));
+    }else if(held===null){
+      events.push(result(id,'MISSING',dim,'需要相关 Amex Marriott 持卡经历'));
+    }else{
+      events.push(result(id,'CLEAR',dim,
+        '未发现适用的 Amex Marriott lifetime / family 持卡历史'));
+    }
     continue;
    }
    const scope=(policy.history_choices_by_rule[id]||[]).map(x=>x==='$TARGET'?product.product_name:x);
    if(!scope.length){events.push(result(id,'REVIEW',dim,'本规则没有审核过的持卡范围'));continue;}
-   if(held===null){events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;}
-   const hits=scope.filter(x=>held.includes(x));
+   const verifiedMarriottTarget=id==='AMEX-001'&&
+     product.product_name.startsWith('Marriott Bonvoy')&&
+     knownMarriottNames.has(product.product_name);
+   if(held===null&&!verifiedMarriottTarget){
+     events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;
+   }
+   const hits=scope.filter(x=>(id==='AMEX-001'&&
+     product.product_name.startsWith('Marriott Bonvoy'))
+     ?knownMarriottNames.has(x):held.includes(x));
    events.push(result(id,!hits.length?'CLEAR':hits.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',dim,
     hits.length?'标准 Offer 假设下，持有历史：'+hits.join('、'):'未报告此规则所涵盖的持卡历史'));
    continue;
@@ -75,6 +107,15 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext}={
    events.push(result(id,!['YES','NO'].includes(v)?'MISSING':v==='YES'?'TRIGGERED':'CLEAR',dim,
     id==='AMEX-010'?'5 天内是否获批 Amex revolving 卡':'90 天内是否申请或获批该产品'));continue;
   }
+ }
+ if(marriottResult?.applicable){
+   for(const row of marriottResult.rule_results||[]){
+     events.push({...row});
+   }
+   if(marriottResult.status==='MISSING'&&!marriottResult.history_known){
+     events.push(result('MARRIOTT-MATRIX','MISSING','BONUS',
+       '还需要确认与目标卡有关的 Marriott/Ritz 历史'));
+   }
  }
  for(const x of plan.diagnostics?.unresolved_system_gates||[]){
   if(x.rule_id.startsWith('AMEX')&&listed.has(x.rule_id))events.push(result(x.rule_id,'REVIEW',

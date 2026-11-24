@@ -10,7 +10,7 @@
     'US_BANK','BARCLAYS','WELLS_FARGO','COLUMN_NA','DISCOVER']);
   const TYPES=new Set(['PERSONAL','BUSINESS']);
   const FORMS=new Set(['REVOLVING_CREDIT','CHARGE_OR_PAY_OVER_TIME']);
-  function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState,amexDecision,amexPolicy,approvalConfig}){
+  function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState,amexDecision,amexPolicy,approvalConfig,marriottMatrix}){
     if(!planner?.getQuestionnaireForProduct||!lookup?.resolve||!lookup?.findById)
       throw Error('QUESTIONNAIRE_DEPENDENCY_MISSING');
     function plan({input,issuer,customer_type,known_facts={},confirm_product_id,
@@ -69,13 +69,33 @@
         :identitySource==='REVIEWED_PRODUCT'
           ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
           :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
-      const plan=amexEnricher&&metadata.issuer==='AMEX'
-        ?amexEnricher.enrich({plan:initialPlan,product:metadata})
+      const enriched=amexEnricher&&metadata.issuer==='AMEX'
+        ?amexEnricher.enrich({plan:initialPlan,product:metadata,known_facts})
         :initialPlan;
+      const marriottResult=marriottMatrix&&metadata.issuer==='AMEX'
+        ?marriottMatrix.evaluate({product:metadata,known_facts}):null;
+      const plan=marriottResult?.applicable
+        ?{...enriched,questionnaire:{...enriched.questionnaire,
+          specific:[...enriched.questionnaire.specific.filter(q=>q.id!=='F07_MARRIOTT_HISTORY'),
+            ...marriottResult.questions]}}
+        :enriched;
       const evaluation=amexDecision&&metadata.issuer==='AMEX'
         ?amexDecision.evaluate({plan,product:metadata,answers:known_facts,
-          policy:amexPolicy,approvalConfig,offerContext:amexContext?.context})
+          policy:amexPolicy,approvalConfig,offerContext:amexContext?.context,
+          marriottResult})
         :null;
+      // Once a bonus-specific blocker is established, other bonus-history
+      // questions cannot change the restriction conclusion. Preserve all
+      // independent application-risk questions.
+      const bonusBlocked=!!evaluation?.bonus?.triggered_rules?.length;
+      const finalPlan=bonusBlocked&&marriottResult?.applicable
+        ?{...plan,questionnaire:{...plan.questionnaire,
+          specific:plan.questionnaire.specific.filter(q=>
+            q.id!=='F03_CARD_HISTORY'&&q.id!=='F07_MARRIOTT_HISTORY'&&
+            q.type!=='structured_marriott')}}
+        :plan;
+      const matrixStatus=bonusBlocked&&marriottResult?.status==='MISSING'
+        ?'SKIPPED_AFTER_BONUS_BLOCK':marriottResult?.status;
       return {
         status,identity:{product_id:metadata.product_id,
           name:product.name||String(input||'').trim(),issuer:metadata.issuer,
@@ -83,7 +103,10 @@
           metadata_completeness:identitySource==='REVIEWED_PRODUCT'?'REVIEWED':
           metadata.formal_nb_card_id?'FORMAL_IDENTITY_ONLY':'PARTIAL',
           formal_nb_card_id:metadata.formal_nb_card_id||null},
-        questionnaire:plan,evaluation,offer_context:amexContext?.context||null,limitations:{
+        questionnaire:finalPlan,evaluation,marriott_matrix:marriottResult?.applicable
+          ?{status:matrixStatus,history_known:marriottResult.history_known,
+            pending_ids:bonusBlocked?[]:(marriottResult.pending_ids||[])} :null,
+          offer_context:amexContext?.context||null,limitations:{
           full_eligibility_result_available:false,
           offer_terms_verified:amexContext?false:identitySource==='REVIEWED_PRODUCT',
           product_specific_rules_verified:identitySource==='REVIEWED_PRODUCT',
