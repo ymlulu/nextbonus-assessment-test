@@ -1745,20 +1745,21 @@
     },
     {
       "id": "AMEX-010",
-      "runtime_class": "EXECUTABLE_RULE",
+      "runtime_class": "INACTIVE",
       "selector": "ISSUER + CARD_FORM",
       "target_predicate": "target.issuer = AMEX AND target.card_form = REVOLVING_CREDIT",
       "system_gate": "NONE",
-      "status": "ACTIVE",
-      "ask_policy": "REUSE_PROFILE_ELSE_ASK",
-      "question_eligible": "YES",
+      "status": "INACTIVE",
+      "ask_policy": "NEVER_ASK_SYSTEM",
+      "question_eligible": "NO",
       "fact_groups": [
         "F02_ISSUER_APPLICATION_HISTORY"
       ],
       "rule_type": "RESTRICTION",
       "application_impact": "2",
       "bonus_impact": "0",
-      "audit_status": "PASS"
+      "audit_status": "DISABLED_BY_PRODUCT_DECISION",
+      "disabled_reason": "User explicitly excluded disputed AMEX 1/5 rule from Assessment; preserve source snapshot record for provenance; do not route, ask, score or require it."
     },
     {
       "id": "AMEX-011",
