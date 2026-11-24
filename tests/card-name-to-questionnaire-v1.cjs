@@ -14,7 +14,7 @@ const planner=makePlanner({products,ruleIndex:read('dynamic-questionnaire-rule-i
   baseQuestions:read('questions.json').common,
   frozenOfferFacts:read('frozen-offer-facts.json')});
 const facade=createFacade({planner,lookup});
-assert.equal(facade.getVersion().source_count,98);
+assert.equal(facade.getVersion().source_count,109);
 assert.equal(facade.getVersion().rules_indexed,129);
 
 const reviewed=facade.plan({input:'Chase Sapphire Preferred'});

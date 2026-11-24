@@ -1,0 +1,194 @@
+{
+  "version": "1",
+  "issuer": "AMEX",
+  "scope": "questionnaire display and rule routing; no eligibility decision",
+  "source": {
+    "name": "Bank Rules.xlsx",
+    "snapshot": "2026-09-12",
+    "rule_ids": [
+      "AMEX-001",
+      "AMEX-002",
+      "AMEX-003",
+      "AMEX-004",
+      "AMEX-005",
+      "AMEX-006",
+      "AMEX-007",
+      "AMEX-008",
+      "AMEX-FL-001",
+      "AMEX-FL-002",
+      "AMEX-FL-003",
+      "AMEX-REL-001",
+      "AMEX-REL-002",
+      "AMEX-FL-004",
+      "AMEX-FL-005",
+      "AMEX-FL-006",
+      "AMEX-FL-007",
+      "AMEX-FL-008",
+      "AMEX-FL-009",
+      "AMEX-FL-010",
+      "AMEX-FL-011",
+      "AMEX-FL-012",
+      "AMEX-FL-013",
+      "AMEX-FL-014",
+      "AMEX-BIZ-001",
+      "AMEX-BIZ-002",
+      "AMEX-BIZ-003",
+      "AMEX-BIZ-004",
+      "AMEX-BIZ-005",
+      "AMEX-010",
+      "AMEX-011"
+    ]
+  },
+  "profiles": "data/amex-formal-product-identities.json",
+  "policy": {
+    "current_offer_must_be_frozen": true,
+    "missing_clause_yields_system_review": true,
+    "never_infer_bonus_from_holding": true,
+    "never_infer_cross_tier_hilton_block": true,
+    "never_apply_personal_delta_family_to_business": true,
+    "never_auto_clear_other_marriott_clause_for_nll": true,
+    "user_answers_local_only": true,
+    "approval_decision": false
+  },
+  "history_choices_by_rule": {
+    "AMEX-001": [
+      "$TARGET"
+    ],
+    "AMEX-FL-001": [
+      "The Platinum Card",
+      "Platinum for Charles Schwab",
+      "Platinum for Morgan Stanley"
+    ],
+    "AMEX-FL-002": [
+      "Platinum for Charles Schwab",
+      "The Platinum Card",
+      "Platinum for Morgan Stanley"
+    ],
+    "AMEX-FL-003": [
+      "Platinum for Morgan Stanley",
+      "The Platinum Card",
+      "Platinum for Charles Schwab"
+    ],
+    "AMEX-FL-004": [
+      "Personal AMEX Gold",
+      "Premier Rewards Gold",
+      "The Platinum Card",
+      "Platinum for Charles Schwab",
+      "Platinum for Morgan Stanley"
+    ],
+    "AMEX-FL-005": [
+      "Blue Cash Everyday",
+      "Cash Magnet",
+      "Blue Cash Preferred",
+      "Morgan Stanley Blue Cash Preferred",
+      "该系列的旧版本"
+    ],
+    "AMEX-FL-006": [
+      "Blue Cash Preferred",
+      "Morgan Stanley Blue Cash Preferred",
+      "该系列的旧版本"
+    ],
+    "AMEX-FL-007": [
+      "Delta SkyMiles Blue (Personal)",
+      "Delta SkyMiles Options",
+      "Delta SkyMiles Gold (Personal)",
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)",
+      "这些产品的旧版本"
+    ],
+    "AMEX-FL-008": [
+      "Delta SkyMiles Gold (Personal)",
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)",
+      "这些产品的旧版本"
+    ],
+    "AMEX-FL-009": [
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)",
+      "这些产品的旧版本"
+    ],
+    "AMEX-FL-010": [
+      "Delta SkyMiles Reserve (Personal)",
+      "该卡旧版本"
+    ],
+    "AMEX-BIZ-001": [
+      "Business Platinum",
+      "该卡的旧版本"
+    ],
+    "AMEX-BIZ-002": [
+      "Business Gold",
+      "该卡的旧版本"
+    ],
+    "AMEX-BIZ-005": [
+      "Marriott Bonvoy Business American Express",
+      "以前的 SPG Business"
+    ],
+    "AMEX-FL-012": [
+      "Marriott Bonvoy Bevy",
+      "Marriott Bonvoy Brilliant",
+      "该系列旧版本"
+    ],
+    "AMEX-FL-013": [
+      "Marriott Bonvoy Brilliant",
+      "以前的 SPG Luxury",
+      "该卡旧版本"
+    ]
+  },
+  "marriott_cross_issuer_history": [
+    "Chase Marriott Bonvoy Bold / Boundless",
+    "Chase Marriott Bonvoy Bountiful",
+    "Chase Ritz-Carlton",
+    "Chase Marriott Business（历史卡）",
+    "AMEX Marriott / Legacy SPG Personal",
+    "AMEX Marriott Bonvoy Bevy",
+    "AMEX Marriott Bonvoy Brilliant",
+    "AMEX Marriott Bonvoy Business / Legacy SPG Business"
+  ],
+  "relationship_options": {
+    "Platinum for Charles Schwab": "Schwab 合格账户",
+    "Platinum for Morgan Stanley": "Morgan Stanley / E*TRADE 合格账户"
+  },
+  "question_templates": {
+    "F02_ISSUER_APPLICATION_HISTORY": {
+      "title": "你近期在 American Express 申请或获批过哪些卡？",
+      "description": "请分别记录申请和获批日期，以判断同产品 90 天、信用卡 1/5 与 2/90 的申请间隔；申请不等于获批。",
+      "type": "text"
+    },
+    "F03_CARD_HISTORY": {
+      "title": "以下 Amex 产品，你现在或以前持有过哪些？",
+      "description": "这里只问持卡经历，包括没有领取开卡奖励的情况；与拿过 Welcome Bonus 是两项不同的事实。",
+      "type": "multi"
+    },
+    "F07_MARRIOTT_HISTORY": {
+      "title": "你有哪些 Marriott 或 Ritz-Carlton 联名卡历史？",
+      "description": "可多选。后续核实持卡、开户、关闭、获批和奖金日期，以区别 30/90/24 限制；并非所有选项都造成限制。",
+      "type": "multi"
+    },
+    "F08_RELATIONSHIP": {
+      "title": "你拥有该卡所需的合格合作机构账户吗？",
+      "description": "不同联名卡的账户关系要求不同，请按所选具体产品回答。",
+      "type": "single",
+      "options": [
+        {
+          "value": "YES",
+          "label": "有"
+        },
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不确定"
+        }
+      ]
+    },
+    "F10_ISSUER_PORTFOLIO_COUNT": {
+      "title": "你目前持有多少张 American Express 卡？",
+      "description": "请按该申请对应的信用卡或签账卡类别统计，不包括附属卡。",
+      "type": "number",
+      "min": 0,
+      "max": 99
+    }
+  }
+}
