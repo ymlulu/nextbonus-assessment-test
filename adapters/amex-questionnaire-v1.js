@@ -19,7 +19,11 @@
       const specific=original.specific.map(q=>{
         const template=templates[q.id];
         if(!template)return q;
-        const output={...q,...template,rule_ids:q.rule_ids};
+        const marriottFamilyIds=(plan.diagnostics.applicable_rule_ids||[])
+          .filter(id=>['AMEX-FL-012','AMEX-FL-013','AMEX-BIZ-005'].includes(id));
+        const extended=q.id==='F03_CARD_HISTORY'
+          ?[...new Set([...q.rule_ids,...marriottFamilyIds])]:q.rule_ids;
+        const output={...q,...template,rule_ids:extended};
         if(q.id==='F02_ISSUER_APPLICATION_HISTORY'&&output.fields){
           const needed=new Set(q.rule_ids.map(id=>({
             'AMEX-006':'approved_revolving_90d',
@@ -30,7 +34,7 @@
         }
         if(q.id==='F03_CARD_HISTORY'){
           const choices=new Set();
-          for(const rid of q.rule_ids){
+          for(const rid of output.rule_ids){
             if(!scoped.has(rid))continue;
             for(const name of policy.history_choices_by_rule?.[rid]||[]){
               choices.add(name==='$TARGET'?product.product_name:name);
