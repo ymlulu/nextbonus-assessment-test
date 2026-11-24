@@ -115,7 +115,9 @@ assert.ok(!deltaBusiness.questionnaire.questionnaire.pending_terms.some(p=>
   'personal Delta family clauses cannot route to business cards');
 const opaque='PERSONAL_ANSWER_MARKER_DO_NOT_ECHO';
 const privateResult=facade.plan({input:'American Express Blue Cash Everyday Card',
-  known_facts:{F02_ISSUER_APPLICATION_HISTORY:opaque,a2:opaque}});
+  known_facts:{F02_ISSUER_APPLICATION_HISTORY:{
+    approved_revolving_90d:0,approved_revolving_5d:'NO',
+    same_product_applied_or_approved_90d:'NO'},a2:opaque}});
 assert.doesNotMatch(JSON.stringify(privateResult),/PERSONAL_ANSWER_MARKER_DO_NOT_ECHO/);
 assert.ok(!privateResult.questionnaire.questionnaire.specific.some(q=>
   q.id==='F02_ISSUER_APPLICATION_HISTORY'),'same fact should not be asked twice');
