@@ -44,12 +44,12 @@ for(const [cardId,ruleId,holdings,notHoldings] of [
  const blank=evalCard(cardId,undefined);
  const q=blank.questionnaire.questionnaire.specific.find(x=>x.id==='F03_CARD_HISTORY');
  assert.ok(q,'must ask identifiable prior products '+cardId);
- assert.ok(q.options.some(x=>x.label.includes('（含同产品旧版本）')));
+ assert.ok(q.options.some(x=>x.label.includes('（包括以前的版本）')));
  assert.ok(!q.options.some(x=>genericLabels.some(p=>x.label.includes(p))));
  for(const holding of holdings){
   const option=q.options.find(x=>x.value===holding);
   assert.ok(option,'option present '+holding);
-  assert.match(option.label,/含同产品旧版本/);
+  assert.match(option.label,/包括以前的版本/);
   const previous=evalCard(cardId,undefined).evaluation;
   const selected=evalCard(cardId,[holding]).evaluation;
   assert.equal(selected.bonus.status,'LIKELY_RESTRICTED');
@@ -64,7 +64,7 @@ for(const [cardId,ruleId,holdings,notHoldings] of [
 }
 const blue=evalCard('history_ot_amex_036',undefined);
 assert.ok(blue.questionnaire.questionnaire.specific.some(q=>q.id==='F03_CARD_HISTORY'&&
- q.options.some(v=>v.value==='Blue Cash Preferred'&&v.label.includes('含同产品旧版本'))));
+ q.options.some(v=>v.value==='Blue Cash Preferred'&&v.label.includes('包括以前的版本'))));
 const spg=evalCard('history_ot_amex_092',undefined);
 assert.ok(spg.questionnaire.questionnaire.specific.some(q=>q.id==='F03_CARD_HISTORY'&&
  q.options.some(v=>v.value==='以前的 SPG Business'&&v.label.includes('SPG Business'))),

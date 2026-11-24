@@ -122,7 +122,7 @@ assert.equal(r.evaluation.application.status,'INSUFFICIENT_DATA');
 assert.equal(r.evaluation.application.base_completed,true);
 assert.equal(r.evaluation.application.base_risk,'HIGH');
 assert.equal(r.evaluation.application.issuer_rules_completed,false);
-assert.match(r.evaluation.application.message,/通用信用风险档位已计算/);
+assert.match(r.evaluation.application.message,/基础信用情况已经算好了/);
 assert.ok(r.evaluation.application.unresolved_rules.some(x=>
   x.rule_id==='AMEX-011'&&x.status==='MISSING'));
 assert.ok(r.questionnaire.questionnaire.specific.some(x=>
@@ -134,7 +134,7 @@ assert.ok(!r.questionnaire.questionnaire.specific.some(x=>x.id==='F02_ISSUER_APP
 r=call('Blue Cash Everyday Card',{...clean,a2:'UNKNOWN'});
 assert.equal(r.evaluation.application.base_risk,'INSUFFICIENT_DATA');
 assert.equal(r.evaluation.application.base_completed,false);
-assert.match(r.evaluation.application.message,/基础信用资料不足/);
+assert.match(r.evaluation.application.message,/信用记录还有几项没填/);
 const onlyIssuerGap=call('Delta SkyMiles Gold Card',{
  ...clean,a2:'SCORE_700_739',
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0}
@@ -143,7 +143,7 @@ assert.equal(onlyIssuerGap.evaluation.application.base_risk,'HIGH');
 assert.equal(onlyIssuerGap.evaluation.application.base_completed,true);
 assert.equal(onlyIssuerGap.evaluation.application.issuer_rules_completed,false);
 assert.ok(onlyIssuerGap.evaluation.application.unresolved_rules.length>0);
-assert.match(onlyIssuerGap.evaluation.application.message,/Amex 专属规则仍有待补充或核实/);
+assert.match(onlyIssuerGap.evaluation.application.message,/Amex 申请记录需要确认/);
 const completeIssuer=call('Delta SkyMiles Gold Card',clean);
 assert.equal(completeIssuer.evaluation.application.issuer_rules_completed,true);
 assert.equal(completeIssuer.evaluation.application.unresolved_rules.length,0);

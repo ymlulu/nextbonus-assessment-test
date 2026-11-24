@@ -97,7 +97,7 @@ assert.ok(schwab.questionnaire.questionnaire.specific.some(q=>q.id==='F08_RELATI
 assert.ok(schwab.questionnaire.questionnaire.pending_terms.some(p=>p.rule_id==='AMEX-FL-002'));
 const ms=facade.plan({input:'Platinum Card exclusively for Morgan Stanley'});
 assert.ok(ms.questionnaire.questionnaire.specific.some(q=>
-  q.id==='F08_RELATIONSHIP'&&q.title.includes('Morgan Stanley / E*TRADE')));
+  q.id==='F08_RELATIONSHIP'&&q.title.includes('Morgan Stanley 或 E*TRADE')));
 const deltaGold=facade.plan({input:'Delta SkyMiles Gold Card'});
 assert.ok(deltaGold.questionnaire.questionnaire.pending_terms.some(p=>
   p.rule_id==='AMEX-FL-008'),'must flag missing current Delta family clause');
