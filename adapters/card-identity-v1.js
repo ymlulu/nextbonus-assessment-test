@@ -32,11 +32,12 @@
       .replace(/(?:-credit-card-review|-card-review|-credit-card|-review|-intro|-bonus|-offer|-apply)$/i,'')
       .replace(/[-_]+/g,' ');
   }
-  const catalogOnly=new Set(['REVIEWED_PRODUCT','EXPANSION_CANDIDATE','HISTORY_ONLY']);
+  const catalogOnly=new Set(['REVIEWED_PRODUCT','EXPANSION_CANDIDATE','HISTORY_ONLY','NB_FORMAL_CATALOG']);
   function createLookup(index){
-    if(index?.schema_version!=='1'||index?.count!==98||
-       !Array.isArray(index.products)||index.products.length!==98)
-      throw Error('Standalone 98-product identity index required');
+    if(index?.schema_version!=='1'||!Number.isSafeInteger(index?.count)||
+       index.count<98||!Array.isArray(index.products)||
+       index.products.length!==index.count)
+      throw Error('Complete and versioned standalone card identity index required');
     const byId=new Map(),aliases=new Map(),directUrls=new Map();
     for(const p of index.products){
       if(!p?.product_id||byId.has(p.product_id)||!catalogOnly.has(p.identity_source))
