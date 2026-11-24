@@ -122,6 +122,20 @@ r=qa('Marriott Bonvoy Bevy Card',{});
 assert.equal(r.marriott_matrix.status,'MISSING');
 assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.id==='F07_MARRIOTT_HISTORY').length,1,
  'only one grouped history question, not per rule');
+// Family and cross-issuer facts share a single F03 question, including
+// old SPG product variants even when the same-product clause is also active.
+for(const [card,expected] of [
+ ['Marriott Bonvoy Bevy Card','Marriott Bonvoy Brilliant'],
+ ['Marriott Bonvoy Brilliant Card','以前的 SPG Luxury'],
+ ['Marriott Bonvoy Business Card','以前的 SPG Business']
+]){
+ const original=qa(card,{});
+ const f03=original.questionnaire.questionnaire.specific.find(q=>q.id==='F03_CARD_HISTORY');
+ assert.ok(f03,'F03 included for '+card);
+ assert.ok(f03.options.some(o=>o.value===expected),
+   'family-specific holding option '+expected+' must not be lost to de-duplication');
+ assert.equal(original.questionnaire.questionnaire.specific.filter(q=>q.id==='F03_CARD_HISTORY').length,1);
+}
 // Reuse confirmed holdings across F07 (cross-bank) and F03 (Amex lifetime).
 let crossKnown=qa('Marriott Bonvoy Bevy Card',{
  F07_MARRIOTT_HISTORY:['AMEX Marriott Bonvoy Brilliant'],
