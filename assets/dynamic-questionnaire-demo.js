@@ -272,7 +272,8 @@
         report.append(el('p','small','Marriott 跨银行规则：'+
           ({CLEAR:'已根据现有历史排除限制',TRIGGERED:'已有明确触发条件',
              MISSING:'仍缺少会影响判断的历史事实',
-             NOT_APPLICABLE:'不适用'})[pending.status]+'。仅按本次所选标准 Offer 模型判断。'));
+             SKIPPED_AFTER_BONUS_BLOCK:'其他奖励限制已触发，跳过无关追问',
+             NOT_APPLICABLE:'不适用'})[pending.status]+'。仅按本次所选 Offer 模型判断。'));
       }
     }
     $('scope').textContent='匹配规则：'+info.applicable_rule_ids.join('、');
