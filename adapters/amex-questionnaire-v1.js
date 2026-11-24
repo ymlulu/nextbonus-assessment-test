@@ -22,7 +22,7 @@
         for(const raw of policy.history_choices_by_rule?.[rid]||[]){
           const name=raw==='$TARGET'?target.product_name:raw;
           if(!name)continue;
-          const label=originals.has(name)?name+'（含同产品旧版本）':
+          const label=originals.has(name)?name+'（包括以前的版本）':
             legacyLabels[name]||name;
           const previous=choices.get(name);
           // Keep the most informative label if this card belongs to multiple rules.
@@ -62,15 +62,15 @@
         }
         if(q.id==='F10_ISSUER_PORTFOLIO_COUNT'){
           output.title=product.card_form==='REVOLVING_CREDIT'
-            ?'你目前持有多少张 Amex 循环信用卡（Revolving Credit Cards）？'
-            :'你目前持有多少张 Amex 签账卡（Charge / Pay Over Time Cards）？';
+            ?'你现在有几张 Amex 普通信用卡？（个人卡、商业卡都算）'
+            :'你现在有几张 Amex Platinum、Gold 这类签账卡？';
           output.description+=product.card_form==='REVOLVING_CREDIT'
-            ?' Amex 持卡数量阈值不是保证拒批的固定上限。'
-            :' 历史数量限制仅作风险参考，不等同银行保证的固定规则。';
+            ?' 这里只算自己名下的主卡，不算副卡。5 张是经验参考，不是一定会拒批的硬上限。'
+            :' 这里只算自己名下的主卡，不算副卡。10 张是经验参考，并非一刀切的上限。';
         }
         if(q.id==='F08_RELATIONSHIP'){
           const needed=policy.relationship_options?.[product.product_name];
-          if(needed)output.title='你是否拥有 '+needed+'？';
+          if(needed)output.title='你有'+needed+'吗？';
         }
         return output;
       });
@@ -88,8 +88,8 @@
           // A standalone F03 is needed only if the planner did not already
           // generate one for same-target lifetime rules.
           specific.push({id:'F03_CARD_HISTORY',type:'multi',
-            title:templates.F03_CARD_HISTORY?.title||'你的相关 Marriott 持卡历史',
-            description:templates.F03_CARD_HISTORY?.description||'包含过去曾持有的旧版本',
+            title:templates.F03_CARD_HISTORY?.title||'下面这些 Marriott 卡，你以前办过哪些？',
+            description:templates.F03_CARD_HISTORY?.description||'已经关掉的卡、旧版卡也算',
             options,
             allow_none:true,rule_ids:marriottFamily});
         }
@@ -97,12 +97,12 @@
       const pending=(plan.diagnostics.unresolved_system_gates||[])
         .filter(x=>scoped.has(x.rule_id)).map(x=>({
           rule_id:x.rule_id,
-          title:x.rule_id==='AMEX-001'?'目标卡的同产品 Welcome Offer 历史限制':
-            x.rule_id.startsWith('AMEX-FL-')?'目标卡的 Family Language':
-            x.rule_id.startsWith('AMEX-BIZ-')?'商业卡 Welcome Offer 历史限制':
-            'Offer 条款相关限制',
+          title:x.rule_id==='AMEX-001'?'这张卡以前办过，会不会影响开卡奖励':
+            x.rule_id.startsWith('AMEX-FL-')?'同系列信用卡的开卡奖励限制':
+            x.rule_id.startsWith('AMEX-BIZ-')?'商业卡以前办过，会不会影响开卡奖励':
+            '这次开卡奖励的特殊限制',
           status:'SYSTEM_TERMS_UNVERIFIED',
-          reason:'申请页面的当前具体 Offer 条款尚未核验；不能直接判定该限制存在，也不能据此要求用户作答。',
+          reason:'还没有核实这次申请链接的具体条款，所以暂时不能根据这一条判断奖励资格。',
           potential_fact_groups:[],
           history_scope:policy.history_choices_by_rule?.[x.rule_id]?.map(v=>
             v==='$TARGET'?product.product_name:v)||[]
