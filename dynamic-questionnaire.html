@@ -13,7 +13,12 @@ p{line-height:1.55}.muted{color:#697588}.small{color:#697588;font-size:12px}
 .header{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}
 .header p{margin:4px 0;color:#697588}.badge{background:#eaf1ff;color:#1a50a4;padding:6px 10px;border-radius:20px;font-size:12px}
 .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}select,input,button{font:inherit;border-radius:9px;padding:10px 12px;border:1px solid #cdd5e3;background:#fff}
-select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candidate-controls[hidden],#amex-offer-settings[hidden]{display:none}.choice-list{display:grid;gap:10px;margin:12px 0 15px}
+select{min-width:170px;max-width:100%}#amex-offer-settings[hidden],#retry[hidden]{display:none}
+.selection-panel{margin:18px 0 22px}.selection-grid{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:12px}
+.selection-grid label{display:flex;flex-direction:column;gap:8px;font-weight:600;font-size:14px}
+.selection-grid select{width:100%;min-width:0;font-weight:400}.selection-grid select:disabled{background:#eff2f8;color:#7f8a9a}
+.selector-actions{margin:14px 0 0}button:disabled{cursor:not-allowed;opacity:.5}
+@media(max-width:650px){.selection-grid{grid-template-columns:1fr}}.choice-list{display:grid;gap:10px;margin:12px 0 15px}
 .check-option{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}
 .check-option input{margin:3px 0;accent-color:#235caa;width:16px;height:16px;flex-shrink:0}
 .pending-rules{border:1px solid #f0d79b;background:#fffaf1;border-radius:14px;padding:16px;margin-top:18px}
@@ -32,22 +37,23 @@ select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candid
 <main class="wrap">
   <div class="header"><div><div class="small"><a href="./">Assessment 独立测试站</a> / 动态问卷</div><h1>动态申请问卷</h1>
     <p>独立问卷生成原型 · 不包含长期福利 Q7 / Q8</p></div><span class="badge">本机运行 · 不上传答案</span></div>
-  <div class="controls"><label for="card-query"><strong>输入信用卡名称或链接：</strong></label>
-    <input id="card-query" type="text" aria-label="信用卡名称或链接" placeholder="例如 Chase Freedom Unlimited，或美卡101文章链接" />
-    <button id="generate" type="button">生成问卷</button>
-    <button id="reset" class="secondary" type="button">清空本页答案</button></div>
-  <div class="controls"><label for="issuer">发行银行：</label>
-    <select id="issuer" aria-label="发行银行">
-      <option value="">自动识别（不确定可选）</option>
-      <option value="AMEX">American Express</option><option value="CHASE">Chase</option>
-      <option value="CITI">Citi</option><option value="CAPITAL_ONE">Capital One</option>
-      <option value="BOFA">Bank of America</option><option value="US_BANK">U.S. Bank</option>
-      <option value="WELLS_FARGO">Wells Fargo</option><option value="BARCLAYS">Barclays</option>
-      <option value="COLUMN_NA">Bilt / Column</option><option value="DISCOVER">Discover</option>
-    </select>
-    <label for="customer-type">卡片类型：</label>
-    <select id="customer-type" aria-label="卡片类型"><option value="">自动识别</option>
-      <option value="PERSONAL">个人卡</option><option value="BUSINESS">商业卡</option></select>
+  <div class="selection-panel">
+    <div class="selection-grid">
+      <label for="issuer"><span>发行银行</span>
+        <select id="issuer" aria-label="选择发行银行" disabled><option value="">正在加载银行…</option></select>
+      </label>
+      <label for="customer-type"><span>卡片类型</span>
+        <select id="customer-type" aria-label="选择个人卡或商业卡" disabled><option value="">请先选择银行</option></select>
+      </label>
+      <label for="card-select"><span>信用卡</span>
+        <select id="card-select" aria-label="选择信用卡" disabled><option value="">请先选择卡片类型</option></select>
+      </label>
+    </div>
+    <div class="controls selector-actions">
+      <button id="generate" type="button" disabled>生成问卷</button>
+      <button id="reset" class="secondary" type="button">清空本页答案</button>
+      <button id="retry" class="secondary" type="button" hidden>重新加载</button>
+    </div>
   </div>
   <div id="amex-offer-settings" class="controls" hidden>
     <label for="offer-variant">Amex Offer 类型：</label>
@@ -57,16 +63,12 @@ select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candid
     </select>
     <span class="small">普通 Offer 默认使用标准 Family / Lifetime 条款；NLL 仅移除同产品 Lifetime 限制，其他条款需单独指定。</span>
   </div>
-  <div id="candidate-controls" class="controls" hidden>
-    <label for="candidate">请确认具体产品：</label><select id="candidate"></select>
-    <button id="confirm" type="button">确认并生成</button>
-  </div>
   <div class="summary"><strong id="summary">正在读取独立评估数据…</strong>
     <p class="small" id="version"></p><p class="small" id="identity-note"></p></div>
   <div id="questions"></div>
   <div id="assessment-result" aria-live="polite"></div>
   <div class="notes"><strong>原型边界</strong>
-    <p class="muted">这版可用卡名或网址匹配独立的 109 张卡片索引，其中包含来自 NextBonus 正式版卡库的 32 张 Amex 卡片身份。历史记录只用于识别身份，不代表卡片仍开放申请或当前优惠有效。未知产品可以补充银行和个人/商业类型，只预览通用问题与确定可匹配的发行行规则。Amex 默认使用普通 Offer 的标准条款假设；特殊 NLL 可以切换，但不保证任何指定 Offer 实际符合该假设。其他需要验证的规则继续标注。不会读取或修改 Discover，也Amex 会分别输出申请风险与开卡奖励规则信号，并说明判断依据。Marriott 跨银行限制由独立矩阵先筛选，只追问会影响判断的时间和持卡事实；不提供真实获批概率，也不保证实际奖励资格。</p>
+    <p class="muted">这版使用银行、个人/商业类型、具体信用卡三级选择，直接按卡片 ID 进入独立的 109 张卡片身份目录，其中包含来自 NextBonus 正式版卡库的 32 张 Amex 卡片身份。历史记录只用于识别身份，不代表卡片仍开放申请或当前优惠有效。未知产品可以补充银行和个人/商业类型，只预览通用问题与确定可匹配的发行行规则。Amex 默认使用普通 Offer 的标准条款假设；特殊 NLL 可以切换，但不保证任何指定 Offer 实际符合该假设。其他需要验证的规则继续标注。不会读取或修改 Discover。Amex 会分别输出申请风险与开卡奖励规则信号，并说明判断依据。Marriott 跨银行限制由独立矩阵先筛选，只追问会影响判断的时间和持卡事实；不提供真实获批概率，也不保证实际奖励资格。</p>
     <details><summary>查看规则匹配详情</summary><p class="small" id="scope"></p><p class="small" id="gaps"></p></details>
   </div>
 </main>

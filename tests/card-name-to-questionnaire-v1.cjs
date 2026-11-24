@@ -115,7 +115,13 @@ for(const source of ['adapters/card-identity-v1.js','adapters/card-questionnaire
     'no user-answer persistence or upload in '+source);
 }
 const html=fs.readFileSync(path.join(root,'dynamic-questionnaire.html'),'utf8');
-assert.match(html,/id="card-query"/);
+assert.match(html,/id="issuer"/);
+assert.match(html,/id="customer-type"/);
+assert.match(html,/id="card-select"/);
+assert.doesNotMatch(html,/id="card-query"/);
+assert.equal(facade.listCards().length,109);
+assert.equal(facade.plan({product_id:'amex_marriott_bonvoy_bevy'}).status,'MATCHED_ID');
+assert.equal(facade.plan({product_id:'does_not_exist'}).status,'UNKNOWN_PRODUCT');
 assert.match(html,/adapters\/card-identity-v1\.js/);
 assert.match(html,/adapters\/card-questionnaire-facade-v1\.js/);
 assert.doesNotMatch(html,/id="product"/);

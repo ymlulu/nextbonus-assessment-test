@@ -13,10 +13,18 @@
   function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState,amexDecision,amexPolicy,approvalConfig,marriottMatrix}){
     if(!planner?.getQuestionnaireForProduct||!lookup?.resolve||!lookup?.findById)
       throw Error('QUESTIONNAIRE_DEPENDENCY_MISSING');
-    function plan({input,issuer,customer_type,known_facts={},confirm_product_id,
+    function plan({input,product_id,issuer,customer_type,known_facts={},confirm_product_id,
       offer_variant='STANDARD',offer_rule_overrides={}}={}){
-      const lookupResult=lookup.resolve({input,issuer});
+      // Product selectors pass an exact catalog ID instead of round-tripping
+      // a label through fuzzy name/URL matching.
+      const selected=product_id?lookup.findById(product_id):null;
+      const lookupResult=product_id
+        ?{status:selected?'MATCHED':'UNKNOWN_PRODUCT',candidates:[],
+          product:selected?{product_id:selected.product_id}:null}
+        :lookup.resolve({input,issuer});
       const candidate=confirm_product_id&&lookup.findById(confirm_product_id);
+      if(product_id&&!selected)
+        return {status:'UNKNOWN_PRODUCT',identity:lookupResult,questionnaire:null};
       if(issuer&&!ISSUERS.has(issuer))
         return {status:'INVALID_ISSUER',identity:lookupResult,questionnaire:null};
       if(customer_type&&!TYPES.has(customer_type))
@@ -30,9 +38,9 @@
       let status=lookupResult.status;
       let identitySource=null;
       if(lookupResult.status==='MATCHED'){
-        product=lookup.findById(lookupResult.product.product_id);
+        product=selected||lookup.findById(lookupResult.product.product_id);
         identitySource=product.identity_source;
-        status='MATCHED';
+        status=selected?'MATCHED_ID':'MATCHED';
       }else if(candidate){
         product=candidate;
         identitySource=product.identity_source;
@@ -120,7 +128,7 @@
       contract_version:'1',mode:'offline_card_name_to_questionnaire',
       source_count:lookup.getVersion().count,
       rules_indexed:planner.getVersion().rule_count}),
-      search:lookup.resolve,plan});
+      search:lookup.resolve,listCards:lookup.list,plan});
   }
   return Object.freeze({createFacade});
 });
