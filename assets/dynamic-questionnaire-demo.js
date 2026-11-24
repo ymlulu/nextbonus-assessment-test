@@ -3,6 +3,8 @@
   const $=id=>document.getElementById(id);
   const answers=Object.create(null);
   let facade=null,selectedProductId='',cards=[],loading=false;
+  let baseQuestionLibrary=[];
+  const seenQuestions=new Map();
   function el(tag,cls,text){
     const n=document.createElement(tag);
     if(cls)n.className=cls;
@@ -167,6 +169,7 @@
   }
   function resetAnswers(){
     for(const key of Object.keys(answers))delete answers[key];
+    seenQuestions.clear();
   }
   function clearReport(note='请选择信用卡以生成申请问卷'){
     $('summary').textContent=note;
@@ -264,14 +267,17 @@
           ?'，已启用 NLL 特殊变量。':'。')
         +'这里是问卷假设，并非实时核实的申请条款。'
         :'此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。');
+    // The rule planner intentionally returns only unanswered facts, but this
+    // QA page keeps all previously displayed questions editable and visible.
+    const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
+    for(const q of plan.questionnaire.specific)rememberQuestion(q);
     list.replaceChildren(el('h2','','基础评分问题'));
-    for(const q of plan.questionnaire.common)list.append(question(q,true));
-    if(!plan.questionnaire.common.length)
-      list.append(el('p','muted','基础评分问题已经在本页回答。'));
+    for(const q of baseQuestionLibrary)list.append(question(q,true,result,true));
     list.append(el('h2','','按规则生成的问题'));
-    if(!plan.questionnaire.specific.length)
+    if(!seenQuestions.size)
       list.append(el('p','muted','当前没有需要补充的规则事实。'));
-    for(const q of plan.questionnaire.specific)list.append(question(q));
+    for(const q of seenQuestions.values())
+      list.append(question(q,false,result,activeIds.has(q.id)));
     if(plan.questionnaire.pending_terms?.length){
       const pending=el('details','pending-rules');
       const label=el('summary','','需要先核实当前 Offer 条款（'+
@@ -364,6 +370,7 @@
          !window.NextBonusAmexOfferContextV1||!window.NextBonusAmexDecisionV1||
          !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1)
         throw Error('评估引擎文件未完全加载，请刷新页面');
+      baseQuestionLibrary=questions.common||[];
       const planner=window.NextBonusQuestionnairePlannerV1.makePlanner({
         ruleIndex,products,baseQuestions:questions.common,frozenOfferFacts
       });
