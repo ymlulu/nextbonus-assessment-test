@@ -28,6 +28,14 @@ select{min-width:170px;max-width:100%}#amex-offer-settings[hidden],#retry[hidden
 .structured-field{display:block;margin:12px 0;font-weight:500;font-size:14px}
 .structured-field input,.structured-field select{display:block;margin-top:7px;width:100%;font-weight:normal}#identity-note{line-height:1.5}button{cursor:pointer;background:#1f61c2;color:#fff;border-color:#1f61c2}button.secondary{background:white;color:#27476b;border-color:#cdd5e3}
 .question-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}.question-head strong{font-size:15px}.question-head span{font-size:11px}
+.choice-inline,.field-line{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.choice-inline>select{flex:0 1 270px}.field-line .structured-field{min-width:260px;flex:0 1 380px;margin:0}
+.structured-field select{width:100%}.count-picker{display:flex;gap:8px;flex-wrap:wrap}
+.count-picker select{min-width:150px}.count-picker input{max-width:170px}
+.count-picker input[hidden]{display:none}
+.rule-delta{color:#b42318;font-size:13px;font-weight:650;line-height:1.5}
+.rule-unchanged{color:#758294;font-size:12px;line-height:1.5}
+.check-option{flex-wrap:wrap}.check-option .rule-delta,.check-option .rule-unchanged{margin-left:4px}
 .input-row{display:flex;gap:8px;flex-wrap:wrap}.input-row input{flex:1;min-width:160px}
 .summary{background:#f0f5ff}details{margin-top:12px}summary{cursor:pointer}
 @media(max-width:560px){.assessment-summary{grid-template-columns:1fr}.wrap{padding:18px 12px 50px}.header{padding:16px}.question{padding:16px}}
@@ -36,7 +44,7 @@ select{min-width:170px;max-width:100%}#amex-offer-settings[hidden],#retry[hidden
 <body>
 <main class="wrap">
   <div class="header"><div><div class="small"><a href="./">Assessment 独立测试站</a> / 动态问卷</div><h1>动态申请问卷</h1>
-    <p>独立问卷生成原型 · 不包含长期福利 Q7 / Q8</p></div><span class="badge">本机运行 · 不上传答案</span></div>
+    <p>独立问卷生成原型 · 已回答的问题不会消失 · 红字展示选择对评估的实际影响 · 不包含长期福利 Q7 / Q8</p></div><span class="badge">本机运行 · 不上传答案</span></div>
   <div class="selection-panel">
     <div class="selection-grid">
       <label for="issuer"><span>发行银行</span>
