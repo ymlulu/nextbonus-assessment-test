@@ -1,0 +1,288 @@
+{
+  "version": "1",
+  "issuer": "CHASE",
+  "source": {
+    "workbook": "Bank Rules.xlsx",
+    "drive_file_id": "1w5cj9m0Y9za6KKhQ1M1inNYax2Wd4Ibq",
+    "snapshot": "2026-09-12",
+    "review_note": "The assessment compiles only the 21 ACTIVE EXECUTABLE_RULE Chase records; other source rows are non-executable references or guards."
+  },
+  "product_name_overrides": {
+    "history_ot_chase_018": "British Airways Visa",
+    "chase_world_of_hyatt": "World of Hyatt Personal",
+    "chase_aeroplan": "Chase Aeroplan Card",
+    "history_ot_chase_070": "Sapphire Reserve for Business",
+    "history_ot_chase_084": "World of Hyatt Business Credit Card"
+  },
+  "source_product_ids": [
+    "chase_sapphire_preferred",
+    "chase_marriott_bonvoy_boundless",
+    "history_ot_chase_016",
+    "history_ot_chase_017",
+    "history_ot_chase_018",
+    "chase_world_of_hyatt",
+    "chase_sapphire_reserve",
+    "chase_ihg_one_rewards_premier",
+    "chase_aeroplan",
+    "chase_freedom_flex",
+    "history_ot_chase_038",
+    "history_ot_chase_039",
+    "history_ot_chase_040",
+    "history_ot_chase_041",
+    "history_ot_chase_042",
+    "history_ot_chase_043",
+    "history_ot_chase_044",
+    "history_ot_chase_045",
+    "history_ot_chase_046",
+    "history_ot_chase_047",
+    "history_ot_chase_070",
+    "history_ot_chase_071",
+    "history_ot_chase_072",
+    "history_ot_chase_082",
+    "history_ot_chase_084",
+    "history_ot_chase_086",
+    "history_ot_chase_087",
+    "history_ot_chase_094",
+    "history_ot_chase_095"
+  ],
+  "presentation": {
+    "base_credit_rating": "same approval-config.json matrix as Amex",
+    "caveat": "Chase eligibility and welcome-offer wording reflect the reviewed 2026-09-12 snapshot. Confirm current exact application terms."
+  },
+  "fields": {
+    "F01_RECENT_NEW_ACCOUNTS": {
+      "title": "先看看你的 5/24 情况",
+      "description": "只统计过去 24 个月新增、出现在你个人信用报告上的信用卡账户；别人给你加的副卡也先算上，后面会单独区分。",
+      "type": "number",
+      "max": 40,
+      "field_id": "reported_new_accounts_24m",
+      "question": "过去 24 个月，你的信用报告上一共新增了几张信用卡？（包括副卡）"
+    },
+    "F06_AU_BREAKDOWN": {
+      "title": "刚才这些新卡里，有几张是副卡？",
+      "description": "副卡指别人把你加到他的信用卡账户里，你不是这张卡的主卡人。Chase 自动审查可能先计入副卡，人工复议不一定会排除。",
+      "type": "number",
+      "max": 40,
+      "field_id": "authorized_user_accounts_24m"
+    },
+    "F02_ISSUER_APPLICATION_HISTORY": {
+      "title": "你最近在 Chase 的批卡情况",
+      "description": "这里统计的是已经获批的 Chase 信用卡，不是单纯提交过多少次申请。",
+      "type": "structured",
+      "fields": {
+        "chase_approved_30d": {
+          "type": "number",
+          "label": "过去 30 天，你获批了几张 Chase 信用卡？（个人卡、商业卡都算）",
+          "min": 0,
+          "max": 20
+        },
+        "chase_business_approved_30d": {
+          "type": "number",
+          "label": "其中有几张是 Chase 商业信用卡？",
+          "min": 0,
+          "max": 20
+        }
+      }
+    },
+    "F03_CARD_HISTORY": {
+      "title": "关于你以前办过的 Chase 卡",
+      "description": "这部分会根据你选的卡自动调整，只问可能影响这次申请或奖励的持卡情况。",
+      "type": "structured",
+      "fields": {
+        "current_target": {
+          "type": "single",
+          "label": "你现在还持有这次想申请的这张卡吗？"
+        },
+        "current_family": {
+          "type": "single",
+          "label": "你现在还持有这一系列的其他个人卡吗？"
+        },
+        "ever_target": {
+          "type": "single",
+          "label": "这张卡你以前办过吗？（包括目前还持有或已经关掉的）"
+        },
+        "ever_other_no_fee_ink": {
+          "type": "single",
+          "label": "你以前办过其他免年费的 Chase Ink Business 卡吗？"
+        }
+      }
+    },
+    "F04_BONUS_HISTORY": {
+      "title": "再确认一下开卡奖励历史",
+      "description": "只算新卡开卡奖励，不算日常刷卡积分；按照实际拿到奖励的时间回答。",
+      "type": "structured",
+      "fields": {
+        "bonus_target_ever": {
+          "type": "single",
+          "label": "你以前拿到过这张卡的新卡开卡奖励吗？"
+        },
+        "bonus_target_24m": {
+          "type": "single",
+          "label": "过去 24 个月，你拿到过这张卡的新卡开卡奖励吗？"
+        },
+        "bonus_family_24m": {
+          "type": "single",
+          "label": "过去 24 个月，你拿到过这一系列任意一张个人卡的新卡开卡奖励吗？"
+        }
+      }
+    }
+  },
+  "rule_checks": {
+    "CHASE-001": {
+      "check": "five_twentyfour",
+      "dimension": "APPLICATION",
+      "name": "Chase 5/24",
+      "impact": 3
+    },
+    "CHASE-002": {
+      "check": "chase_30d",
+      "dimension": "APPLICATION",
+      "name": "Chase 2/30",
+      "impact": 3
+    },
+    "CHASE-003": {
+      "check": "bonus_target_ever",
+      "dimension": "BONUS",
+      "name": "Sapphire 同卡开卡奖励历史",
+      "impact": 3
+    },
+    "CHASE-005": {
+      "check": [
+        "ever_target",
+        "ever_other_no_fee_ink"
+      ],
+      "dimension": "BONUS",
+      "name": "免年费 Ink Business 持卡历史",
+      "impact": 2
+    },
+    "CHASE-006": {
+      "check": "ever_target",
+      "dimension": "BONUS",
+      "name": "Ink Preferred 持卡历史",
+      "impact": 2
+    },
+    "CHASE-007": {
+      "check": "ever_target",
+      "dimension": "BONUS",
+      "name": "Ink Premier 持卡历史",
+      "impact": 2
+    },
+    "CHASE-008": {
+      "check": "ever_target",
+      "dimension": "BONUS",
+      "name": "Sapphire Reserve Business 持卡历史",
+      "impact": 2
+    },
+    "CHASE-PROD-001": {
+      "check": "current_family",
+      "dimension": "APPLICATION",
+      "name": "IHG 个人卡目前持卡限制",
+      "impact": 3
+    },
+    "CHASE-PROD-002": {
+      "check": "bonus_family_24m",
+      "dimension": "APPLICATION",
+      "name": "IHG 个人卡 24 个月奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-005": {
+      "check": [
+        "current_family",
+        "bonus_family_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "Southwest 个人卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-006": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "Hyatt 个人卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-007": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "Aeroplan 同卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-012": {
+      "check": "chase_business_30d",
+      "dimension": "APPLICATION",
+      "name": "Chase 商业卡 30 天申请间隔",
+      "impact": 2
+    },
+    "CHASE-PROD-011": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "Freedom 同卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-012": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "United 同卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-013": {
+      "check": [
+        "current_family",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "United Club 持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-014": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "APPLICATION",
+      "name": "Avios 同卡持卡与奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-015": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "BONUS",
+      "name": "Hyatt Business 同卡开卡奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-016": {
+      "check": [
+        "current_target",
+        "bonus_target_24m"
+      ],
+      "dimension": "BONUS",
+      "name": "Southwest Business 同卡开卡奖励限制",
+      "impact": 3
+    },
+    "CHASE-PROD-017": {
+      "check": "current_target",
+      "dimension": "APPLICATION",
+      "name": "Sapphire Preferred 当前持卡限制",
+      "impact": 3
+    },
+    "CHASE-PROD-018": {
+      "check": "current_target",
+      "dimension": "APPLICATION",
+      "name": "Sapphire Reserve 当前持卡限制",
+      "impact": 3
+    }
+  }
+}
