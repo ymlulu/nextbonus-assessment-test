@@ -22,19 +22,19 @@
       rule_ids:[...new Set([...(old.rule_ids||[]),...(q.rule_ids||[])])]});
   }
   const readableRuleNames={
-    'AMEX-011':'Amex 同产品 90 天申请间隔限制'
+    'AMEX-011':'90 天内重复申请同一张 Amex 卡'
   };
   function ruleLabel(id){
     return readableRuleNames[id]?id+'（'+readableRuleNames[id]+'）':id;
   }
   const ruleStates={MISSING:'待补充',REVIEW:'待核实',
-    TRIGGERED:'触发限制',CLEAR:'未触发'};
-  const riskStates={HIGH:'相对较好',MEDIUM:'一般',
-    HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'资料不足'};
+    TRIGGERED:'可能受限',CLEAR:'未发现限制'};
+  const riskStates={HIGH:'优秀（最高档）',MEDIUM:'一般',
+    HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'还没算出来'};
   const outcomeStates={MODEL_ONLY:'已检查',INSUFFICIENT_DATA:'尚未完成',
-    ELEVATED_RISK:'发现风险',
-    NO_TRIGGER_FOUND:'未发现奖励限制',NEEDS_REVIEW:'奖励待确认',
-    LIKELY_RESTRICTED:'可能受限'};
+    ELEVATED_RISK:'有需要注意的申请风险',
+    NO_TRIGGER_FOUND:'未发现开卡奖励限制',NEEDS_REVIEW:'开卡奖励还要确认',
+    LIKELY_RESTRICTED:'可能拿不到奖励'};
   const structuredRuleIds={
     approved_revolving_90d:['AMEX-006'],
     same_product_applied_or_approved_90d:['AMEX-011']
@@ -79,7 +79,7 @@
     const effects=[];
     if(item.id.startsWith('a')&&/^a[1-4]$/.test(item.id)){
       if(a.application.base_risk!==b.application.base_risk)
-        effects.push('基础档位：'+(riskStates[a.application.base_risk]||'待计算')+
+        effects.push('基础信用档位：'+(riskStates[a.application.base_risk]||'待计算')+
           ' → '+(riskStates[b.application.base_risk]||'待计算'));
     }
     const oldMap=new Map((a.rule_results||[]).map(x=>[x.rule_id,x]));
@@ -101,10 +101,10 @@
     const oldApp=a.application.status,newApp=b.application.status;
     const oldBonus=a.bonus.status,newBonus=b.bonus.status;
     if(oldApp!==newApp)
-      effects.push('申请规则：'+(outcomeStates[oldApp]||oldApp)+
+      effects.push('申请风险：'+(outcomeStates[oldApp]||oldApp)+
         ' → '+(outcomeStates[newApp]||newApp));
     if(oldBonus!==newBonus)
-      effects.push('奖励结果：'+(outcomeStates[oldBonus]||oldBonus)+
+      effects.push('开卡奖励：'+(outcomeStates[oldBonus]||oldBonus)+
         ' → '+(outcomeStates[newBonus]||newBonus));
     if(!effects.length)return '';
     return effects.slice(0,3).join('；')+
@@ -115,11 +115,11 @@
     const summary=impactFor(item,result,field);
     if(summary)return el('span','rule-delta',summary);
     return el('span','rule-unchanged',
-      result.evaluation?'当前不改变已计算的规则状态':'此银行尚未接入完整结果比较');
+      result.evaluation?'这项回答暂时不会改变评估结果':'这张卡暂时只能查看问题，还不能比较评估结果');
   }
   function optionsForQuestion(item,result){
     const select=el('select');
-    const empty=el('option','','请选择（可跳过）');empty.value='';
+    const empty=el('option','','请选择');empty.value='';
     select.append(empty);
     for(const option of item.options||[]){
       const node=el('option','',option.label);node.value=option.value;
@@ -148,14 +148,14 @@
   }
   function countSelector({value,max=30,commit}){
     const select=el('select');
-    select.append(option('','请选择数量'));
+    select.append(option('','请选择张数'));
     for(const n of numericOptions(max))select.append(option(String(n),n+' 张'));
-    select.append(option('OTHER','其他数量…'));
+    select.append(option('OTHER','其他张数…'));
     const chosen=value===undefined||value===null?'':String(value);
     select.value=chosen&&numericOptions(max).includes(Number(chosen))?chosen:
       chosen?'OTHER':'';
     const number=el('input');number.type='number';number.min='0';
-    number.max=String(max);number.step='1';number.placeholder='输入准确数量';
+    number.max=String(max);number.step='1';number.placeholder='输入张数';
     number.value=chosen&&!numericOptions(max).includes(Number(chosen))?chosen:'';
     number.hidden=select.value!=='OTHER';
     select.addEventListener('change',()=>{
@@ -182,8 +182,8 @@
     const card=el('section','question');
     const head=el('div','question-head');
     head.append(el('strong','',item.title));
-    head.append(el('span','muted',!active?'已展示 · 当前无需再追问':
-      common?'基础评分':'规则自动匹配'));
+    head.append(el('span','muted',!active?'已回答 · 可以修改':
+      common?'信用情况':'与这张卡有关'));
     card.append(head);
     if(item.description)card.append(el('p','small',item.description));
     if(item.type==='structured_marriott'&&Array.isArray(item.fields)){
@@ -271,9 +271,9 @@
       // Unstructured facts in the 129-rule source cannot safely be invented
       // as Yes/No questions. Retain their source-owned free-text fallback.
       const input=el('input');input.type='text';
-      input.placeholder='补充具体事实（仅在本机）';
+      input.placeholder='请填写你知道的情况（仅保存在本机）';
       input.value=String(answers[item.id]??'');
-      const button=el('button','secondary','保存并更新');button.type='button';
+      const button=el('button','secondary','保存答案');button.type='button';
       button.addEventListener('click',()=>{
         if(input.value.trim())answers[item.id]=input.value.trim();
         else delete answers[item.id];
@@ -284,7 +284,7 @@
       card.append(row);
     }
     if(item.rule_ids?.length)
-      card.append(el('p','small','依据规则：'+item.rule_ids.map(ruleLabel).join('、')));
+      card.append(el('p','small','对应规则：'+item.rule_ids.map(ruleLabel).join('、')));
     return card;
   }
   const ISSUER_LABELS={
@@ -300,7 +300,7 @@
     for(const key of Object.keys(answers))delete answers[key];
     seenQuestions.clear();
   }
-  function clearReport(note='请选择信用卡以生成申请问卷'){
+  function clearReport(note='先选择一张信用卡，我们会根据这张卡生成问题'){
     $('summary').textContent=note;
     $('questions').replaceChildren();
     $('assessment-result').replaceChildren();
@@ -345,14 +345,14 @@
     const select=$('card-select');
     const matches=cards.filter(p=>p.issuer===issuer&&p.customer_type===type)
       .sort((a,b)=>a.name.localeCompare(b.name,'en'));
-    fillSelect(select,'请选择具体信用卡',matches.map(p=>({
+    fillSelect(select,'请选择要申请的卡',matches.map(p=>({
       value:p.product_id,label:p.name
     })));
     select.disabled=!type||!matches.length;
     selectedProductId='';
     $('generate').disabled=true;
     resetAnswers();
-    clearReport(matches.length?'请选择信用卡':'该类别暂无信用卡');
+    clearReport(matches.length?'请选择信用卡':'这里暂时没有可选的卡');
   }
   function selectCard(){
     const id=$('card-select').value;
@@ -400,21 +400,21 @@
     // QA page keeps all previously displayed questions editable and visible.
     const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
     for(const q of plan.questionnaire.specific)rememberQuestion(q);
-    list.replaceChildren(el('h2','','基础评分问题'));
+    list.replaceChildren(el('h2','','先了解一下你的信用情况'));
     for(const q of baseQuestionLibrary)list.append(question(q,true,result,true));
-    list.append(el('h2','','按规则生成的问题'));
+    list.append(el('h2','','关于这张卡，还想了解这些情况'));
     if(!seenQuestions.size)
-      list.append(el('p','muted','当前没有需要补充的规则事实。'));
+      list.append(el('p','muted','目前没有其他需要回答的问题。'));
     for(const q of seenQuestions.values())
       list.append(question(q,false,result,activeIds.has(q.id)));
     if(plan.questionnaire.pending_terms?.length){
       const pending=el('details','pending-rules');
-      const label=el('summary','','需要先核实当前 Offer 条款（'+
-        plan.questionnaire.pending_terms.length+' 条，不计入问卷）');
-      pending.append(label,el('p','small','以下限制可能与目标卡有关，但当前申请条款没有确认。系统不会擅自认定这些限制存在，也不会以此判断奖励资格。'));
+      const label=el('summary','','还有几项开卡奖励条款需要核实（'+
+        plan.questionnaire.pending_terms.length+' 项，暂不需要你回答）');
+      pending.append(label,el('p','small','这些限制可能和这张卡有关，但还没核实你这次申请的具体条款，因此暂时不能判断。'));
       for(const rule of plan.questionnaire.pending_terms){
         const p=el('p','small',rule.rule_id+' · '+rule.title+
-          (rule.history_scope.length?' · 可能关联：'+rule.history_scope.join('、'):''));
+          (rule.history_scope.length?' · 相关卡片：'+rule.history_scope.join('、'):''));
         pending.append(p);
       }
       list.append(pending);
@@ -424,63 +424,63 @@
     report.replaceChildren();
     if(result.evaluation){
       const d=result.evaluation;
-      report.append(el('h2','','Amex 本机评估结果'));
+      report.append(el('h2','','这张 Amex 卡适不适合现在申请？'));
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
       app.append(el('p','',d.application.message));
-      app.append(el('p','small','通用信用矩阵：'+({
-        HIGH:'相对较好',MEDIUM:'一般',HIGH_RISK:'偏高风险',
-        INSUFFICIENT_DATA:'资料不足'
-      })[d.application.base_risk]+'。不代表银行审批概率。'));
+      app.append(el('p','small','基础信用情况：'+({
+        HIGH:'优秀（最高档）',MEDIUM:'一般',HIGH_RISK:'偏高风险',
+        INSUFFICIENT_DATA:'还没算出来'
+      })[d.application.base_risk]+'。这不是银行的获批概率。'));
       const unfinished=d.application.unresolved_rules||[];
       if(unfinished.length){
-        app.append(el('p','small','Amex 专属规则：'+
-          unfinished.filter(x=>x.status==='MISSING').length+' 项需要补充答案，'+
-          unfinished.filter(x=>x.status==='REVIEW').length+' 项需要核实。'));
+        app.append(el('p','small','Amex 申请规则：'+
+          unfinished.filter(x=>x.status==='MISSING').length+' 项还没回答，'+
+          unfinished.filter(x=>x.status==='REVIEW').length+' 项需要再确认。'));
         const detail=el('details','approval-gaps');
-        detail.append(el('summary','','查看尚未完成的条件（'+unfinished.length+' 项）'));
+        detail.append(el('summary','','看看还有哪些信息没确认（'+unfinished.length+' 项）'));
         for(const row of unfinished){
           detail.append(el('p','small',ruleLabel(row.rule_id)+' · '+
-            (row.status==='MISSING'?'需要回答':'需核实')+'：'+row.reason));
+            (row.status==='MISSING'?'还没回答':'需要核实')+'：'+row.reason));
         }
         app.append(detail);
       }else if(d.application.base_completed){
-        app.append(el('p','small','当前适用的 Amex 专属申请规则已完成检查。'));
+        app.append(el('p','small','这张卡适用的 Amex 申请规则已检查完。'));
       }
       const bonus=el('section','assessment-panel');
-      bonus.append(el('strong','','开卡奖励资格'));
+      bonus.append(el('strong','','能不能拿到开卡奖励'));
       bonus.append(el('p','',d.bonus.message));
-      bonus.append(el('p','small','Offer 假设：'+(d.offer_variant==='NLL'?'NLL 特殊 Offer':'普通公开 Offer')));
+      bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
-      itemized.append(el('summary','','逐条规则解释（'+d.rule_results.length+' 项）'));
+      itemized.append(el('summary','','查看每条规则的判断（'+d.rule_results.length+' 项）'));
       for(const rule of d.rule_results){
         const desc=el('p','small',
-          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:'触发风险/限制',CLEAR:'未发现触发',
-            MISSING:'需要补充',REVIEW:'待确认'})[rule.status]+' · '+rule.reason);
+          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:'可能受限',CLEAR:'没有触发',
+            MISSING:'还没回答',REVIEW:'需要核实'})[rule.status]+' · '+rule.reason);
         itemized.append(desc);
       }
       report.append(itemized,el('p','small',d.caveat));
       if(result.marriott_matrix){
         const pending=result.marriott_matrix;
-        report.append(el('p','small','Marriott 跨银行规则：'+
-          ({CLEAR:'已根据现有历史排除限制',TRIGGERED:'已有明确触发条件',
-             MISSING:'仍缺少会影响判断的历史事实',
-             SKIPPED_AFTER_BONUS_BLOCK:'其他奖励限制已触发，跳过无关追问',
-             NOT_APPLICABLE:'不适用'})[pending.status]+'。仅按本次所选 Offer 模型判断。'));
+        report.append(el('p','small','Marriott 跨银行开卡奖励限制：'+
+          ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'有可能影响奖励的持卡记录',
+             MISSING:'还需要补充相关持卡时间',
+             SKIPPED_AFTER_BONUS_BLOCK:'已经发现其他奖励限制，不再重复追问',
+             NOT_APPLICABLE:'不适用'})[pending.status]+'。具体以这次申请的条款为准。'));
       }
     }
-    $('scope').textContent='匹配规则：'+info.applicable_rule_ids.join('、');
-    $('gaps').textContent='待核实系统条件：'+
+    $('scope').textContent='对应的规则编号：'+info.applicable_rule_ids.join('、');
+    $('gaps').textContent='待核实的申请条款：'+
       (info.unresolved_system_gates.map(x=>x.rule_id).join('、')||'无')+
-      '；目标属性不完整：'+(info.unresolved_target_mappings.map(x=>x.rule_id).join('、')||'无');
+      '；卡片信息缺失：'+(info.unresolved_target_mappings.map(x=>x.rule_id).join('、')||'无');
   }
   async function start(){
     if(loading)return;
     loading=true;
     $('retry').hidden=true;
-    $('summary').textContent='正在读取独立卡片目录和规则…';
+    $('summary').textContent='正在加载卡片和申请规则…';
     $('generate').disabled=true;
     try{
       const files=['dynamic-questionnaire-rule-index.json','products.json',
