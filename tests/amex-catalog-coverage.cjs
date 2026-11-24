@@ -18,7 +18,7 @@ const amexEnricher=createEnricher({policy:amexPolicy});
 const facade=createFacade({planner,lookup,amexEnricher});
 const amexRules=ruleIndex.rules.filter(x=>x.id.startsWith('AMEX'));
 assert.equal(amexRules.length,31,'the reviewed Bank Rules source has 31 AMEX rows');
-assert.equal(amexRules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,23);
+assert.equal(amexRules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,22);
 assert.deepEqual(new Set(amexPolicy.source.rule_ids),new Set(amexRules.map(r=>r.id)));
 assert.equal(formal.count,32,'read 32 AMEX profiles from NB formal catalog');
 assert.equal(formal.products.length,32);
@@ -55,16 +55,17 @@ for(const f of formal.products){
   assert.equal(result.limitations.application_availability_verified,false);
   assert.equal(result.limitations.full_eligibility_result_available,false);
   const active=new Set(result.questionnaire.diagnostics.applicable_rule_ids);
+  assert.ok(!active.has('AMEX-010'),'disabled 1/5 must never route for '+f.nb_card_id);
   assert.ok(active.has('AMEX-011'),'same-target spacing for '+f.nb_card_id);
   if(f.card_form==='REVOLVING_CREDIT'){
-    for(const id of ['AMEX-006','AMEX-007','AMEX-010'])
+    for(const id of ['AMEX-006','AMEX-007'])
       assert.ok(active.has(id),id+' should apply to revolving '+f.nb_card_id);
     assert.ok(!active.has('AMEX-008'),'charge-cap rule must not apply to revolving cards');
   }else{
     assert.ok(active.has('AMEX-008'),'charge card count question for '+f.nb_card_id);
     assert.ok(!active.has('AMEX-006'),'revolving 2/90 must not apply to charge cards');
     assert.ok(!active.has('AMEX-007'),'revolving count must not apply to charge cards');
-    assert.ok(!active.has('AMEX-010'),'revolving 1/5 must not apply to charge cards');
+    assert.ok(!active.has('AMEX-010'),'inactive 1/5 must not apply to any product');
   }
   const groups=result.questionnaire.questionnaire.specific;
   const count=groups.find(x=>x.id==='F10_ISSUER_PORTFOLIO_COUNT');
@@ -116,7 +117,7 @@ assert.ok(!deltaBusiness.questionnaire.questionnaire.pending_terms.some(p=>
 const opaque='PERSONAL_ANSWER_MARKER_DO_NOT_ECHO';
 const privateResult=facade.plan({input:'American Express Blue Cash Everyday Card',
   known_facts:{F02_ISSUER_APPLICATION_HISTORY:{
-    approved_revolving_90d:0,approved_revolving_5d:'NO',
+    approved_revolving_90d:0,
     same_product_applied_or_approved_90d:'NO'},a2:opaque}});
 assert.doesNotMatch(JSON.stringify(privateResult),/PERSONAL_ANSWER_MARKER_DO_NOT_ECHO/);
 assert.ok(!privateResult.questionnaire.questionnaire.specific.some(q=>
@@ -128,5 +129,5 @@ for(const fname of ['adapters/amex-questionnaire-v1.js','adapters/card-questionn
 }
 console.log(JSON.stringify({suite:'amex-formal-catalog-coverage',
   formalAmexCards:32,assessmentAmexIdentities:33,ruleRows:31,
-  executableRestrictionRules:23,productFormRouting:true,
+  executableRestrictionRules:22,productFormRouting:true,
   productHistoryGating:true,benefitsExcluded:true,answersStayLocal:true,status:'PASS'}));

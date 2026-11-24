@@ -20,11 +20,11 @@ AMEX rule/card-form classification uses the formal catalog + audited rule target
 
 The authoritative reviewed `Bank Rules.xlsx` snapshot contains **31 AMEX-related rows**:
 
-- **23 executable rule definitions** used for conservative questionnaire routing.
+- **22 active executable rule definitions** used for conservative questionnaire routing; AMEX-010 (1/5) is retained in the source snapshot but disabled in Assessment on user request.
 - **8 other rows** (meta, reference, inactive): retained as exclusions/scope guards, not converted into user questions.
 - Across the 32 formally cataloged cards, exact issuer, card-form, personal/business and product-name predicates are now routable.
 - Existing frozen offer-term gates are honored for the two previously reviewed Assessment products. **For other cards, offer-dependent lifetime/family language is not assumed present or absent.** Pending clauses are shown as *system review required*, separate from the actionable questionnaire.
-- Amex revolving card 1/5 and 2/90, charge-card count, and issuer same-product timing questions are based on actual card type. Do not reuse 2/90 revolving rules for charge cards.
+- Amex revolving card 2/90, charge-card count, and issuer same-product timing questions are based on actual card type. Do not reuse 2/90 revolving rules for charge cards.
 - Holding history (F03) is separate from having received a welcome bonus (F04). NLL language is clause specific, **not** a global override.
 - Personal Delta family language must not be applied to Business Delta. Different Hilton personal tiers are **not** declared mutually excluding. Marriott has a separate cross-issuer historical matrix needing current terms and dated history. Schwab and Morgan Stanley variants ask for the correct partner relationship.
 - The Amex-specific question display comes from one `data/amex-questionnaire-policy.json`, interpreted by `adapters/amex-questionnaire-v1.js`. No hand-built questionnaire per card.
@@ -45,7 +45,7 @@ node tests/card-name-to-questionnaire-v1.cjs
 node tests/dynamic-questionnaire-v1.cjs
 ```
 
-Coverage includes all 32 formal Amex IDs, 31 Amex rules, 33 independent Amex identities, merchant history and URL matching, personal/business Delta isolation, known-vs-unknown offer gates, 1/5/2/90 form routing, 3-dimensional facts, and local answer privacy. The full legacy Assessment CI suite remains required before merge.
+Coverage includes all 32 formal Amex IDs, 31 Amex rules, 33 independent Amex identities, merchant history and URL matching, personal/business Delta isolation, known-vs-unknown offer gates, 2/90 form routing; inactive 1/5 does not route, 3-dimensional facts, and local answer privacy. The full legacy Assessment CI suite remains required before merge.
 
 ## Standard-offer default and explicit NLL variants
 

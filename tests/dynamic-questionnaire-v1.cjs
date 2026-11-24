@@ -13,9 +13,9 @@ const planner=makePlanner({ruleIndex,products,baseQuestions:existing.common,
 
 assert.equal(planner.getVersion().rule_count,129);
 assert.equal(ruleIndex.facts.length,12);
-assert.equal(ruleIndex.rules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,89);
+assert.equal(ruleIndex.rules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,88);
 assert.equal(ruleIndex.rules.filter(x=>x.runtime_class==='REFERENCE_ONLY').length,15);
-assert.equal(ruleIndex.rules.filter(x=>x.runtime_class==='INACTIVE').length,4);
+assert.equal(ruleIndex.rules.filter(x=>x.runtime_class==='INACTIVE').length,5);
 assert.equal(new Set(ruleIndex.rules.map(x=>x.id)).size,129);
 assert.equal(planner.listProducts().length,7);
 

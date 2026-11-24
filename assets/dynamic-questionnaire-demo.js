@@ -37,7 +37,6 @@
     LIKELY_RESTRICTED:'可能受限'};
   const structuredRuleIds={
     approved_revolving_90d:['AMEX-006'],
-    approved_revolving_5d:['AMEX-010'],
     same_product_applied_or_approved_90d:['AMEX-011']
   };
   function minusAnswer(item,field){

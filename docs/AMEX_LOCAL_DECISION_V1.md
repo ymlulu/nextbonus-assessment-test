@@ -23,7 +23,7 @@ Each applied source rule produces a distinct `rule_results[]` record with a dime
 }
 ```
 
-The form only asks fields that apply to the selected product. Amex charge cards do not acquire revolving-specific 1/5 or 2/90 questions. Partially completed structured facts are **not** treated as fully answered.
+The form only asks fields that apply to the selected product. AMEX-010 (1/5) is deactivated for all cards; revolving 2/90 (AMEX-006) remains active and does not apply to charge cards. Partially completed structured facts are **not** treated as fully answered.
 
 `F10_ISSUER_PORTFOLIO_COUNT` is the count for the applicable revolving / charge card type. `F03_CARD_HISTORY` is an explicit multi-selection of ever-held cards, not welcome-bonus receipts; `F07_MARRIOTT_HISTORY` is Marriott/Ritz-Carlton family history and does not establish time windows by itself; `F08_RELATIONSHIP` is an eligible account flag. Baseline `a1`…`a4` continue to use the established, reviewed generic credit model.
 
@@ -31,7 +31,7 @@ The UI never posts, saves or uploads answers. The results stay in browser memory
 
 ## Conservative interpretations
 
-- Amex credit-card 1/5 and 2/90 spacing and same-product 90-day timing raise application risk; a triggered risk **does not certify rejection**.
+- Amex credit-card 2/90 spacing and same-product 90-day timing raise application risk; a triggered risk **does not certify rejection**. The disputed AMEX-010 1/5 rule is preserved in the source inventory but does not ask questions, lower risk ratings, or create missing-fact warnings.
 - The five-revolving-card and ten-charge-card counts are issuer-related risk signals, **not absolute hard caps**.
 - Standard assumed Lifetime/Family Language with positive, exact prior holding history yields `LIKELY_RESTRICTED`; NLL removes only same-product Lifetime by default. Family clauses must be overridden individually when a verified special offer lacks them.
 - Personal Delta family is never copied into Delta Business. Hilton different personal tiers do not establish a cross-tier bonus block.

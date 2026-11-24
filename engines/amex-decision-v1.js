@@ -5,7 +5,7 @@ const api=factory();if(typeof module==='object'&&module.exports)module.exports=a
 else root.NextBonusAmexDecisionV1=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const APP=new Set(['AMEX-006','AMEX-007','AMEX-008','AMEX-010','AMEX-011','AMEX-REL-001','AMEX-REL-002']);
+const APP=new Set(['AMEX-006','AMEX-007','AMEX-008','AMEX-011','AMEX-REL-001','AMEX-REL-002']);
 const BONUS=new Set(['AMEX-001','AMEX-FL-001','AMEX-FL-002','AMEX-FL-003','AMEX-FL-004','AMEX-FL-005','AMEX-FL-006','AMEX-FL-007','AMEX-FL-008','AMEX-FL-009','AMEX-FL-010','AMEX-FL-012','AMEX-FL-013','AMEX-BIZ-001','AMEX-BIZ-002','AMEX-BIZ-005']);
 // Only unidentifiable old-version phrases are review-only. Named and mapped
 // historical products (e.g. SPG predecessors) are actionable facts under the
@@ -104,11 +104,10 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    events.push(result(id,!count(n)?'MISSING':n>=2?'TRIGGERED':'CLEAR',dim,
     count(n)?'过去 90 天 Amex revolving 卡获批 '+n+' 张':'需要 90 天获批张数'));continue;
   }
-  if(id==='AMEX-010'||id==='AMEX-011'){
-   const field=id==='AMEX-010'?'approved_revolving_5d':'same_product_applied_or_approved_90d';
-   const v=activity[field];
+  if(id==='AMEX-011'){
+   const v=activity.same_product_applied_or_approved_90d;
    events.push(result(id,!['YES','NO'].includes(v)?'MISSING':v==='YES'?'TRIGGERED':'CLEAR',dim,
-    id==='AMEX-010'?'5 天内是否获批 Amex revolving 卡':'90 天内是否申请或获批该产品'));continue;
+    '90 天内是否申请或获批该产品'));continue;
   }
  }
  if(marriottResult?.applicable){

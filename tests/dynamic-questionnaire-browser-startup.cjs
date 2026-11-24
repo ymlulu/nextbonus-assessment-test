@@ -122,7 +122,7 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(walk(get('questions')).some(n=>n.tag==='select'&&n.value==='NO'),
    'completed activity question must still show its chosen option');
  assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
-   /AMEX-010：待补充 → 未触发/.test(n.textContent)),
+   /AMEX-011（Amex 同产品 90 天申请间隔限制）：待补充 → 未触发/.test(n.textContent)),
    'rule-specific answer must show its exact source rule status transition in red');
  // The question should remain even though the planner removed the answered
  // F02 fact from its still-pending question list.
