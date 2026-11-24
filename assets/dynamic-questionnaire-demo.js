@@ -32,7 +32,36 @@
     head.append(el('span','muted',common?'基础评分':'规则自动匹配'));
     card.append(head);
     if(item.description)card.append(el('p','small',item.description));
-    if(item.type==='structured'&&Array.isArray(item.fields)){
+    if(item.type==='structured_marriott'&&Array.isArray(item.fields)){
+      const stored=answers.F07_MARRIOTT_DETAILS||{};
+      const prior=stored[item.prior_id]||{};
+      const fields=[];
+      for(const def of item.fields){
+        const label=el('label','structured-field',def.label);
+        const control=el('select');
+        const empty=el('option','','请选择');empty.value='';control.append(empty);
+        for(const option of def.options||[]){
+          const node=el('option','',option.label);node.value=option.value;
+          if(prior[def.id]===option.value)node.selected=true;
+          control.append(node);
+        }
+        label.append(control);card.append(label);
+        fields.push({def,control});
+      }
+      const button=el('button','secondary','保存并继续判断');
+      button.type='button';
+      button.addEventListener('click',()=>{
+        const values={...prior};
+        for(const {def,control} of fields){
+          if(control.value)values[def.id]=control.value;
+        }
+        answers.F07_MARRIOTT_DETAILS={
+          ...(answers.F07_MARRIOTT_DETAILS||{}),[item.prior_id]:values
+        };
+        render();
+      });
+      card.append(button);
+    }else if(item.type==='structured'&&Array.isArray(item.fields)){
       const entry=answers[item.id]&&typeof answers[item.id]==='object'?answers[item.id]:{};
       const controls=[];
       for(const field of item.fields){
@@ -238,6 +267,13 @@
         itemized.append(desc);
       }
       report.append(itemized,el('p','small',d.caveat));
+      if(result.marriott_matrix){
+        const pending=result.marriott_matrix;
+        report.append(el('p','small','Marriott 跨银行规则：'+
+          ({CLEAR:'已根据现有历史排除限制',TRIGGERED:'已有明确触发条件',
+             MISSING:'仍缺少会影响判断的历史事实',
+             NOT_APPLICABLE:'不适用'})[pending.status]+'。仅按本次所选标准 Offer 模型判断。'));
+      }
     }
     $('scope').textContent='匹配规则：'+info.applicable_rule_ids.join('、');
     $('gaps').textContent='待核实系统条件：'+
