@@ -5,9 +5,17 @@
     "history": "data/offer-history.json",
     "products": "data/products.json",
     "expansion": "config/expansion-candidates.json",
-    "note": "Identifiers only; historical inclusion does not assert current issuance or offer terms"
+    "note": "Identifiers only; historical inclusion does not assert current issuance or offer terms",
+    "nb_formal_catalog": {
+      "repository": "uscc101/nextbonus-web",
+      "commit": "e1aa32f62a9cb4e806393d9afd5a2c835317e405",
+      "path": "docs/card-catalog/products.json",
+      "profile": "packages/card-catalog/data/amex.json",
+      "rule": "NB formal identity only; no offer terms or benefits imported",
+      "amex_formal_count": 32
+    }
   },
-  "count": 98,
+  "count": 109,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -25,11 +33,18 @@
       "aliases": [
         "AMEX Platinum",
         "American Express Platinum",
-        "Platinum",
-        "The Platinum Card"
+        "platinum",
+        "The Platinum Card",
+        "Platinum Card",
+        "American Express Platinum Card",
+        "AMEX Platinum Card"
       ],
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-platinum-intro/",
-      "application_url": "https://www.uscreditcards101.com/go/amex-platinum"
+      "application_url": "https://www.uscreditcards101.com/go/amex-platinum",
+      "formal_nb_card_id": "platinum",
+      "canonical_rule_product_name": "The Platinum Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "amex_gold",
@@ -47,21 +62,28 @@
       "aliases": [
         "AMEX Gold",
         "American Express Gold",
-        "Gold",
-        "Personal AMEX Gold"
+        "gold",
+        "Personal AMEX Gold",
+        "American Express Gold Card",
+        "American Express American Express Gold Card",
+        "AMEX American Express Gold Card"
       ],
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/amex-prg-intro/",
-      "application_url": "https://www.uscreditcards101.com/go/amex-gold"
+      "application_url": "https://www.uscreditcards101.com/go/amex-gold",
+      "formal_nb_card_id": "gold",
+      "canonical_rule_product_name": "Personal AMEX Gold",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "amex_delta_gold",
       "name": "Delta Gold",
-      "product_name": "Delta Gold",
+      "product_name": "Delta SkyMiles Gold (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-003",
@@ -69,18 +91,26 @@
       "aliases": [
         "Delta Gold",
         "American Express Delta Gold",
-        "AMEX Delta Gold"
-      ]
+        "amex-delta-gold",
+        "Delta SkyMiles Gold Card",
+        "Delta SkyMiles Gold (Personal)",
+        "American Express Delta SkyMiles Gold Card",
+        "AMEX Delta SkyMiles Gold Card"
+      ],
+      "formal_nb_card_id": "amex-delta-gold",
+      "canonical_rule_product_name": "Delta SkyMiles Gold (Personal)",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_004",
       "name": "American Express Delta Platinum",
-      "product_name": "Delta Platinum",
+      "product_name": "Delta SkyMiles Platinum (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-004",
@@ -88,18 +118,26 @@
       "aliases": [
         "American Express Delta Platinum",
         "Delta Platinum",
-        "AMEX Delta Platinum"
-      ]
+        "amex-delta-platinum",
+        "Delta SkyMiles Platinum Card",
+        "Delta SkyMiles Platinum (Personal)",
+        "American Express Delta SkyMiles Platinum Card",
+        "AMEX Delta SkyMiles Platinum Card"
+      ],
+      "formal_nb_card_id": "amex-delta-platinum",
+      "canonical_rule_product_name": "Delta SkyMiles Platinum (Personal)",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_005",
       "name": "American Express Delta Reserve",
-      "product_name": "Delta Reserve",
+      "product_name": "Delta SkyMiles Reserve (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-005",
@@ -107,8 +145,16 @@
       "aliases": [
         "American Express Delta Reserve",
         "Delta Reserve",
-        "AMEX Delta Reserve"
-      ]
+        "amex-delta-reserve",
+        "Delta SkyMiles Reserve Card",
+        "Delta SkyMiles Reserve (Personal)",
+        "American Express Delta SkyMiles Reserve Card",
+        "AMEX Delta SkyMiles Reserve Card"
+      ],
+      "formal_nb_card_id": "amex-delta-reserve",
+      "canonical_rule_product_name": "Delta SkyMiles Reserve (Personal)",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "citi_aadvantage_executive",
@@ -172,7 +218,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-009",
@@ -180,8 +226,15 @@
       "aliases": [
         "Marriott Bonvoy Brilliant",
         "American Express Marriott Bonvoy Brilliant",
-        "AMEX Marriott Bonvoy Brilliant"
-      ]
+        "amex-marriott-bonvoy-brilliant",
+        "Marriott Bonvoy Brilliant Card",
+        "American Express Marriott Bonvoy Brilliant Card",
+        "AMEX Marriott Bonvoy Brilliant Card"
+      ],
+      "formal_nb_card_id": "amex-marriott-bonvoy-brilliant",
+      "canonical_rule_product_name": "Marriott Bonvoy Brilliant",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "chase_sapphire_preferred",
@@ -269,7 +322,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-014",
@@ -277,8 +330,15 @@
       "aliases": [
         "Marriott Bonvoy Bevy",
         "American Express Marriott Bonvoy Bevy",
-        "AMEX Marriott Bonvoy Bevy"
-      ]
+        "amex-marriott-bonvoy-bevy",
+        "Marriott Bonvoy Bevy Card",
+        "American Express Marriott Bonvoy Bevy Card",
+        "AMEX Marriott Bonvoy Bevy Card"
+      ],
+      "formal_nb_card_id": "amex-marriott-bonvoy-bevy",
+      "canonical_rule_product_name": "Marriott Bonvoy Bevy",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "citi_strata_elite",
@@ -438,7 +498,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-023",
@@ -446,8 +506,16 @@
       "aliases": [
         "American Express Platinum for Morgan Stanley",
         "Platinum for Morgan Stanley",
-        "AMEX Platinum for Morgan Stanley"
-      ]
+        "AMEX Platinum for Morgan Stanley",
+        "Platinum Card exclusively for Morgan Stanley",
+        "the-platinum-card-from-american-express-exclusively-for-morgan-stanley",
+        "American Express Platinum Card exclusively for Morgan Stanley",
+        "AMEX Platinum Card exclusively for Morgan Stanley"
+      ],
+      "formal_nb_card_id": "the-platinum-card-from-american-express-exclusively-for-morgan-stanley",
+      "canonical_rule_product_name": "Platinum for Morgan Stanley",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_bankofamerica_024",
@@ -471,12 +539,12 @@
     {
       "product_id": "history_ot_amex_025",
       "name": "American Express Hilton Honors",
-      "product_name": "Hilton Honors",
+      "product_name": "Hilton Honors (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-025",
@@ -484,18 +552,26 @@
       "aliases": [
         "American Express Hilton Honors",
         "Hilton Honors",
-        "AMEX Hilton Honors"
-      ]
+        "amex-hilton-honors",
+        "Hilton Honors Card",
+        "Hilton Honors (Personal)",
+        "American Express Hilton Honors Card",
+        "AMEX Hilton Honors Card"
+      ],
+      "formal_nb_card_id": "amex-hilton-honors",
+      "canonical_rule_product_name": "Hilton Honors (Personal)",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_026",
       "name": "American Express Hilton Surpass",
-      "product_name": "Hilton Surpass",
+      "product_name": "Hilton Surpass (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-026",
@@ -503,18 +579,26 @@
       "aliases": [
         "American Express Hilton Surpass",
         "Hilton Surpass",
-        "AMEX Hilton Surpass"
-      ]
+        "amex-hilton-surpass",
+        "Hilton Honors Surpass Card",
+        "Hilton Surpass (Personal)",
+        "American Express Hilton Honors Surpass Card",
+        "AMEX Hilton Honors Surpass Card"
+      ],
+      "formal_nb_card_id": "amex-hilton-surpass",
+      "canonical_rule_product_name": "Hilton Surpass (Personal)",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "amex_hilton_aspire",
       "name": "Hilton Aspire",
-      "product_name": "Hilton Aspire",
+      "product_name": "Hilton Aspire (Personal)",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-027",
@@ -522,8 +606,17 @@
       "aliases": [
         "Hilton Aspire",
         "American Express Hilton Aspire",
-        "AMEX Hilton Aspire"
-      ]
+        "AMEX Hilton Aspire",
+        "Hilton Honors Aspire Card",
+        "Hilton Aspire (Personal)",
+        "aspire",
+        "American Express Hilton Honors Aspire Card",
+        "AMEX Hilton Honors Aspire Card"
+      ],
+      "formal_nb_card_id": "aspire",
+      "canonical_rule_product_name": "Hilton Aspire (Personal)",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "chase_ihg_one_rewards_premier",
@@ -662,7 +755,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-035",
@@ -670,8 +763,15 @@
       "aliases": [
         "American Express Blue Cash Everyday",
         "Blue Cash Everyday",
-        "AMEX Blue Cash Everyday"
-      ]
+        "amex-blue-cash-everyday",
+        "Blue Cash Everyday Card",
+        "American Express Blue Cash Everyday Card",
+        "AMEX Blue Cash Everyday Card"
+      ],
+      "formal_nb_card_id": "amex-blue-cash-everyday",
+      "canonical_rule_product_name": "Blue Cash Everyday",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_036",
@@ -681,7 +781,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-036",
@@ -689,8 +789,15 @@
       "aliases": [
         "American Express Blue Cash Preferred",
         "Blue Cash Preferred",
-        "AMEX Blue Cash Preferred"
-      ]
+        "amex-blue-cash-preferred",
+        "Blue Cash Preferred Card",
+        "American Express Blue Cash Preferred Card",
+        "AMEX Blue Cash Preferred Card"
+      ],
+      "formal_nb_card_id": "amex-blue-cash-preferred",
+      "canonical_rule_product_name": "Blue Cash Preferred",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "chase_freedom_flex",
@@ -1350,12 +1457,12 @@
     {
       "product_id": "history_ot_amex_073",
       "name": "American Express Delta Gold Business",
-      "product_name": "Delta Gold Business",
+      "product_name": "Delta SkyMiles Business Gold",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-073",
@@ -1363,18 +1470,26 @@
       "aliases": [
         "American Express Delta Gold Business",
         "Delta Gold Business",
-        "AMEX Delta Gold Business"
-      ]
+        "amex-delta-gold-business",
+        "Delta SkyMiles Gold Business Card",
+        "Delta SkyMiles Business Gold",
+        "American Express Delta SkyMiles Gold Business Card",
+        "AMEX Delta SkyMiles Gold Business Card"
+      ],
+      "formal_nb_card_id": "amex-delta-gold-business",
+      "canonical_rule_product_name": "Delta SkyMiles Business Gold",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_074",
       "name": "American Express Delta Platinum Business",
-      "product_name": "Delta Platinum Business",
+      "product_name": "Delta SkyMiles Business Platinum",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-074",
@@ -1382,18 +1497,26 @@
       "aliases": [
         "American Express Delta Platinum Business",
         "Delta Platinum Business",
-        "AMEX Delta Platinum Business"
-      ]
+        "amex-delta-platinum-business",
+        "Delta SkyMiles Platinum Business Card",
+        "Delta SkyMiles Business Platinum",
+        "American Express Delta SkyMiles Platinum Business Card",
+        "AMEX Delta SkyMiles Platinum Business Card"
+      ],
+      "formal_nb_card_id": "amex-delta-platinum-business",
+      "canonical_rule_product_name": "Delta SkyMiles Business Platinum",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_075",
       "name": "American Express Delta Reserve Business",
-      "product_name": "Delta Reserve Business",
+      "product_name": "Delta SkyMiles Business Reserve",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-075",
@@ -1401,8 +1524,17 @@
       "aliases": [
         "American Express Delta Reserve Business",
         "Delta Reserve Business",
-        "AMEX Delta Reserve Business"
-      ]
+        "AMEX Delta Reserve Business",
+        "Delta SkyMiles Reserve Business Card",
+        "delta-skymiles-reserve-business-american-express-card",
+        "Delta SkyMiles Business Reserve",
+        "American Express Delta SkyMiles Reserve Business Card",
+        "AMEX Delta SkyMiles Reserve Business Card"
+      ],
+      "formal_nb_card_id": "delta-skymiles-reserve-business-american-express-card",
+      "canonical_rule_product_name": "Delta SkyMiles Business Reserve",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_capitalone_076",
@@ -1466,7 +1598,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-079",
@@ -1474,8 +1606,15 @@
       "aliases": [
         "American Express Business Gold",
         "Business Gold",
-        "AMEX Business Gold"
-      ]
+        "amex-business-gold",
+        "Business Gold Card",
+        "American Express Business Gold Card",
+        "AMEX Business Gold Card"
+      ],
+      "formal_nb_card_id": "amex-business-gold",
+      "canonical_rule_product_name": "Business Gold",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_080",
@@ -1485,7 +1624,7 @@
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-080",
@@ -1493,18 +1632,25 @@
       "aliases": [
         "American Express Business Platinum",
         "Business Platinum",
-        "AMEX Business Platinum"
-      ]
+        "amex-business-platinum",
+        "Business Platinum Card",
+        "American Express Business Platinum Card",
+        "AMEX Business Platinum Card"
+      ],
+      "formal_nb_card_id": "amex-business-platinum",
+      "canonical_rule_product_name": "Business Platinum",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_081",
       "name": "American Express Graphite Business",
-      "product_name": "Graphite Business",
+      "product_name": "Graphite Business Cash Unlimited Card",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-081",
@@ -1512,8 +1658,16 @@
       "aliases": [
         "American Express Graphite Business",
         "Graphite Business",
-        "AMEX Graphite Business"
-      ]
+        "amex-graphite-business",
+        "Graphite Business Cash Unlimited Card",
+        "amex graphier business",
+        "American Express Graphite Business Cash Unlimited Card",
+        "AMEX Graphite Business Cash Unlimited Card"
+      ],
+      "formal_nb_card_id": "amex-graphite-business",
+      "canonical_rule_product_name": "Graphite Business Cash Unlimited Card",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_chase_082",
@@ -1701,12 +1855,12 @@
     {
       "product_id": "history_ot_amex_092",
       "name": "American Express Marriott Bonvoy Business",
-      "product_name": "Marriott Bonvoy Business",
+      "product_name": "Marriott Bonvoy Business American Express",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-092",
@@ -1714,18 +1868,26 @@
       "aliases": [
         "American Express Marriott Bonvoy Business",
         "Marriott Bonvoy Business",
-        "AMEX Marriott Bonvoy Business"
-      ]
+        "amex-marriott-bonvoy-business",
+        "Marriott Bonvoy Business Card",
+        "Marriott Bonvoy Business American Express",
+        "American Express Marriott Bonvoy Business Card",
+        "AMEX Marriott Bonvoy Business Card"
+      ],
+      "formal_nb_card_id": "amex-marriott-bonvoy-business",
+      "canonical_rule_product_name": "Marriott Bonvoy Business American Express",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_amex_093",
       "name": "American Express Hilton Business",
-      "product_name": "Hilton Business",
+      "product_name": "Hilton Honors American Express Business",
       "issuer": "AMEX",
       "approval_issuer": "AMEX",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
-      "card_form": null,
+      "card_form": "REVOLVING_CREDIT",
       "brand": null,
       "generation": null,
       "offer_timing_id": "OT-AMEX-093",
@@ -1733,8 +1895,16 @@
       "aliases": [
         "American Express Hilton Business",
         "Hilton Business",
-        "AMEX Hilton Business"
-      ]
+        "amex-hilton-business",
+        "Hilton Honors Business Card",
+        "Hilton Honors American Express Business",
+        "American Express Hilton Honors Business Card",
+        "AMEX Hilton Honors Business Card"
+      ],
+      "formal_nb_card_id": "amex-hilton-business",
+      "canonical_rule_product_name": "Hilton Honors American Express Business",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
     },
     {
       "product_id": "history_ot_chase_094",
@@ -1826,6 +1996,270 @@
         "Barclays Wyndham Earner Business",
         "Wyndham Earner Business"
       ]
+    },
+    {
+      "product_id": "nb_amex-blue-business-cash-business",
+      "name": "Blue Business Cash Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Blue Business Cash Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Blue Business Cash Card",
+        "amex-blue-business-cash-business",
+        "American Express Blue Business Cash Card",
+        "AMEX Blue Business Cash Card"
+      ],
+      "formal_nb_card_id": "amex-blue-business-cash-business",
+      "canonical_rule_product_name": "Blue Business Cash Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_blue-business-plus-credit-card-from-american-express",
+      "name": "Blue Business Plus Credit Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Blue Business Plus Credit Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Blue Business Plus Credit Card",
+        "blue-business-plus-credit-card-from-american-express",
+        "American Express Blue Business Plus Credit Card",
+        "AMEX Blue Business Plus Credit Card"
+      ],
+      "formal_nb_card_id": "blue-business-plus-credit-card-from-american-express",
+      "canonical_rule_product_name": "Blue Business Plus Credit Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-business-green",
+      "name": "Business Green Rewards Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
+      "product_name": "Business Green Rewards Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Business Green Rewards Card",
+        "amex-business-green",
+        "American Express Business Green Rewards Card",
+        "AMEX Business Green Rewards Card"
+      ],
+      "formal_nb_card_id": "amex-business-green",
+      "canonical_rule_product_name": "Business Green Rewards Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-cash-magnet",
+      "name": "Cash Magnet Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Cash Magnet Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Cash Magnet Card",
+        "amex-cash-magnet",
+        "American Express Cash Magnet Card",
+        "AMEX Cash Magnet Card"
+      ],
+      "formal_nb_card_id": "amex-cash-magnet",
+      "canonical_rule_product_name": "Cash Magnet Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-everyday-ed",
+      "name": "Amex EveryDay Credit Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Amex EveryDay Credit Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Amex EveryDay Credit Card",
+        "amex-everyday-ed",
+        "American Express Amex EveryDay Credit Card",
+        "AMEX Amex EveryDay Credit Card"
+      ],
+      "formal_nb_card_id": "amex-everyday-ed",
+      "canonical_rule_product_name": "Amex EveryDay Credit Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-everyday-preferred-credit-card",
+      "name": "Amex EveryDay Preferred Credit Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Amex EveryDay Preferred Credit Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "amex-everyday-preferred-credit-card",
+        "American Express Amex EveryDay Preferred Credit Card",
+        "AMEX Amex EveryDay Preferred Credit Card"
+      ],
+      "formal_nb_card_id": "amex-everyday-preferred-credit-card",
+      "canonical_rule_product_name": "Amex EveryDay Preferred Credit Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-plum-business",
+      "name": "Plum Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
+      "product_name": "Plum Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Plum Card",
+        "amex-plum-business",
+        "American Express Plum Card",
+        "AMEX Plum Card"
+      ],
+      "formal_nb_card_id": "amex-plum-business",
+      "canonical_rule_product_name": "Plum Card",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_amex-schwab-investor",
+      "name": "Schwab Investor Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Schwab Investor Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Schwab Investor Card",
+        "amex-schwab-investor",
+        "American Express Schwab Investor Card",
+        "AMEX Schwab Investor Card"
+      ],
+      "formal_nb_card_id": "amex-schwab-investor",
+      "canonical_rule_product_name": "Schwab Investor Card",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_american-express-green-card",
+      "name": "Classic Green Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "CHARGE_OR_PAY_OVER_TIME",
+      "product_name": "Classic Green Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Classic Green Card",
+        "american-express-green-card",
+        "American Express Classic Green Card",
+        "AMEX Classic Green Card"
+      ],
+      "formal_nb_card_id": "american-express-green-card",
+      "canonical_rule_product_name": "Classic Green Card",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_delta-skymiles-blue-american-express-card",
+      "name": "Delta SkyMiles Blue Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Delta SkyMiles Blue (Personal)",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Delta SkyMiles Blue Card",
+        "delta-skymiles-blue-american-express-card",
+        "Delta SkyMiles Blue (Personal)",
+        "American Express Delta SkyMiles Blue Card",
+        "AMEX Delta SkyMiles Blue Card"
+      ],
+      "formal_nb_card_id": "delta-skymiles-blue-american-express-card",
+      "canonical_rule_product_name": "Delta SkyMiles Blue (Personal)",
+      "formal_source_reviewed_on": "2026-10-28",
+      "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "nb_marriott-bonvoy-american-express-card",
+      "name": "Marriott Bonvoy Card",
+      "issuer": "AMEX",
+      "approval_issuer": "AMEX",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "product_name": "Marriott Bonvoy Card",
+      "brand": "AMEX",
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "NB_FORMAL_CATALOG",
+      "aliases": [
+        "Marriott Bonvoy Card",
+        "marriott-bonvoy-american-express-card",
+        "American Express Marriott Bonvoy Card",
+        "AMEX Marriott Bonvoy Card"
+      ],
+      "formal_nb_card_id": "marriott-bonvoy-american-express-card",
+      "canonical_rule_product_name": "Marriott Bonvoy Card",
+      "formal_source_reviewed_on": "2026-10-29",
+      "formal_application_availability": "UNKNOWN"
     }
   ]
 }
