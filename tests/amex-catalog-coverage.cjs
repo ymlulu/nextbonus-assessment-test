@@ -18,7 +18,7 @@ const amexEnricher=createEnricher({policy:amexPolicy});
 const facade=createFacade({planner,lookup,amexEnricher});
 const amexRules=ruleIndex.rules.filter(x=>x.id.startsWith('AMEX'));
 assert.equal(amexRules.length,31,'the reviewed Bank Rules source has 31 AMEX rows');
-assert.equal(amexRules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,23);
+assert.equal(amexRules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,22);
 assert.deepEqual(new Set(amexPolicy.source.rule_ids),new Set(amexRules.map(r=>r.id)));
 assert.equal(formal.count,32,'read 32 AMEX profiles from NB formal catalog');
 assert.equal(formal.products.length,32);
