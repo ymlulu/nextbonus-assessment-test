@@ -3,7 +3,7 @@
   const $=id=>document.getElementById(id);
   const answers=Object.create(null);
   let facade=null,selectedProductId='',cards=[],loading=false;
-  let baseQuestionLibrary=[];
+  let baseQuestionLibrary=[],chasePolicy=null;
   const seenQuestions=new Map();
   function el(tag,cls,text){
     const n=document.createElement(tag);
@@ -395,7 +395,9 @@
         ?'Amex 按普通 Offer 建模'+(result.offer_context.variant==='NLL'
           ?'，已启用 NLL 特殊变量。':'。')
         +'这里是问卷假设，并非实时核实的申请条款。'
-        :'此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。');
+        :result.identity.issuer==='CHASE'&&result.evaluation
+          ?'Chase 按已审核的规则库做初步评估，尚未逐条核实当前申请链接；不代表银行实际审批结果。'
+          :'此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。');
     // The rule planner intentionally returns only unanswered facts, but this
     // QA page keeps all previously displayed questions editable and visible.
     const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
@@ -424,7 +426,8 @@
     report.replaceChildren();
     if(result.evaluation){
       const d=result.evaluation;
-      report.append(el('h2','','这张 Amex 卡适不适合现在申请？'));
+      const bank=result.identity.issuer==='CHASE'?'Chase':'Amex';
+      report.append(el('h2','','这张 '+bank+' 卡适不适合现在申请？'));
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
@@ -435,7 +438,7 @@
       })[d.application.base_risk]+'。这不是银行的获批概率。'));
       const unfinished=d.application.unresolved_rules||[];
       if(unfinished.length){
-        app.append(el('p','small','Amex 申请规则：'+
+        app.append(el('p','small',bank+' 申请规则：'+
           unfinished.filter(x=>x.status==='MISSING').length+' 项还没回答，'+
           unfinished.filter(x=>x.status==='REVIEW').length+' 项需要再确认。'));
         const detail=el('details','approval-gaps');
@@ -446,12 +449,12 @@
         }
         app.append(detail);
       }else if(d.application.base_completed){
-        app.append(el('p','small','这张卡适用的 Amex 申请规则已检查完。'));
+        app.append(el('p','small','这张卡适用的 '+bank+' 申请规则已检查完。'));
       }
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','能不能拿到开卡奖励'));
       bonus.append(el('p','',d.bonus.message));
-      bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
+      bonus.append(el('p','small','当前按以下资料估算：'+(bank==='Chase'?'已审核的 Chase 规则库（具体条款未实时核实）':d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
       itemized.append(el('summary','','查看每条规则的判断（'+d.rule_results.length+' 项）'));
@@ -486,9 +489,10 @@
       const files=['dynamic-questionnaire-rule-index.json','products.json',
         'questions.json','frozen-offer-facts.json','card-identity-index.json',
         'amex-questionnaire-policy.json','approval-config.json',
-        'marriott-eligibility-matrix.json','amex-formal-product-identities.json'];
+        'marriott-eligibility-matrix.json','amex-formal-product-identities.json',
+        'chase-questionnaire-policy.json'];
       const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,
-        amexPolicy,approvalConfig,marriottMatrixConfig,formalAmex]=
+        amexPolicy,approvalConfig,marriottMatrixConfig,formalAmex,chaseData]=
         await Promise.all(files.map(async name=>{
           const response=await fetch('data/'+name,{cache:'no-cache'});
           if(!response.ok)throw Error('数据文件加载失败：'+name+' (HTTP '+response.status+')');
@@ -497,7 +501,8 @@
       if(!window.NextBonusQuestionnairePlannerV1||
          !window.NextBonusCardIdentityV1||!window.NextBonusAmexQuestionnaireV1||
          !window.NextBonusAmexOfferContextV1||!window.NextBonusAmexDecisionV1||
-         !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1)
+         !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1||
+         !window.NextBonusChaseQuestionnaireV1||!window.NextBonusChaseDecisionV1)
         throw Error('评估引擎文件未完全加载，请刷新页面');
       // Display-only copy. Runtime-owned questions.json is locked and must
       // never be rewritten just to change reader-facing wording.
@@ -519,8 +524,13 @@
       });
       const lookup=window.NextBonusCardIdentityV1.createLookup(identityIndex);
       const amexEnricher=window.NextBonusAmexQuestionnaireV1.createEnricher({policy:amexPolicy});
+      chasePolicy=chaseData;
+      for(const [id,rule] of Object.entries(chasePolicy.rule_checks))
+        readableRuleNames[id]=rule.name;
+      const chaseEnricher=window.NextBonusChaseQuestionnaireV1.createEnricher({policy:chasePolicy});
       facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
-        planner,lookup,amexEnricher,ruleIndex,
+        planner,lookup,amexEnricher,chaseEnricher,chasePolicy,
+        chaseDecision:window.NextBonusChaseDecisionV1,ruleIndex,
         targetState:window.NextBonusQuestionnairePlannerV1.targetState,
         amexOfferContext:window.NextBonusAmexOfferContextV1,
         amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
