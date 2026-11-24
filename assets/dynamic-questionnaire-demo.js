@@ -21,6 +21,12 @@
       options:mergeById(old.options,q.options,'value'),
       rule_ids:[...new Set([...(old.rule_ids||[]),...(q.rule_ids||[])])]});
   }
+  const readableRuleNames={
+    'AMEX-011':'Amex 同产品 90 天申请间隔限制'
+  };
+  function ruleLabel(id){
+    return readableRuleNames[id]?id+'（'+readableRuleNames[id]+'）':id;
+  }
   const ruleStates={MISSING:'待补充',REVIEW:'待核实',
     TRIGGERED:'触发限制',CLEAR:'未触发'};
   const riskStates={HIGH:'相对较好',MEDIUM:'一般',
@@ -90,7 +96,7 @@
     for(const id of all){
       const before=oldMap.get(id)?.status||'MISSING';
       const after=newMap.get(id)?.status||'MISSING';
-      if(before!==after)effects.push(id+'：'+
+      if(before!==after)effects.push(ruleLabel(id)+'：'+
         (ruleStates[before]||'未适用')+' → '+(ruleStates[after]||'未适用'));
     }
     const oldApp=a.application.status,newApp=b.application.status;
@@ -279,7 +285,7 @@
       card.append(row);
     }
     if(item.rule_ids?.length)
-      card.append(el('p','small','依据规则：'+item.rule_ids.join('、')));
+      card.append(el('p','small','依据规则：'+item.rule_ids.map(ruleLabel).join('、')));
     return card;
   }
   const ISSUER_LABELS={
@@ -436,7 +442,7 @@
         const detail=el('details','approval-gaps');
         detail.append(el('summary','','查看尚未完成的条件（'+unfinished.length+' 项）'));
         for(const row of unfinished){
-          detail.append(el('p','small',row.rule_id+' · '+
+          detail.append(el('p','small',ruleLabel(row.rule_id)+' · '+
             (row.status==='MISSING'?'需要回答':'需核实')+'：'+row.reason));
         }
         app.append(detail);
@@ -452,7 +458,7 @@
       itemized.append(el('summary','','逐条规则解释（'+d.rule_results.length+' 项）'));
       for(const rule of d.rule_results){
         const desc=el('p','small',
-          rule.rule_id+' · '+({TRIGGERED:'触发风险/限制',CLEAR:'未发现触发',
+          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:'触发风险/限制',CLEAR:'未发现触发',
             MISSING:'需要补充',REVIEW:'待确认'})[rule.status]+' · '+rule.reason);
         itemized.append(desc);
       }
