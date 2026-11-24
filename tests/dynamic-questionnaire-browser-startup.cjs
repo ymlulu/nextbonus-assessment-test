@@ -117,6 +117,14 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  appAnswered.value='NO';appAnswered.fire('change');
  assert.ok(walk(get('questions')).some(n=>n.tag==='select'&&n.value==='NO'),
    'completed activity question must still show its chosen option');
+ assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
+   /AMEX-010：待补充 → 未触发/.test(n.textContent)),
+   'rule-specific answer must show its exact source rule status transition in red');
+ // The question should remain even though the planner removed the answered
+ // F02 fact from its still-pending question list.
+ const selectedQuestion=walk(get('questions')).find(n=>n.tag==='section'&&
+   walk(n).some(c=>c.tag==='select'&&c.value==='NO'));
+ assert.ok(selectedQuestion,'answered Amex field remains editable after rebuild');
  get('offer-variant').value='NLL';
  get('offer-variant').fire('change');
  assert.match(get('identity-note').textContent,/NLL/);
