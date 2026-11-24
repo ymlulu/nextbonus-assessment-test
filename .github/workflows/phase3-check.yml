@@ -31,6 +31,8 @@ jobs:
         run: node tests/phase5e-architecture-gate.cjs
       - name: Verify standalone dynamic questionnaire routing and privacy
         run: node tests/dynamic-questionnaire-v1.cjs
+      - name: Smoke-test actual questionnaire browser bootstrap and cascading selectors
+        run: node tests/dynamic-questionnaire-browser-startup.cjs
       - name: Verify name / link identity and standalone questionnaire safety
         run: node tests/card-name-to-questionnaire-v1.cjs
       - name: Verify full AMEX formal catalog questionnaire routing
