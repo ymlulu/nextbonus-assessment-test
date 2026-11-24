@@ -11,6 +11,26 @@
       throw Error('AMEX_31_RULE_POLICY_REQUIRED');
     const scoped=new Set(policy.source.rule_ids);
     const templates=policy.question_templates||{};
+    const legacyScope=policy.legacy_variant_scope_by_rule||{};
+    const legacyLabels=policy.historical_card_display_labels||{};
+    function historyOptions(ruleIds,target){
+      const choices=new Map();
+      for(const rid of ruleIds){
+        if(!scoped.has(rid))continue;
+        const originals=new Set((legacyScope[rid]||[]).map(x=>
+          x==='$TARGET'?target.product_name:x));
+        for(const raw of policy.history_choices_by_rule?.[rid]||[]){
+          const name=raw==='$TARGET'?target.product_name:raw;
+          if(!name)continue;
+          const label=originals.has(name)?name+'（含同产品旧版本）':
+            legacyLabels[name]||name;
+          const previous=choices.get(name);
+          // Keep the most informative label if this card belongs to multiple rules.
+          if(!previous||originals.has(name))choices.set(name,{value:name,label});
+        }
+      }
+      return [...choices.values()];
+    }
     function enrich({plan,product,known_facts={}}){
       if(!product||product.issuer!=='AMEX')return plan;
       if(!plan?.questionnaire||!plan?.diagnostics)
@@ -33,14 +53,7 @@
           output.fields=output.fields.filter(f=>needed.has(f.id));
         }
         if(q.id==='F03_CARD_HISTORY'){
-          const choices=new Set();
-          for(const rid of output.rule_ids){
-            if(!scoped.has(rid))continue;
-            for(const name of policy.history_choices_by_rule?.[rid]||[]){
-              choices.add(name==='$TARGET'?product.product_name:name);
-            }
-          }
-          output.options=[...choices].filter(Boolean).map(name=>({value:name,label:name}));
+          output.options=historyOptions(output.rule_ids,product);
           output.allow_none=true;
         }
         if(q.id==='F07_MARRIOTT_HISTORY'){
@@ -71,17 +84,14 @@
       const knownHistory=known_facts&&Object.prototype.hasOwnProperty.call(known_facts,'F03_CARD_HISTORY')&&
         Array.isArray(known_facts.F03_CARD_HISTORY)&&known_facts.F03_CARD_HISTORY.length>0;
       if(marriottFamily.length&&!alreadyPresent&&!knownHistory){
-        const options=new Set();
-        for(const id of marriottFamily){
-          for(const name of policy.history_choices_by_rule?.[id]||[])options.add(name);
-        }
-        if(options.size){
+        const options=historyOptions(marriottFamily,product);
+        if(options.length){
           // A standalone F03 is needed only if the planner did not already
           // generate one for same-target lifetime rules.
           specific.push({id:'F03_CARD_HISTORY',type:'multi',
             title:templates.F03_CARD_HISTORY?.title||'你的相关 Marriott 持卡历史',
             description:templates.F03_CARD_HISTORY?.description||'包含过去曾持有的旧版本',
-            options:[...options].map(value=>({value,label:value})),
+            options,
             allow_none:true,rule_ids:marriottFamily});
         }
       }
