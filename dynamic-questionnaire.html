@@ -66,7 +66,7 @@ select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candid
   <div id="questions"></div>
   <div id="assessment-result" aria-live="polite"></div>
   <div class="notes"><strong>原型边界</strong>
-    <p class="muted">这版可用卡名或网址匹配独立的 109 张卡片索引，其中包含来自 NextBonus 正式版卡库的 32 张 Amex 卡片身份。历史记录只用于识别身份，不代表卡片仍开放申请或当前优惠有效。未知产品可以补充银行和个人/商业类型，只预览通用问题与确定可匹配的发行行规则。Amex 默认使用普通 Offer 的标准条款假设；特殊 NLL 可以切换，但不保证任何指定 Offer 实际符合该假设。其他需要验证的规则继续标注。不会读取或修改 Discover，也Amex 会分别输出申请风险与开卡奖励规则信号，并说明判断依据；不提供真实获批概率，也不保证实际奖励资格。</p>
+    <p class="muted">这版可用卡名或网址匹配独立的 109 张卡片索引，其中包含来自 NextBonus 正式版卡库的 32 张 Amex 卡片身份。历史记录只用于识别身份，不代表卡片仍开放申请或当前优惠有效。未知产品可以补充银行和个人/商业类型，只预览通用问题与确定可匹配的发行行规则。Amex 默认使用普通 Offer 的标准条款假设；特殊 NLL 可以切换，但不保证任何指定 Offer 实际符合该假设。其他需要验证的规则继续标注。不会读取或修改 Discover，也Amex 会分别输出申请风险与开卡奖励规则信号，并说明判断依据。Marriott 跨银行限制由独立矩阵先筛选，只追问会影响判断的时间和持卡事实；不提供真实获批概率，也不保证实际奖励资格。</p>
     <details><summary>查看规则匹配详情</summary><p class="small" id="scope"></p><p class="small" id="gaps"></p></details>
   </div>
 </main>
@@ -75,6 +75,7 @@ select{min-width:170px;max-width:100%}#card-query{flex:1;min-width:230px}#candid
 <script src="adapters/amex-questionnaire-v1.js"></script>
 <script src="adapters/amex-offer-context-v1.js"></script>
 <script src="engines/amex-decision-v1.js"></script>
+<script src="engines/marriott-matrix-v1.js"></script>
 <script src="adapters/card-questionnaire-facade-v1.js"></script>
 <script src="assets/dynamic-questionnaire-demo.js"></script>
 </body>
