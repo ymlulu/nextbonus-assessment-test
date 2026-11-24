@@ -61,8 +61,8 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
       events.push(result(id,matches.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',
         dim,'标准 Offer 家族条款下曾持有：'+matches.join('、')));
     }else if(id==='AMEX-BIZ-005'&&ambiguousLegacyBusiness){
-      events.push(result(id,'REVIEW',dim,
-        '已报告 Marriott Business / SPG Business 历史，需要确认具体旧版本'));
+      events.push(result(id,'TRIGGERED',dim,
+        '已确认持有 Marriott Bonvoy Business 或其旧版 SPG Business；标准 Offer 均包含此历史'));
     }else if(held===null){
       events.push(result(id,'MISSING',dim,'需要相关 Amex Marriott 持卡经历'));
     }else{
