@@ -122,6 +122,31 @@ r=qa('Marriott Bonvoy Bevy Card',{});
 assert.equal(r.marriott_matrix.status,'MISSING');
 assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.id==='F07_MARRIOTT_HISTORY').length,1,
  'only one grouped history question, not per rule');
+// Reuse confirmed holdings across F07 (cross-bank) and F03 (Amex lifetime).
+let crossKnown=qa('Marriott Bonvoy Bevy Card',{
+ F07_MARRIOTT_HISTORY:['AMEX Marriott Bonvoy Brilliant'],
+ F03_CARD_HISTORY:['NONE']
+});
+assert.equal(crossKnown.evaluation.bonus.status,'LIKELY_RESTRICTED');
+assert.ok(crossKnown.evaluation.bonus.triggered_rules.includes('AMEX-FL-012'));
+assert.ok(!crossKnown.questionnaire.questionnaire.specific.some(q=>q.id==='F03_CARD_HISTORY'),
+ 'already-confirmed Brilliant holding needs no duplicate family-history question');
+let previouslyBlocked=qa('Marriott Bonvoy Bevy Card',{
+ F03_CARD_HISTORY:['Marriott Bonvoy Brilliant']
+});
+assert.equal(previouslyBlocked.evaluation.bonus.status,'LIKELY_RESTRICTED');
+assert.equal(previouslyBlocked.marriott_matrix.status,'SKIPPED_AFTER_BONUS_BLOCK');
+assert.ok(!previouslyBlocked.questionnaire.questionnaire.specific.some(q=>
+ q.id==='F07_MARRIOTT_HISTORY'||q.type==='structured_marriott'),
+ 'confirmed family blocker means Marriott date questions cannot change outcome');
+let legacyBiz=qa('Marriott Bonvoy Business Card',{
+ F03_CARD_HISTORY:['NONE'],
+ F07_MARRIOTT_HISTORY:['AMEX Marriott Bonvoy Business / Legacy SPG Business']
+});
+assert.equal(legacyBiz.evaluation.bonus.status,'LIKELY_RESTRICTED',
+ 'Business/legacy SPG group is itself enough to trigger current target family rule');
+assert.ok(legacyBiz.evaluation.bonus.triggered_rules.includes('AMEX-BIZ-005'));
+assert.equal(legacyBiz.questionnaire.questionnaire.specific.some(q=>q.type==='structured_marriott'),false);
 const dummy=matrix.evaluate({product:product(bevy),
  known_facts:{F07_MARRIOTT_HISTORY:['some arbitrary historic card']}});
 assert.equal(dummy.status,'MISSING','unknown holdings are not auto-cleared');
