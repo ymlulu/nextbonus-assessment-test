@@ -10,7 +10,7 @@
     'US_BANK','BARCLAYS','WELLS_FARGO','COLUMN_NA','DISCOVER']);
   const TYPES=new Set(['PERSONAL','BUSINESS']);
   const FORMS=new Set(['REVOLVING_CREDIT','CHARGE_OR_PAY_OVER_TIME']);
-  function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState,amexDecision,amexPolicy,approvalConfig,marriottMatrix}){
+  function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState,amexDecision,amexPolicy,approvalConfig,marriottMatrix,chaseEnricher,chaseDecision,chasePolicy}){
     if(!planner?.getQuestionnaireForProduct||!lookup?.resolve||!lookup?.findById)
       throw Error('QUESTIONNAIRE_DEPENDENCY_MISSING');
     function plan({input,product_id,issuer,customer_type,known_facts={},confirm_product_id,
@@ -63,7 +63,8 @@
         return {status:'CUSTOMER_TYPE_CONFLICT',identity:lookupResult,questionnaire:null};
       const metadata={...product,product_type:'CREDIT_CARD',
         customer_type:product.customer_type||customer_type||null,
-        card_form:FORMS.has(product.card_form)?product.card_form:null};
+        card_form:FORMS.has(product.card_form)?product.card_form:null,
+        product_name:product.issuer==='CHASE'&&chasePolicy?.product_name_overrides?.[product.product_id]||product.product_name};
       // AMEX has an explicit simulated ordinary-offer baseline. NLL and
       // individual rule exceptions are typed inputs and never inferred from
       // current web offers. Other issuers retain the reviewed/unknown gates.
@@ -79,7 +80,9 @@
           :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
       const enriched=amexEnricher&&metadata.issuer==='AMEX'
         ?amexEnricher.enrich({plan:initialPlan,product:metadata,known_facts})
-        :initialPlan;
+        :chaseEnricher&&metadata.issuer==='CHASE'
+          ?chaseEnricher.enrich({plan:initialPlan,product:metadata,known_facts})
+          :initialPlan;
       const marriottResult=marriottMatrix&&metadata.issuer==='AMEX'
         ?marriottMatrix.evaluate({product:metadata,known_facts}):null;
       const plan=marriottResult?.applicable
@@ -91,7 +94,10 @@
         ?amexDecision.evaluate({plan,product:metadata,answers:known_facts,
           policy:amexPolicy,approvalConfig,offerContext:amexContext?.context,
           marriottResult})
-        :null;
+        :chaseDecision&&chasePolicy&&metadata.issuer==='CHASE'
+          ?chaseDecision.evaluate({plan,product:metadata,answers:known_facts,
+            policy:chasePolicy,approvalConfig,approvalBase:amexDecision?.approvalBase})
+          :null;
       // Once a bonus-specific blocker is established, other bonus-history
       // questions cannot change the restriction conclusion. Preserve all
       // independent application-risk questions.
@@ -116,7 +122,7 @@
             pending_ids:bonusBlocked?[]:(marriottResult.pending_ids||[])} :null,
           offer_context:amexContext?.context||null,limitations:{
           full_eligibility_result_available:false,
-          offer_terms_verified:amexContext?false:identitySource==='REVIEWED_PRODUCT',
+          offer_terms_verified:metadata.issuer==='CHASE'||amexContext?false:identitySource==='REVIEWED_PRODUCT',
           product_specific_rules_verified:identitySource==='REVIEWED_PRODUCT',
           long_term_benefits_included:false,
           user_answers_uploaded:false,
