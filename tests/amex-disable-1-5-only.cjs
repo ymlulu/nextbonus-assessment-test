@@ -74,7 +74,9 @@ assert.ok(!unanswered.evaluation.application.missing_rules.includes('AMEX-010'))
 const pendingQuestion=unanswered.questionnaire.questionnaire.specific.find(
  q=>q.id==='F02_ISSUER_APPLICATION_HISTORY');
 assert.ok(pendingQuestion,'question still asks missing 2/90 fact');
-assert.deepEqual(pendingQuestion.fields.map(x=>x.id),['approved_revolving_90d']);
+assert.deepEqual(pendingQuestion.fields.map(x=>x.id),
+ ['approved_revolving_90d','same_product_applied_or_approved_90d']);
+assert.ok(!pendingQuestion.fields.some(x=>x.id==='approved_revolving_5d'));
 for(const file of ['adapters/amex-questionnaire-v1.js',
  'adapters/dynamic-questionnaire-v1.js','engines/amex-decision-v1.js',
  'assets/dynamic-questionnaire-demo.js']){
