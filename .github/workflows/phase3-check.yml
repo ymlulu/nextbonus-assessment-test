@@ -45,6 +45,8 @@ jobs:
         run: node tests/marriott-matrix-dynamic.cjs
       - name: Verify actionable previous-version family histories
         run: node tests/amex-previous-versions-actionable.cjs
+      - name: Verify Chase 5/24, 2/30, product/bonus histories and UI reuse
+        run: node tests/chase-local-decision.cjs
       - name: Verify only AMEX 1/5 is disabled, preserving 2/90
         run: node tests/amex-disable-1-5-only.cjs
       - name: Verify Phase 6.1 integration contract
