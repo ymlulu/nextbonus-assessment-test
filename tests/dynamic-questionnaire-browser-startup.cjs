@@ -146,7 +146,19 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  get('card-select').value=freedom.value;get('card-select').fire('change');
  assert.match(get('summary').textContent,/Freedom/i);
  assert.equal(get('amex-offer-settings').hidden,true,'NLL control hidden for Chase');
- assert.equal(get('assessment-result').children.length,0,'Amex decision must not appear for Chase');
+ assert.ok(get('assessment-result').children.length>0,
+   'Chase now reuses Amex two-panel application/bonus decision UI');
+ assert.ok(walk(get('assessment-result')).some(n=>/Chase 卡适不适合现在申请/.test(n.textContent)),
+   'issuer label changes without a second UI');
+ const five24=walk(get('questions')).find(n=>n.tag==='select'&&
+   n.options.some(o=>o.value==='5')&&n.options.some(o=>o.value==='OTHER'));
+ assert.ok(five24,'Chase 5/24 is an actual count selector, not free text');
+ five24.value='5';five24.fire('change');
+ assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
+   /CHASE-001/.test(n.textContent)),
+   '5/24 selected answer must produce the same inline red rule-change UI');
+ assert.ok(walk(get('assessment-result')).some(n=>/Chase/.test(n.textContent)),
+   'Chase result remains visible after changes');
  assert.ok(requestLog.some(x=>x.includes('amex-formal-product-identities.json')));
  assert.ok(!requestLog.some(x=>!x.startsWith('data/')),'only static data requests');
  // Exercise the transient failure branch and successful retry on a fresh page.

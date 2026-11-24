@@ -68,7 +68,9 @@
     if(!value||typeof value!=='object'||Array.isArray(value))return false;
     const requirements={
       'AMEX-006':'approved_revolving_90d',
-      'AMEX-011':'same_product_applied_or_approved_90d'
+      'AMEX-011':'same_product_applied_or_approved_90d',
+      'CHASE-002':'approved_chase_30d',
+      'CHASE-012':'approved_chase_business_30d'
     };
     return ruleIds.every(id=>!requirements[id]||isAnswered(value,requirements[id]));
   }
