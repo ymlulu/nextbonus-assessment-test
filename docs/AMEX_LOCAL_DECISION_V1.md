@@ -35,7 +35,7 @@ The UI never posts, saves or uploads answers. The results stay in browser memory
 - The five-revolving-card and ten-charge-card counts are issuer-related risk signals, **not absolute hard caps**.
 - Standard assumed Lifetime/Family Language with positive, exact prior holding history yields `LIKELY_RESTRICTED`; NLL removes only same-product Lifetime by default. Family clauses must be overridden individually when a verified special offer lacks them.
 - Personal Delta family is never copied into Delta Business. Hilton different personal tiers do not establish a cross-tier bonus block.
-- Marriott cross-issuer and old-version history requires exact former product and application/bonus dates; nonempty records return `NEEDS_REVIEW` instead of an invented 30/90/24 decision.
+- Marriott cross-issuer history is now evaluated against a separate, source-backed target-by-prior matrix. Known OK combinations are automatically cleared, known triggered date windows result in a bonus-risk signal, and only genuinely missing decisive 30/90/24 facts produce targeted user follow-ups. Legacy/uncertain details remain unresolved. See [Marriott dynamic matrix](MARRIOTT_MATRIX_DYNAMIC_QUESTIONNAIRE.md).
 - For profiles with no known history, `NO_TRIGGER_FOUND` means *no source-trigger found under selected offer assumptions*, **not** official welcome bonus eligibility. The actual pop-up application warning and offer terms govern.
 - A missing fact or target-eligibility condition returns an explicit `MISSING` or `REVIEW`, not an implicit `CLEAR`.
 
