@@ -33,6 +33,10 @@ The [dynamic questionnaire QA page](dynamic-questionnaire.html) now accepts a ca
 
 All matching and questionnaire generation stays on-device in the browser. Answers never leave the page. This is **not** a remote HTTP scoring API, not the full 129-rule executable evaluator, and not wired into Discover. See [scope and limitations](docs/DYNAMIC_QUESTIONNAIRE_PROTOTYPE_V1.md).
 
+## AMEX catalog questionnaire coverage
+
+The independent card identity index now includes **32 American Express cards** from the reviewed NextBonus formal card catalog, plus a separately sourced Schwab Platinum variant. The independent catalog has 109 total identities. Amex questionnaire routing recognizes exact product/family scope, revolving vs charge card forms, and the 31 reviewed AMEX Bank Rules. An unconfirmed offer clause stays a visible *system knowledge gap* rather than a guessed eligibility restriction. See [AMEX catalog coverage](docs/AMEX_CATALOG_COVERAGE.md) for provenance, privacy and limitations. The independent assessment remains questionnaire-only; no changes to Discover.
+
 ## Deploy with GitHub Pages
 
 1. Push changes on a feature/fix branch.
