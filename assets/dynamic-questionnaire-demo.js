@@ -336,9 +336,9 @@
       const files=['dynamic-questionnaire-rule-index.json','products.json',
         'questions.json','frozen-offer-facts.json','card-identity-index.json',
         'amex-questionnaire-policy.json','approval-config.json',
-        'marriott-eligibility-matrix.json'];
+        'marriott-eligibility-matrix.json','amex-formal-product-identities.json'];
       const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,
-        amexPolicy,approvalConfig,marriottMatrixConfig]=
+        amexPolicy,approvalConfig,marriottMatrixConfig,formalAmex]=
         await Promise.all(files.map(async name=>{
           const response=await fetch('data/'+name,{cache:'no-cache'});
           if(!response.ok)throw Error('数据文件加载失败：'+name+' (HTTP '+response.status+')');
@@ -361,7 +361,10 @@
         amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
         marriottMatrix:window.NextBonusMarriottMatrixV1.createMatrix(marriottMatrixConfig)
       });
-      cards=facade.listCards().filter(p=>p.issuer&&p.customer_type);
+      const formalNames=new Map((formalAmex.products||[])
+        .map(x=>[x.assessment_product_id,x.display_name]));
+      cards=facade.listCards().filter(p=>p.issuer&&p.customer_type)
+        .map(p=>({...p,name:formalNames.get(p.product_id)||p.name}));
       $('version').textContent='独立目录 '+facade.getVersion().source_count+
         ' 张卡 · 已确认发行方 '+cards.length+' 张 · 规则索引 '+
         facade.getVersion().rules_indexed+' 条';
