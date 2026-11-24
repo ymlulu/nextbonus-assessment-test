@@ -10,10 +10,11 @@
     'US_BANK','BARCLAYS','WELLS_FARGO','COLUMN_NA','DISCOVER']);
   const TYPES=new Set(['PERSONAL','BUSINESS']);
   const FORMS=new Set(['REVOLVING_CREDIT','CHARGE_OR_PAY_OVER_TIME']);
-  function createFacade({planner,lookup,amexEnricher}){
+  function createFacade({planner,lookup,amexEnricher,amexOfferContext,ruleIndex,targetState}){
     if(!planner?.getQuestionnaireForProduct||!lookup?.resolve||!lookup?.findById)
       throw Error('QUESTIONNAIRE_DEPENDENCY_MISSING');
-    function plan({input,issuer,customer_type,known_facts={},confirm_product_id}={}){
+    function plan({input,issuer,customer_type,known_facts={},confirm_product_id,
+      offer_variant='STANDARD',offer_rule_overrides={}}={}){
       const lookupResult=lookup.resolve({input,issuer});
       const candidate=confirm_product_id&&lookup.findById(confirm_product_id);
       if(issuer&&!ISSUERS.has(issuer))
@@ -55,11 +56,19 @@
       const metadata={...product,product_type:'CREDIT_CARD',
         customer_type:product.customer_type||customer_type||null,
         card_form:FORMS.has(product.card_form)?product.card_form:null};
-      // Exact offer facts only exist in the independently reviewed seven-card
-      // runtime. History rows do NOT prove today's offer eligibility terms.
-      const initialPlan=identitySource==='REVIEWED_PRODUCT'
-        ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
-        :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
+      // AMEX has an explicit simulated ordinary-offer baseline. NLL and
+      // individual rule exceptions are typed inputs and never inferred from
+      // current web offers. Other issuers retain the reviewed/unknown gates.
+      const amexContext=amexOfferContext&&metadata.issuer==='AMEX'
+        ?amexOfferContext.makeContext({product:metadata,ruleIndex,targetState,
+          offer_variant,offer_rule_overrides})
+        :null;
+      const initialPlan=amexContext
+        ?planner.getQuestionnaireForProduct({product:metadata,known_facts,
+          offer_facts:amexContext.offer_facts})
+        :identitySource==='REVIEWED_PRODUCT'
+          ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
+          :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
       const plan=amexEnricher&&metadata.issuer==='AMEX'
         ?amexEnricher.enrich({plan:initialPlan,product:metadata})
         :initialPlan;
@@ -70,9 +79,9 @@
           metadata_completeness:identitySource==='REVIEWED_PRODUCT'?'REVIEWED':
           metadata.formal_nb_card_id?'FORMAL_IDENTITY_ONLY':'PARTIAL',
           formal_nb_card_id:metadata.formal_nb_card_id||null},
-        questionnaire:plan,limitations:{
+        questionnaire:plan,offer_context:amexContext?.context||null,limitations:{
           full_eligibility_result_available:false,
-          offer_terms_verified:identitySource==='REVIEWED_PRODUCT',
+          offer_terms_verified:amexContext?false:identitySource==='REVIEWED_PRODUCT',
           product_specific_rules_verified:identitySource==='REVIEWED_PRODUCT',
           long_term_benefits_included:false,
           user_answers_uploaded:false,
