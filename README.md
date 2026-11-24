@@ -37,6 +37,8 @@ All matching and questionnaire generation stays on-device in the browser. Answer
 
 The independent card identity index now includes **32 American Express cards** from the reviewed NextBonus formal card catalog, plus a separately sourced Schwab Platinum variant. The independent catalog has 109 total identities. Amex questionnaire routing recognizes exact product/family scope, revolving vs charge card forms, and the 31 reviewed AMEX Bank Rules. An unconfirmed offer clause stays a visible *system knowledge gap* rather than a guessed eligibility restriction. See [AMEX catalog coverage](docs/AMEX_CATALOG_COVERAGE.md) for provenance, privacy and limitations. The independent assessment remains questionnaire-only; no changes to Discover.
 
+Amex question previews now assume the **standard public offer** by default, with explicit `NLL` and rule-level exceptions; no live offer verification or approval decision is implied. See [Amex offer variants](docs/AMEX_CATALOG_COVERAGE.md#standard-offer-default-and-explicit-nll-variants).
+
 ## Deploy with GitHub Pages
 
 1. Push changes on a feature/fix branch.

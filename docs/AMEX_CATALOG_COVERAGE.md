@@ -46,3 +46,25 @@ node tests/dynamic-questionnaire-v1.cjs
 ```
 
 Coverage includes all 32 formal Amex IDs, 31 Amex rules, 33 independent Amex identities, merchant history and URL matching, personal/business Delta isolation, known-vs-unknown offer gates, 1/5/2/90 form routing, 3-dimensional facts, and local answer privacy. The full legacy Assessment CI suite remains required before merge.
+
+## Standard-offer default and explicit NLL variants
+
+Amex questionnaire *planning* defaults to `offer_variant: "STANDARD"` for all 32 formally cataloged cards. This models a **normal publicly offered signup bonus** and assumes the conventional same-card lifetime and applicable product family terms are present. This is a **scenario assumption** for deciding what the questionnaire must ask, **not** a claim that the current live URL was checked or that a person is bonus-ineligible.
+
+Use an explicit special-offer variable when relevant:
+
+```js
+facade.plan({input:"American Express Gold Card"}); // STANDARD by default
+facade.plan({input:"American Express Gold Card",offer_variant:"NLL"});
+facade.plan({input:"American Express Gold Card",offer_variant:"NLL",
+  offer_rule_overrides:{"AMEX-FL-004":"ABSENT"}});
+```
+
+- `STANDARD` treats the target's ordinary same-product and applicable **family** clauses as present *for questionnaire routing*, so no artificial "offer terms unresolved" blockage.
+- `NLL` removes the **same-product lifetime** clause (`AMEX-001`) only. NLL never automatically removes an independent family restriction.
+- `offer_rule_overrides` is a vetted, explicit per-rule map (`PRESENT`/`ABSENT`) and only accepts rules applicable to the selected target. A different special Offer may suppress both clauses when explicitly represented.
+- This never overrides bank application-velocity, card-count or partner relationship rules; those are still queried normally.
+- Unknown card metadata and uncompiled system predicates remain unknown rather than fabricating product eligibility.
+- All user answers remain in browser memory; `evaluation_ready` stays false. The business-rule evaluation source workbook is unchanged, and standard-offer assumptions cannot be presented as verified official terms.
+
+Regression: `node tests/amex-offer-context.cjs`.

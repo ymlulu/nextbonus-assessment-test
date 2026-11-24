@@ -109,7 +109,8 @@
     const issuer=$('issuer').value||undefined;
     const type=$('customer-type').value||undefined;
     const result=facade.plan({input:lastInput,issuer,customer_type:type,
-      known_facts:answers,confirm_product_id:confirmedId||undefined});
+      known_facts:answers,confirm_product_id:confirmedId||undefined,
+      offer_variant:$('offer-variant').value});
     const status=$('summary'),list=$('questions');
     if(!result.questionnaire){
       status.textContent=({
@@ -128,6 +129,7 @@
       return;
     }
     $('candidate-controls').hidden=true;
+    $('amex-offer-settings').hidden=result.identity.issuer!=='AMEX';
     const plan=result.questionnaire,info=plan.diagnostics;
     const label=result.identity.name;
     status.textContent=label+' · 适用规则 '+info.applicable_rule_ids.length+
@@ -143,7 +145,11 @@
     }[result.identity.source]||result.identity.source;
     $('identity-note').textContent='身份来源：'+(result.identity.formal_nb_card_id
       ?'NB 正式版信用卡目录（仅卡片身份）':source)+
-      '。此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。';
+      '。'+(result.offer_context
+        ?'Amex 按普通 Offer 建模'+(result.offer_context.variant==='NLL'
+          ?'，已启用 NLL 特殊变量。':'。')
+        +'这里是问卷假设，并非实时核实的申请条款。'
+        :'此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。');
     list.replaceChildren(el('h2','','基础评分问题'));
     for(const q of plan.questionnaire.common)list.append(question(q,true));
     if(!plan.questionnaire.common.length)
@@ -184,7 +190,11 @@
     });
     const lookup=window.NextBonusCardIdentityV1.createLookup(identityIndex);
     const amexEnricher=window.NextBonusAmexQuestionnaireV1.createEnricher({policy:amexPolicy});
-    facade=window.NextBonusQuestionnaireFacadeV1.createFacade({planner,lookup,amexEnricher});
+    facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
+      planner,lookup,amexEnricher,ruleIndex,
+      targetState:window.NextBonusQuestionnairePlannerV1.targetState,
+      amexOfferContext:window.NextBonusAmexOfferContextV1
+    });
     $('version').textContent='独立目录 '+facade.getVersion().source_count+
       ' 张卡 · 规则索引 '+facade.getVersion().rules_indexed+' 条';
     $('generate').addEventListener('click',()=>{
@@ -204,6 +214,10 @@
       confirmedId=null;if(lastInput)render();
     });
     $('reset').addEventListener('click',()=>{
+      for(const key of Object.keys(answers))delete answers[key];
+      if(lastInput)render();
+    });
+    $('offer-variant').addEventListener('change',()=>{
       for(const key of Object.keys(answers))delete answers[key];
       if(lastInput)render();
     });

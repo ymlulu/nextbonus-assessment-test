@@ -35,6 +35,8 @@ jobs:
         run: node tests/card-name-to-questionnaire-v1.cjs
       - name: Verify full AMEX formal catalog questionnaire routing
         run: node tests/amex-catalog-coverage.cjs
+      - name: Verify AMEX standard and NLL offer overrides
+        run: node tests/amex-offer-context.cjs
       - name: Verify Phase 6.1 integration contract
         run: node tests/phase6-1-integration-contract.cjs
       - name: Verify static bridge contract
