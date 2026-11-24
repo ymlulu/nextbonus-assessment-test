@@ -129,7 +129,7 @@ for(const [card,expected] of [
  ['Marriott Bonvoy Brilliant Card','以前的 SPG Luxury'],
  ['Marriott Bonvoy Business Card','以前的 SPG Business']
 ]){
- const original=qa(card,{});
+ const original=qa(card,{F03_CARD_HISTORY:undefined});
  const f03=original.questionnaire.questionnaire.specific.find(q=>q.id==='F03_CARD_HISTORY');
  assert.ok(f03,'F03 included for '+card);
  assert.ok(f03.options.some(o=>o.value===expected),
