@@ -80,44 +80,36 @@
       "Blue Cash Everyday",
       "Cash Magnet",
       "Blue Cash Preferred",
-      "Morgan Stanley Blue Cash Preferred",
-      "该系列的旧版本"
+      "Morgan Stanley Blue Cash Preferred"
     ],
     "AMEX-FL-006": [
       "Blue Cash Preferred",
-      "Morgan Stanley Blue Cash Preferred",
-      "该系列的旧版本"
+      "Morgan Stanley Blue Cash Preferred"
     ],
     "AMEX-FL-007": [
       "Delta SkyMiles Blue (Personal)",
       "Delta SkyMiles Options",
       "Delta SkyMiles Gold (Personal)",
       "Delta SkyMiles Platinum (Personal)",
-      "Delta SkyMiles Reserve (Personal)",
-      "这些产品的旧版本"
+      "Delta SkyMiles Reserve (Personal)"
     ],
     "AMEX-FL-008": [
       "Delta SkyMiles Gold (Personal)",
       "Delta SkyMiles Platinum (Personal)",
-      "Delta SkyMiles Reserve (Personal)",
-      "这些产品的旧版本"
+      "Delta SkyMiles Reserve (Personal)"
     ],
     "AMEX-FL-009": [
       "Delta SkyMiles Platinum (Personal)",
-      "Delta SkyMiles Reserve (Personal)",
-      "这些产品的旧版本"
+      "Delta SkyMiles Reserve (Personal)"
     ],
     "AMEX-FL-010": [
-      "Delta SkyMiles Reserve (Personal)",
-      "该卡旧版本"
+      "Delta SkyMiles Reserve (Personal)"
     ],
     "AMEX-BIZ-001": [
-      "Business Platinum",
-      "该卡的旧版本"
+      "Business Platinum"
     ],
     "AMEX-BIZ-002": [
-      "Business Gold",
-      "该卡的旧版本"
+      "Business Gold"
     ],
     "AMEX-BIZ-005": [
       "Marriott Bonvoy Business American Express",
@@ -125,13 +117,11 @@
     ],
     "AMEX-FL-012": [
       "Marriott Bonvoy Bevy",
-      "Marriott Bonvoy Brilliant",
-      "该系列旧版本"
+      "Marriott Bonvoy Brilliant"
     ],
     "AMEX-FL-013": [
       "Marriott Bonvoy Brilliant",
-      "以前的 SPG Luxury",
-      "该卡旧版本"
+      "以前的 SPG Luxury"
     ]
   },
   "marriott_cross_issuer_history": [
@@ -229,5 +219,71 @@
       "min": 0,
       "max": 99
     }
-  }
+  },
+  "legacy_variant_scope_by_rule": {
+    "AMEX-FL-005": [
+      "Blue Cash Everyday",
+      "Cash Magnet",
+      "Blue Cash Preferred",
+      "Morgan Stanley Blue Cash Preferred"
+    ],
+    "AMEX-FL-006": [
+      "Blue Cash Preferred",
+      "Morgan Stanley Blue Cash Preferred"
+    ],
+    "AMEX-FL-007": [
+      "Delta SkyMiles Blue (Personal)",
+      "Delta SkyMiles Gold (Personal)",
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)"
+    ],
+    "AMEX-FL-008": [
+      "Delta SkyMiles Gold (Personal)",
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)"
+    ],
+    "AMEX-FL-009": [
+      "Delta SkyMiles Platinum (Personal)",
+      "Delta SkyMiles Reserve (Personal)"
+    ],
+    "AMEX-FL-010": [
+      "Delta SkyMiles Reserve (Personal)"
+    ],
+    "AMEX-BIZ-001": [
+      "Business Platinum"
+    ],
+    "AMEX-BIZ-002": [
+      "Business Gold"
+    ],
+    "AMEX-FL-012": [
+      "Marriott Bonvoy Bevy",
+      "Marriott Bonvoy Brilliant"
+    ],
+    "AMEX-FL-013": [
+      "Marriott Bonvoy Brilliant"
+    ]
+  },
+  "legacy_variants": {
+    "semantics": "A selected canonical product includes previous versions of that SAME product when scoped by the modeled rule. Generic previous-version group labels are never separate selectable facts.",
+    "verified_delta_family_source": {
+      "scope": [
+        "AMEX-FL-007",
+        "AMEX-FL-008",
+        "AMEX-FL-009",
+        "AMEX-FL-010"
+      ],
+      "historical_public_terms": "https://www.doctorofcredit.com/american-express-adds-family-language-to-delta-personal-cards/",
+      "recent_independent_check": "https://thepointsguy.com/credit-cards/american-express-bonus-lifetime-restrictions/",
+      "review_status": "HISTORICAL_TERMS_AND_2026_INDEPENDENT_CONFIRMATION",
+      "current_exact_offer_verified": false
+    },
+    "other_rules_review_status": "RULE_LIBRARY_STANDARD_OFFER_ASSUMPTION",
+    "separately_named_historical_products": [
+      "以前的 SPG Business",
+      "以前的 SPG Luxury",
+      "Premier Rewards Gold",
+      "Delta SkyMiles Options"
+    ]
+  },
+  "history_policy_note": "Do not prompt an unidentifiable 'previous versions' checkbox. When a rule explicitly scopes previous versions, display a canonical named product as covering its former versions; the selected canonical value must drive the actual rule status. Keep named predecessor products as separate facts when needed. Never assume that an exact special Offer has the standard wording."
 }
