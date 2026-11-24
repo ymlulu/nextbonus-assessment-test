@@ -50,6 +50,8 @@ for(const item of chase){
  assert.ok(r.questionnaire.diagnostics.applicable_rule_ids.includes('CHASE-002'),
   '2/30 applies across Chase cards');
  assert.ok(!r.evaluation.rule_results.some(v=>v.rule_id==='AMEX-010'));
+ assert.ok(!r.questionnaire.diagnostics.unresolved_target_mappings.some(x=>x.rule_id==='CHASE-PROD-013'),
+  'known non-Club identity must exclude the Club lineage rule, including reviewed Sapphire cards');
  assert.equal(r.evaluation.application.base_risk,'HIGH');
  assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND',
   'clean known profile has no modeled bonus trigger: '+item.product_id);
@@ -184,6 +186,20 @@ for(const held of [false,true])for(const awarded of [false,true]){
  const ev=v.rule_results.find(x=>x.rule_id===aeroplanRule);
  assert.equal(ev.status,blocked?'TRIGGERED':'CLEAR');
  assert.equal(ev.trigger_sources?.length||0,Number(held)+Number(awarded));
+}
+// IHG personal cards use two distinct product gates. Both must be
+// independently visible in the application and bonus decision.
+for(const product_id of ['chase_ihg_one_rewards_premier','history_ot_chase_044']){
+ for(const held of [false,true])for(const awarded of [false,true]){
+  const v=run(product_id,{F03_CARD_HISTORY:[held?'IHG One Rewards Premier':'NONE'],
+   F04_BONUS_HISTORY:[awarded?'IHG One Rewards Traveler':'NONE']}).evaluation;
+  assert.equal(v.application.status,held||awarded?'PRODUCT_INELIGIBLE':'MODEL_ONLY');
+  assert.equal(v.bonus.status,held||awarded?'PRODUCT_INELIGIBLE':'NO_TRIGGER_FOUND');
+  for(const key of ['application','bonus']){
+   assert.equal(v[key].triggered_rules.includes('CHASE-PROD-001'),held);
+   assert.equal(v[key].triggered_rules.includes('CHASE-PROD-002'),awarded);
+  }
+ }
 }
 const incompleteGate=run(aeroplan,{F03_CARD_HISTORY:undefined}).evaluation;
 assert.equal(incompleteGate.bonus.status,'NEEDS_REVIEW');

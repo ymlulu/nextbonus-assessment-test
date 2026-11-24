@@ -83,9 +83,15 @@
       const initialPlan=amexContext
         ?planner.getQuestionnaireForProduct({product:metadata,known_facts,
           offer_facts:amexContext.offer_facts})
-        :identitySource==='REVIEWED_PRODUCT'
-          ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
-          :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
+        :metadata.issuer==='CHASE'
+          // Use the same canonical identity for rule routing and evaluation.
+          // Reviewed products retain their frozen facts through the planner's
+          // default lookup; identity-only products do not invent offer terms.
+          ?planner.getQuestionnaireForProduct({product:metadata,known_facts,
+              offer_facts:identitySource==='REVIEWED_PRODUCT'?undefined:{}})
+          :identitySource==='REVIEWED_PRODUCT'
+            ?planner.getQuestionnaire({product_id:metadata.product_id,known_facts})
+            :planner.getQuestionnaireForProduct({product:metadata,known_facts,offer_facts:{}});
       const enriched=amexEnricher&&metadata.issuer==='AMEX'
         ?amexEnricher.enrich({plan:initialPlan,product:metadata,known_facts})
         :chaseEnricher&&metadata.issuer==='CHASE'
