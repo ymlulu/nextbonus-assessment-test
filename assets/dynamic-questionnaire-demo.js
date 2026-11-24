@@ -32,7 +32,7 @@
   const riskStates={HIGH:'优秀（最高档）',MEDIUM:'一般',
     HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'还没算出来'};
   const outcomeStates={MODEL_ONLY:'已检查',INSUFFICIENT_DATA:'尚未完成',
-    ELEVATED_RISK:'有需要注意的申请风险',
+    ELEVATED_RISK:'有需要注意的申请风险',PRODUCT_INELIGIBLE:'不符合当前产品条件',
     NO_TRIGGER_FOUND:'未发现开卡奖励限制',NEEDS_REVIEW:'开卡奖励还要确认',
     LIKELY_RESTRICTED:'可能拿不到奖励'};
   const structuredRuleIds={
@@ -41,7 +41,7 @@
     approved_chase_30d:['CHASE-002'],
     approved_chase_business_30d:['CHASE-012']
   };
-  function minusAnswer(item,field){
+  function minusAnswer(item,field,choiceValue){
     const previous={...answers};
     if(item.type==='structured'&&field){
       const previousFields={...(answers[item.id]||{})};
@@ -57,6 +57,10 @@
       if(Object.keys(previousGroups).length)
         previous.F07_MARRIOTT_DETAILS=previousGroups;
       else delete previous.F07_MARRIOTT_DETAILS;
+    }else if(choiceValue!==undefined&&Array.isArray(answers[item.id])){
+      const remaining=answers[item.id].filter(value=>value!==choiceValue);
+      if(remaining.length)previous[item.id]=remaining;
+      else delete previous[item.id];
     }else delete previous[item.id];
     return previous;
   }
@@ -69,12 +73,13 @@
     return value!==undefined&&value!==''&&value!==null&&
       (!Array.isArray(value)||value.length>0);
   }
-  // The red copy is derived from the actual BEFORE and AFTER evaluation,
-  // never from an option label or an invented approval-probability estimate.
-  function impactFor(item,current,field){
+  // Red feedback comes from rule-engine evidence and actual before/after
+  // evaluation. A checked choice may independently trigger an OR condition
+  // even when another answer already produces the same final status.
+  function impactFor(item,current,field,choiceValue){
     if(!hasAnswer(item,field)||!facade||!selectedProductId)return '';
     const previous=facade.plan({product_id:selectedProductId,
-      known_facts:minusAnswer(item,field),
+      known_facts:minusAnswer(item,field,choiceValue),
       offer_variant:$('offer-variant').value});
     const a=previous.evaluation,b=current.evaluation;
     if(!a||!b)return '';
@@ -96,9 +101,19 @@
       .filter(matching);
     for(const id of all){
       const before=oldMap.get(id)?.status||'MISSING';
-      const after=newMap.get(id)?.status||'MISSING';
+      const rule=newMap.get(id);
+      const after=rule?.status||'MISSING';
+      const sources=choiceValue===undefined?[]:(rule?.trigger_sources||[])
+        .filter(x=>x.question_id===item.id&&x.value===choiceValue);
+      if(after==='TRIGGERED'&&sources.length){
+        const consequence=rule.product_eligibility?'不符合申请及开卡奖励条件':
+          rule.dimension==='BONUS'?'可能影响开卡奖励':'可能影响申请';
+        effects.push(ruleLabel(id)+'：'+sources.map(x=>x.reason).join('、')+'，'+consequence);
+      }
       if(before!==after)effects.push(ruleLabel(id)+'：'+
-        (ruleStates[before]||'未适用')+' → '+(ruleStates[after]||'未适用'));
+        (ruleStates[before]||'未适用')+' → '+
+        (after==='TRIGGERED'&&rule?.product_eligibility?'不符合产品申请条件':
+         ruleStates[after]||'未适用'));
     }
     const oldApp=a.application.status,newApp=b.application.status;
     const oldBonus=a.bonus.status,newBonus=b.bonus.status;
@@ -112,9 +127,9 @@
     return effects.slice(0,3).join('；')+
       (effects.length>3?'；另有 '+(effects.length-3)+' 项变化':'');
   }
-  function feedback(item,result,field){
+  function feedback(item,result,field,choiceValue){
     if(!hasAnswer(item,field))return null;
-    const summary=impactFor(item,result,field);
+    const summary=impactFor(item,result,field,choiceValue);
     if(summary)return el('span','rule-delta',summary);
     return el('span','rule-unchanged',
       result.evaluation?'这项回答暂时不会改变评估结果':'这张卡暂时只能查看问题，还不能比较评估结果');
@@ -253,7 +268,8 @@
         });
         label.append(box,document.createTextNode(choice.label));
         if(box.checked){
-          const note=feedback(item,result);
+          const note=feedback(item,result,undefined,
+            result.evaluation?.issuer==='CHASE'?choice.value:undefined);
           if(note)label.append(note);
         }
         options.append(label);
@@ -433,7 +449,7 @@
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
-      app.append(el('p','',d.application.message));
+      app.append(el('p',d.application.status==='PRODUCT_INELIGIBLE'?'rule-delta':'',d.application.message));
       app.append(el('p','small','基础信用情况：'+({
         HIGH:'优秀（最高档）',MEDIUM:'一般',HIGH_RISK:'偏高风险',
         INSUFFICIENT_DATA:'还没算出来'
@@ -455,14 +471,14 @@
       }
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','能不能拿到开卡奖励'));
-      bonus.append(el('p','',d.bonus.message));
+      bonus.append(el('p',d.bonus.status==='PRODUCT_INELIGIBLE'?'rule-delta':'',d.bonus.message));
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
       itemized.append(el('summary','','查看每条规则的判断（'+d.rule_results.length+' 项）'));
       for(const rule of d.rule_results){
         const desc=el('p','small',
-          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:'可能受限',CLEAR:'没有触发',
+          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:rule.product_eligibility?'不符合产品申请条件':'可能受限',CLEAR:'没有触发',
             MISSING:'还没回答',REVIEW:'需要核实'})[rule.status]+' · '+rule.reason);
         itemized.append(desc);
       }

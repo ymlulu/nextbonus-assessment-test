@@ -135,6 +135,65 @@ assert.equal(partial.identity.source,'USER_SUPPLIED_PARTIAL');
 assert.equal(partial.evaluation.answers_transmitted,false);
 assert.ok(partial.evaluation.application.unresolved_rules.length>0,
  'unknown card metadata must not be silently treated as fully verified');
+// Every applicable explicit product availability gate must independently
+// block the product and its new-card reward, regardless of base-risk data.
+const gateIds=Object.entries(policy.rules).filter(([,v])=>v.product_eligibility).map(([id])=>id);
+assert.equal(gateIds.length,11);
+const checked=new Set();
+for(const item of chase){
+ const initial=run(item.product_id);
+ const applicable=initial.questionnaire.diagnostics.applicable_rule_ids;
+ for(const id of gateIds.filter(id=>applicable.includes(id))){
+  const rule=policy.rules[id];
+  for(const [key,scope] of [['F03_CARD_HISTORY',rule.history_scope],['F04_BONUS_HISTORY',rule.bonus_scope]]){
+   if(!scope?.length)continue;
+   const value=scope[0]==='$TARGET'?policy.canonical_target_names[item.product_id]:scope[0];
+   const triggered=run(item.product_id,{[key]:[value],a1:undefined}).evaluation;
+   assert.equal(triggered.application.status,'PRODUCT_INELIGIBLE',id+' app gate');
+   assert.equal(triggered.bonus.status,'PRODUCT_INELIGIBLE',id+' bonus gate');
+   assert.ok(triggered.application.triggered_rules.includes(id));
+   assert.ok(triggered.bonus.triggered_rules.includes(id));
+   const event=triggered.rule_results.find(x=>x.rule_id===id);
+   assert.ok(event.product_eligibility);
+   assert.ok(event.trigger_sources.some(x=>x.question_id===key&&x.value===value));
+   checked.add(id);
+  }
+ }
+}
+// United Club currently has no applicable catalog identity; check the engine
+// directly with the reviewed lineage rule, without inventing a new product.
+for(const id of gateIds.filter(id=>!checked.has(id))){
+ const rule=policy.rules[id];
+ const product={issuer:'CHASE',product_id:'test-gate',product_name:rule.history_scope?.[0]||rule.bonus_scope?.[0]};
+ for(const [key,scope] of [['F03_CARD_HISTORY',rule.history_scope],['F04_BONUS_HISTORY',rule.bonus_scope]]){
+  if(!scope?.length)continue;
+  const value=scope[0]==='$TARGET'?product.product_name:scope[0];
+  const decision=chaseDecision.evaluate({product,plan:{diagnostics:{applicable_rule_ids:[id]}},
+   policy,approvalConfig:data('approval-config.json'),answers:{...base,[key]:[value]}});
+  assert.equal(decision.application.status,'PRODUCT_INELIGIBLE',id);
+  assert.equal(decision.bonus.status,'PRODUCT_INELIGIBLE',id);
+ }
+}
+const aeroplan='chase_aeroplan', aeroplanName='Chase Aeroplan Card', aeroplanRule='CHASE-PROD-007';
+for(const held of [false,true])for(const awarded of [false,true]){
+ const v=run(aeroplan,{F03_CARD_HISTORY:[held?aeroplanName:'NONE'],
+  F04_BONUS_HISTORY:[awarded?aeroplanName:'NONE']}).evaluation;
+ const blocked=held||awarded;
+ assert.equal(v.application.status,blocked?'PRODUCT_INELIGIBLE':'MODEL_ONLY');
+ assert.equal(v.bonus.status,blocked?'PRODUCT_INELIGIBLE':'NO_TRIGGER_FOUND');
+ const ev=v.rule_results.find(x=>x.rule_id===aeroplanRule);
+ assert.equal(ev.status,blocked?'TRIGGERED':'CLEAR');
+ assert.equal(ev.trigger_sources?.length||0,Number(held)+Number(awarded));
+}
+const incompleteGate=run(aeroplan,{F03_CARD_HISTORY:undefined}).evaluation;
+assert.equal(incompleteGate.bonus.status,'NEEDS_REVIEW');
+assert.ok(incompleteGate.bonus.missing_rules.includes(aeroplanRule));
+for(const changes of [{F01_RECENT_NEW_ACCOUNTS:5},{F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:2}}]){
+ const v=run(aeroplan,changes).evaluation;
+ assert.equal(v.application.status,'ELEVATED_RISK');
+ assert.equal(v.bonus.status,'NO_TRIGGER_FOUND');
+ assert.deepEqual(v.bonus.product_blocking_rules,[]);
+}
 const privateR=run(csp,{a2:'SENSITIVE_TEST_MARKER_DO_NOT_ECHO'});
 assert.ok(!JSON.stringify(privateR).includes('SENSITIVE_TEST_MARKER_DO_NOT_ECHO'));
 const amex=facade.plan({product_id:'amex_gold',known_facts:{a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0'}});

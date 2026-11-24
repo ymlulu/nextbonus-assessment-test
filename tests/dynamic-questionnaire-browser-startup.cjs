@@ -159,6 +159,33 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    '5/24 selected answer must produce the same inline red rule-change UI');
  assert.ok(walk(get('assessment-result')).some(n=>/Chase/.test(n.textContent)),
    'Chase result remains visible after changes');
+ // Reproduce the Aeroplan screenshot: both independent OR triggers checked.
+ const aeroplan=get('card-select').options.find(x=>/Aeroplan/i.test(x.textContent));
+ assert.ok(aeroplan,'Aeroplan shown in selector');
+ get('card-select').value=aeroplan.value;get('card-select').fire('change');
+ function historyRows(){
+  return walk(get('questions')).filter(n=>n.className==='check-option'&&
+   walk(n).some(c=>c.tag==='input'&&c.value==='Chase Aeroplan Card'));
+ }
+ function toggleHistory(index,checked){
+  const row=historyRows()[index];
+  assert.ok(row,'history choice '+index+' stays editable');
+  const control=walk(row).find(c=>c.tag==='input');
+  control.checked=checked;control.fire('change');
+ }
+ assert.equal(historyRows().length,2);
+ toggleHistory(0,true);
+ toggleHistory(1,true);
+ const historyNotes=historyRows().map(row=>walk(row).find(c=>c.className==='rule-delta')?.textContent||'');
+ assert.match(historyNotes[0],/CHASE-PROD-007.*目前持有.*不符合申请及开卡奖励条件/);
+ assert.match(historyNotes[1],/CHASE-PROD-007.*过去 24 个月拿过.*不符合申请及开卡奖励条件/);
+ assert.ok(walk(get('assessment-result')).some(n=>/你不符合这张卡的申请条件/.test(n.textContent)));
+ assert.ok(walk(get('assessment-result')).some(n=>/你不符合这次开卡奖励条件/.test(n.textContent)));
+ toggleHistory(0,false);
+ assert.ok(walk(historyRows()[1]).some(n=>n.className==='rule-delta'&&/不符合申请及开卡奖励条件/.test(n.textContent)));
+ assert.ok(walk(get('assessment-result')).some(n=>/你不符合这次开卡奖励条件/.test(n.textContent)));
+ toggleHistory(1,false);
+ assert.ok(!walk(get('assessment-result')).some(n=>/你不符合这次开卡奖励条件/.test(n.textContent)));
  assert.ok(requestLog.some(x=>x.includes('amex-formal-product-identities.json')));
  assert.ok(!requestLog.some(x=>!x.startsWith('data/')),'only static data requests');
  // Exercise the transient failure branch and successful retry on a fresh page.
