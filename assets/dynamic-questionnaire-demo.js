@@ -32,7 +32,46 @@
     head.append(el('span','muted',common?'基础评分':'规则自动匹配'));
     card.append(head);
     if(item.description)card.append(el('p','small',item.description));
-    if((common||item.type==='single')&&item.options?.length){
+    if(item.type==='structured'&&Array.isArray(item.fields)){
+      const entry=answers[item.id]&&typeof answers[item.id]==='object'?answers[item.id]:{};
+      const controls=[];
+      for(const field of item.fields){
+        const label=el('label','structured-field',field.label);
+        let control;
+        if(field.type==='number'){
+          control=el('input');control.type='number';control.min=String(field.min??0);
+          control.max=String(field.max??30);control.step='1';
+          control.value=entry[field.id]===undefined?'':String(entry[field.id]);
+        }else{
+          control=el('select');
+          const empty=el('option','','请选择');empty.value='';control.append(empty);
+          for(const choice of field.options||[]){
+            const opt=el('option','',choice.label);opt.value=choice.value;
+            if(entry[field.id]===choice.value)opt.selected=true;
+            control.append(opt);
+          }
+        }
+        label.append(control);card.append(label);
+        controls.push({field,control});
+      }
+      const button=el('button','secondary','保存并更新问卷');
+      button.type='button';
+      button.addEventListener('click',()=>{
+        const data={};
+        for(const {field,control} of controls){
+          const value=control.value;
+          if(!value)continue;
+          if(field.type==='number'){
+            if(!/^\d+$/.test(value)||Number(value)>field.max)return;
+            data[field.id]=Number(value);
+          }else data[field.id]=value;
+        }
+        if(Object.keys(data).length)answers[item.id]=data;
+        else delete answers[item.id];
+        render();
+      });
+      card.append(button);
+    }else if((common||item.type==='single')&&item.options?.length){
       card.append(optionsForQuestion(item));
     }else if(item.type==='multi'&&item.options?.length){
       const options=el('div','choice-list');
@@ -123,6 +162,7 @@
         CUSTOMER_TYPE_CONFLICT:'个人/商业卡类型冲突'
       })[result.status]||result.note||'请补充产品身份';
       list.replaceChildren();
+      $('assessment-result').replaceChildren();
       $('scope').textContent='';
       $('gaps').textContent='';
       showSuggestions(result);
@@ -170,6 +210,35 @@
       }
       list.append(pending);
     }
+
+    const report=$('assessment-result');
+    report.replaceChildren();
+    if(result.evaluation){
+      const d=result.evaluation;
+      report.append(el('h2','','Amex 本机评估结果'));
+      const summary=el('div','assessment-summary');
+      const app=el('section','assessment-panel');
+      app.append(el('strong','','申请风险'));
+      app.append(el('p','',d.application.message));
+      app.append(el('p','small','通用信用矩阵：'+({
+        HIGH:'相对较好',MEDIUM:'一般',HIGH_RISK:'偏高风险',
+        INSUFFICIENT_DATA:'资料不足'
+      })[d.application.base_risk]+'。不代表银行审批概率。'));
+      const bonus=el('section','assessment-panel');
+      bonus.append(el('strong','','开卡奖励资格'));
+      bonus.append(el('p','',d.bonus.message));
+      bonus.append(el('p','small','Offer 假设：'+(d.offer_variant==='NLL'?'NLL 特殊 Offer':'普通公开 Offer')));
+      summary.append(app,bonus);report.append(summary);
+      const itemized=el('details','rule-report');
+      itemized.append(el('summary','','逐条规则解释（'+d.rule_results.length+' 项）'));
+      for(const rule of d.rule_results){
+        const desc=el('p','small',
+          rule.rule_id+' · '+({TRIGGERED:'触发风险/限制',CLEAR:'未发现触发',
+            MISSING:'需要补充',REVIEW:'待确认'})[rule.status]+' · '+rule.reason);
+        itemized.append(desc);
+      }
+      report.append(itemized,el('p','small',d.caveat));
+    }
     $('scope').textContent='匹配规则：'+info.applicable_rule_ids.join('、');
     $('gaps').textContent='待核实系统条件：'+
       (info.unresolved_system_gates.map(x=>x.rule_id).join('、')||'无')+
@@ -178,8 +247,8 @@
   async function start(){
     const files=['dynamic-questionnaire-rule-index.json','products.json',
       'questions.json','frozen-offer-facts.json','card-identity-index.json',
-      'amex-questionnaire-policy.json'];
-    const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,amexPolicy]=
+      'amex-questionnaire-policy.json','approval-config.json'];
+    const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,amexPolicy,approvalConfig]=
       await Promise.all(files.map(async name=>{
         const response=await fetch('data/'+name,{cache:'no-cache'});
         if(!response.ok)throw Error('无法读取 Assessment 独立数据：'+name);
@@ -193,7 +262,8 @@
     facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
       planner,lookup,amexEnricher,ruleIndex,
       targetState:window.NextBonusQuestionnairePlannerV1.targetState,
-      amexOfferContext:window.NextBonusAmexOfferContextV1
+      amexOfferContext:window.NextBonusAmexOfferContextV1,
+      amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig
     });
     $('version').textContent='独立目录 '+facade.getVersion().source_count+
       ' 张卡 · 规则索引 '+facade.getVersion().rules_indexed+' 条';

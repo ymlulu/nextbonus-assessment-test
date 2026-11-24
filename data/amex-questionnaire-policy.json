@@ -150,9 +150,48 @@
   },
   "question_templates": {
     "F02_ISSUER_APPLICATION_HISTORY": {
-      "title": "你近期在 American Express 申请或获批过哪些卡？",
-      "description": "请分别记录申请和获批日期，以判断同产品 90 天、信用卡 1/5 与 2/90 的申请间隔；申请不等于获批。",
-      "type": "text"
+      "title": "你近期在 American Express 的申请与获批记录",
+      "description": "分别填写以下三项；信用卡获批、申请与签账卡不同，不能混为一谈。",
+      "type": "structured",
+      "fields": [
+        {
+          "id": "approved_revolving_90d",
+          "type": "number",
+          "label": "过去 90 天获批了几张 Amex 循环信用卡？",
+          "min": 0,
+          "max": 30
+        },
+        {
+          "id": "approved_revolving_5d",
+          "type": "single",
+          "label": "过去 5 天内是否获批过 Amex 循环信用卡？",
+          "options": [
+            {
+              "value": "NO",
+              "label": "没有"
+            },
+            {
+              "value": "YES",
+              "label": "有"
+            }
+          ]
+        },
+        {
+          "id": "same_product_applied_or_approved_90d",
+          "type": "single",
+          "label": "过去 90 天内是否申请或获批过目前选中的这张 Amex 卡？",
+          "options": [
+            {
+              "value": "NO",
+              "label": "没有"
+            },
+            {
+              "value": "YES",
+              "label": "有"
+            }
+          ]
+        }
+      ]
     },
     "F03_CARD_HISTORY": {
       "title": "以下 Amex 产品，你现在或以前持有过哪些？",

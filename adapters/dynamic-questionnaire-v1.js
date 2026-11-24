@@ -61,6 +61,18 @@
       facts[key]!==null&&facts[key]!==undefined&&facts[key]!=='';
   }
 
+  function answeredFor(key,facts,ruleIds){
+    if(!isAnswered(facts,key))return false;
+    if(key!=='F02_ISSUER_APPLICATION_HISTORY')return true;
+    const value=facts[key];
+    if(!value||typeof value!=='object'||Array.isArray(value))return false;
+    const requirements={
+      'AMEX-006':'approved_revolving_90d',
+      'AMEX-010':'approved_revolving_5d',
+      'AMEX-011':'same_product_applied_or_approved_90d'
+    };
+    return ruleIds.every(id=>!requirements[id]||isAnswered(value,requirements[id]));
+  }
   function needsFollowUp(key,facts){
     if(key!=='F06_AU_BREAKDOWN')return true;
     const recent=facts.F01_RECENT_NEW_ACCOUNTS;
@@ -122,7 +134,7 @@
       }
       const specific=[];
       for(const [key,dependencies] of byGroup){
-        if(isAnswered(facts,key)||!needsFollowUp(key,facts))continue;
+        if(answeredFor(key,facts,dependencies)||!needsFollowUp(key,facts))continue;
         const definition=groups.get(key);
         specific.push({id:key,type:'fact_group',title:definition.prompt,
           source:'reviewed_fact_registry',rule_ids:[...new Set(dependencies)],

@@ -20,6 +20,14 @@
         const template=templates[q.id];
         if(!template)return q;
         const output={...q,...template,rule_ids:q.rule_ids};
+        if(q.id==='F02_ISSUER_APPLICATION_HISTORY'&&output.fields){
+          const needed=new Set(q.rule_ids.map(id=>({
+            'AMEX-006':'approved_revolving_90d',
+            'AMEX-010':'approved_revolving_5d',
+            'AMEX-011':'same_product_applied_or_approved_90d'
+          })[id]).filter(Boolean));
+          output.fields=output.fields.filter(f=>needed.has(f.id));
+        }
         if(q.id==='F03_CARD_HISTORY'){
           const choices=new Set();
           for(const rid of q.rule_ids){
