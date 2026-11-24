@@ -62,52 +62,52 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
     const matches=scope.filter(x=>knownMarriottNames.has(x));
     if(matches.length){
       events.push(result(id,matches.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',
-        dim,'标准 Offer 家族条款下曾持有：'+matches.join('、')));
+        dim,'按普通开卡奖励条款，你以前办过：'+matches.join('、')));
     }else if(id==='AMEX-BIZ-005'&&ambiguousLegacyBusiness){
       events.push(result(id,'TRIGGERED',dim,
-        '已确认持有 Marriott Bonvoy Business 或其旧版 SPG Business；标准 Offer 均包含此历史'));
+        '你办过 Marriott Bonvoy Business 或旧版 SPG Business，普通 Offer 可能拿不到奖励'));
     }else if(held===null){
-      events.push(result(id,'MISSING',dim,'需要相关 Amex Marriott 持卡经历'));
+      events.push(result(id,'MISSING',dim,'还需要知道你以前是否办过相关的 Marriott 卡'));
     }else{
       events.push(result(id,'CLEAR',dim,
-        '未发现适用的 Amex Marriott lifetime / family 持卡历史'));
+        '没发现会影响这次奖励的 Amex Marriott 持卡记录'));
     }
     continue;
    }
    const scope=(policy.history_choices_by_rule[id]||[]).map(x=>x==='$TARGET'?product.product_name:x);
-   if(!scope.length){events.push(result(id,'REVIEW',dim,'本规则没有审核过的持卡范围'));continue;}
+   if(!scope.length){events.push(result(id,'REVIEW',dim,'这条规则还没有对应的卡片名单，需要人工核实'));continue;}
    const verifiedMarriottTarget=id==='AMEX-001'&&
      product.product_name.startsWith('Marriott Bonvoy')&&
      knownMarriottNames.has(product.product_name);
    if(held===null&&!verifiedMarriottTarget){
-     events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;
+     events.push(result(id,'MISSING',dim,'还需要确认你以前办过哪些 Amex 卡'));continue;
    }
    const hits=scope.filter(x=>(id==='AMEX-001'&&
      product.product_name.startsWith('Marriott Bonvoy'))
      ?knownMarriottNames.has(x):held.includes(x));
    events.push(result(id,!hits.length?'CLEAR':hits.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',dim,
-    hits.length?'标准 Offer 假设下，持有历史：'+hits.join('、'):'未报告此规则所涵盖的持卡历史'));
+    hits.length?'按普通 Offer 的条款，你以前办过：'+hits.join('、'):'没有选中会触发这条限制的信用卡'));
    continue;
   }
   if(id==='AMEX-REL-001'||id==='AMEX-REL-002'){
    const v=a.F08_RELATIONSHIP;
    events.push(result(id,!['YES','NO'].includes(v)?'MISSING':v==='NO'?'TRIGGERED':'CLEAR',dim,
-    v==='NO'?'尚未具备所需合作方账户':'请确认符合联名合作方的账户要求'));continue;
+    v==='NO'?'你目前没有申请这张联名卡所需的账户':'已选择有相关账户；还需以申请页面的要求为准'));continue;
   }
   if(id==='AMEX-007'||id==='AMEX-008'){
    const n=a.F10_ISSUER_PORTFOLIO_COUNT,threshold=id==='AMEX-007'?5:10;
    events.push(result(id,!count(n)?'MISSING':n>=threshold?'TRIGGERED':'CLEAR',dim,
-    count(n)?'对应类别持卡 '+n+' 张；参考阈值 '+threshold+'（非保证的硬上限）':'需要相关持卡数量'));continue;
+    count(n)?'你现在持有 '+n+' 张同类 Amex 卡；'+threshold+' 张是经验参考，并非一定会拒批':'还需要知道你现在持有几张同类 Amex 卡'));continue;
   }
   if(id==='AMEX-006'){
    const n=activity.approved_revolving_90d;
    events.push(result(id,!count(n)?'MISSING':n>=2?'TRIGGERED':'CLEAR',dim,
-    count(n)?'过去 90 天 Amex revolving 卡获批 '+n+' 张':'需要 90 天获批张数'));continue;
+    count(n)?'过去 90 天获批了 '+n+' 张 Amex 普通信用卡':'还需要知道过去 90 天获批了几张 Amex 普通信用卡'));continue;
   }
   if(id==='AMEX-011'){
    const v=activity.same_product_applied_or_approved_90d;
    events.push(result(id,!['YES','NO'].includes(v)?'MISSING':v==='YES'?'TRIGGERED':'CLEAR',dim,
-    '90 天内是否申请或获批该产品'));continue;
+    '过去 90 天有没有申请过这张卡'));continue;
   }
  }
  if(marriottResult?.applicable){
@@ -116,16 +116,16 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    }
    if(marriottResult.status==='MISSING'&&!marriottResult.history_known){
      events.push(result('MARRIOTT-MATRIX','MISSING','BONUS',
-       '还需要确认与目标卡有关的 Marriott/Ritz 历史'));
+       '还需要确认你以前办过哪些 Marriott / Ritz-Carlton 卡'));
    }
  }
  for(const x of plan.diagnostics?.unresolved_system_gates||[]){
   if(x.rule_id.startsWith('AMEX')&&listed.has(x.rule_id))events.push(result(x.rule_id,'REVIEW',
-   BONUS.has(x.rule_id)?'BONUS':'APPLICATION','Offer 条款缺少核实信息'));
+   BONUS.has(x.rule_id)?'BONUS':'APPLICATION','还没有核实这次申请链接的奖励条款'));
  }
  for(const x of plan.diagnostics?.unresolved_target_mappings||[]){
   if(x.rule_id.startsWith('AMEX')&&listed.has(x.rule_id))events.push(result(x.rule_id,'REVIEW',
-   BONUS.has(x.rule_id)?'BONUS':'APPLICATION','产品适用范围信息不足'));
+   BONUS.has(x.rule_id)?'BONUS':'APPLICATION','暂时不能确定这条规则是否适用于这张卡'));
  }
  const app=events.filter(x=>x.dimension==='APPLICATION'),bonus=events.filter(x=>x.dimension==='BONUS');
  const any=(e,s)=>e.some(x=>x.status===s);
@@ -148,18 +148,18 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    missing_rules:missingApplication.map(x=>x.rule_id),
    unresolved_rules:unresolvedApplication.map(x=>({rule_id:x.rule_id,
      status:x.status,reason:x.reason})),
-   message:appStatus==='ELEVATED_RISK'?'存在 Amex 申请限制或风险信号':
-    !baseComplete?'基础信用资料不足，暂无法计算通用风险档位':
-    unresolvedApplication.length?'通用信用风险档位已计算；Amex 专属规则仍有待补充或核实的条件':
-    '已完成通用风险档位及当前可执行的 Amex 规则检查（非获批保证）'},
+   message:appStatus==='ELEVATED_RISK'?'发现可能影响这次 Amex 申请的情况':
+    !baseComplete?'信用记录还有几项没填，暂时算不出基础风险档位':
+    unresolvedApplication.length?'基础信用情况已经算好了，但还有几项 Amex 申请记录需要确认':
+    '已检查基础信用情况和适用的 Amex 申请规则；是否获批仍以银行为准'},
   bonus:{status:bonusStatus,
    triggered_rules:bonus.filter(x=>x.status==='TRIGGERED').map(x=>x.rule_id),
    missing_rules:bonus.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
-   message:bonusStatus==='LIKELY_RESTRICTED'?'标准 Offer 假设下可能触发 Welcome Bonus 限制':
-    bonusStatus==='NEEDS_REVIEW'?'历史或规则尚需核实，不能确认奖励资格':
-    '未发现已触发的奖励历史限制；并非保证获得开卡奖励'},
+   message:bonusStatus==='LIKELY_RESTRICTED'?'按普通 Offer 的条款，你这次可能拿不到开卡奖励':
+    bonusStatus==='NEEDS_REVIEW'?'还需要确认几项持卡历史，暂时无法判断开卡奖励资格':
+    '目前没发现已触发的开卡奖励限制，但最终以申请条款为准'},
   rule_results:events,review_only:true,benefits_included:false,answers_transmitted:false,
-  caveat:'本机模拟；没有数值获批概率；当前具体 Offer 条款和 Amex 审批决定以银行为准'};
+  caveat:'这是根据已填信息做的初步评估，不代表 Amex 的实际审批结果。具体开卡奖励请以申请页面条款为准。'};
 }
 return Object.freeze({version:'1',evaluate,approvalBase});
 });
