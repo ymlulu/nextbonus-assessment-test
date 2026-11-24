@@ -121,6 +121,8 @@
       if(answers[item.id]===option.value)node.selected=true;
       select.append(node);
     }
+    // Explicitly set the controlled select value, including after DOM rebuild.
+    select.value=answers[item.id]||'';
     select.addEventListener('change',()=>{
       if(select.value)answers[item.id]=select.value;
       else delete answers[item.id];
