@@ -45,6 +45,8 @@ jobs:
         run: node tests/marriott-matrix-dynamic.cjs
       - name: Verify actionable previous-version family histories
         run: node tests/amex-previous-versions-actionable.cjs
+      - name: Verify only AMEX 1/5 is disabled, preserving 2/90
+        run: node tests/amex-disable-1-5-only.cjs
       - name: Verify Phase 6.1 integration contract
         run: node tests/phase6-1-integration-contract.cjs
       - name: Verify static bridge contract
