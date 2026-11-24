@@ -8,6 +8,7 @@ const {createFacade}=require('../adapters/card-questionnaire-facade-v1.js');
 const {createEnricher}=require('../adapters/amex-questionnaire-v1.js');
 const amexContext=require('../adapters/amex-offer-context-v1.js');
 const decision=require('../engines/amex-decision-v1.js');
+const {createMatrix}=require('../engines/marriott-matrix-v1.js');
 const idx=data('dynamic-questionnaire-rule-index.json');
 const policy=data('amex-questionnaire-policy.json');
 const identity=data('amex-formal-product-identities.json');
@@ -17,7 +18,8 @@ const planner=makePlanner({ruleIndex:idx,products:data('products.json'),
 const facade=createFacade({planner,lookup,
   amexEnricher:createEnricher({policy}),amexOfferContext:amexContext,
   ruleIndex:idx,targetState,amexDecision:decision,amexPolicy:policy,
-  approvalConfig:data('approval-config.json')});
+  approvalConfig:data('approval-config.json'),
+  marriottMatrix:createMatrix(data('marriott-eligibility-matrix.json'))});
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0'};
 const clean={...base,
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,
@@ -91,9 +93,9 @@ assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND',
  'no inferred Hilton cross-tier restriction');
 r=call('Marriott Bonvoy Business Card',{...clean,
  F07_MARRIOTT_HISTORY:['Chase Ritz-Carlton']});
-assert.equal(r.evaluation.bonus.status,'NEEDS_REVIEW',
- 'cross-issuer Marriott historical rule requires dated terms');
-assert.ok(r.evaluation.rule_results.some(x=>x.rule_id==='AMEX-BIZ-005'&&x.status==='REVIEW'));
+assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND',
+ 'source matrix makes Ritz-Carlton history irrelevant for AMEX Marriott Business');
+assert.equal(r.marriott_matrix.status,'CLEAR');
 r=call('Platinum Card exclusively for Morgan Stanley',{...clean,F08_RELATIONSHIP:'NO'});
 assert.equal(r.evaluation.application.status,'ELEVATED_RISK');
 assert.ok(r.evaluation.application.triggered_rules.includes('AMEX-REL-002'));
