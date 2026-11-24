@@ -33,7 +33,11 @@ function matches(history,scope,product){
  if(history===null)return null;
  return resolved(scope,product).filter(x=>history.includes(x));
 }
-const event=(rule_id,status,dimension,reason)=>({rule_id,status,dimension,reason});
+const event=(rule_id,status,dimension,reason,trigger_sources=[])=>({rule_id,status,dimension,reason,
+ ...(trigger_sources.length?{trigger_sources}:{})});
+const evidence=(question_id,hits,prefix,suffix='')=>(hits||[]).map(value=>({
+ question_id,value,reason:prefix+value+suffix
+}));
 function evaluate({plan,product,answers={},policy,approvalConfig}={}){
  if(product?.issuer!=='CHASE'||!plan?.diagnostics||!policy?.rules||!approvalConfig)
   throw Error('CHASE_EVALUATION_INPUT_REQUIRED');
@@ -96,7 +100,8 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
    else events.push(event(id,hits.length?'TRIGGERED':'CLEAR',dimension,
      hits.length?(rule.mode==='held_ever'?'以前办过：':'目前持有：')+hits.join('、')+
        (rule.soft?'，按当前参考条款可能影响开卡奖励':''):
-       '没发现这条规则涉及的相关持卡记录'));
+       '没发现这条规则涉及的相关持卡记录',
+     evidence('F03_CARD_HISTORY',hits.filter(x=>x!=='OTHER_CHASE_NO_FEE_BUSINESS'),rule.mode==='held_ever'?'以前办过 ':'目前持有 ')));
    continue;
   }
   if(rule.mode==='bonus_history'){
@@ -106,7 +111,8 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
       '还要确认你以前是否拿过这张卡的开卡奖励':
       '还要确认近 24 个月拿过哪些相关卡的开卡奖励'):
     hits.length?'你拿过相关开卡奖励：'+hits.join('、'):
-      '没有报告这条规则范围内的开卡奖励记录'));
+      '没有报告这条规则范围内的开卡奖励记录',
+    evidence('F04_BONUS_HISTORY',hits,rule.bonus_window==='EVER'?'以前拿过 ':'过去 24 个月拿过 ',' 的开卡奖励')));
    continue;
   }
   if(rule.mode==='current_or_bonus'||rule.mode==='club_current_or_bonus'){
@@ -115,7 +121,10 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
    if((held&&held.length)||(awarded&&awarded.length)){
     const reason=[...(held?.length?['目前持有 '+held.join('、')]:[]),
       ...(awarded?.length?['近 24 个月拿过 '+awarded.join('、')+' 的开卡奖励']:[])].join('；');
-    events.push(event(id,'TRIGGERED',dimension,reason));
+    events.push(event(id,'TRIGGERED',dimension,reason,[
+     ...evidence('F03_CARD_HISTORY',held,'目前持有 '),
+     ...evidence('F04_BONUS_HISTORY',awarded,'过去 24 个月拿过 ',' 的开卡奖励')
+    ]));
    }else if(held===null||awarded===null){
     events.push(event(id,'MISSING',dimension,
      '还要确认这张卡目前是否持有，以及近 24 个月有没有拿过相关开卡奖励'));
@@ -133,14 +142,25 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
   if(x.rule_id.startsWith('CHASE'))events.push(event(x.rule_id,'REVIEW','APPLICATION',
    '卡片资料还不够完整，暂时不能判断这条规则是否适用'));
  }
+ // Explicit product availability is a hard gate, unlike approval-frequency
+ // or underwriting signals. Keep the source dimension and a single event
+ // per rule, but propagate its result to application and bonus eligibility.
+ for(const x of events){
+  if(x.dimension==='APPLICATION'&&policy.rules[x.rule_id]?.product_eligibility===true)
+   x.product_eligibility=true;
+ }
  const app=events.filter(x=>x.dimension==='APPLICATION');
- const bonusEvents=events.filter(x=>x.dimension==='BONUS');
+ const bonusEvents=events.filter(x=>x.dimension==='BONUS'||x.product_eligibility);
+ const productBlockers=app.filter(x=>x.product_eligibility&&x.status==='TRIGGERED');
+ const productBlockingRules=productBlockers.map(x=>x.rule_id);
  const any=(rs,status)=>rs.some(x=>x.status===status);
  const base=approvalBase(a,approvalConfig);
  const incomplete=app.filter(x=>x.status==='MISSING'||x.status==='REVIEW');
- const appStatus=any(app,'TRIGGERED')?'ELEVATED_RISK':
+ const appStatus=productBlockers.length?'PRODUCT_INELIGIBLE':
+  any(app,'TRIGGERED')?'ELEVATED_RISK':
   incomplete.length||base.rating==='INSUFFICIENT_DATA'?'INSUFFICIENT_DATA':'MODEL_ONLY';
- const bonusStatus=any(bonusEvents,'TRIGGERED')?'LIKELY_RESTRICTED':
+ const bonusStatus=productBlockers.length?'PRODUCT_INELIGIBLE':
+  any(bonusEvents,'TRIGGERED')?'LIKELY_RESTRICTED':
   any(bonusEvents,'MISSING')||any(bonusEvents,'REVIEW')?'NEEDS_REVIEW':'NO_TRIGGER_FOUND';
  return {
   contract_version:'1',issuer:'CHASE',product_id:product.product_id,
@@ -150,9 +170,12 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
    base_completed:base.rating!=='INSUFFICIENT_DATA',
    issuer_rules_completed:!incomplete.length,
    triggered_rules:app.filter(x=>x.status==='TRIGGERED').map(x=>x.rule_id),
+   product_blocking_rules:productBlockingRules,
    missing_rules:app.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
    unresolved_rules:incomplete.map(x=>({rule_id:x.rule_id,status:x.status,reason:x.reason})),
-   message:appStatus==='ELEVATED_RISK'?
+   message:appStatus==='PRODUCT_INELIGIBLE'?
+     '按目前参考条款，你不符合这张卡的申请条件：'+productBlockers.map(x=>x.reason).join('；'):
+    appStatus==='ELEVATED_RISK'?
      '发现可能影响这次 Chase 申请的限制或风险':
     base.rating==='INSUFFICIENT_DATA'?'信用记录还有几项没填，暂时算不出基础风险档位':
     incomplete.length?'基础信用情况已经算好了，但还有几项 Chase 申请记录需要确认':
@@ -161,8 +184,11 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
   bonus:{
    status:bonusStatus,
    triggered_rules:bonusEvents.filter(x=>x.status==='TRIGGERED').map(x=>x.rule_id),
+   product_blocking_rules:productBlockingRules,
    missing_rules:bonusEvents.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
-   message:bonusStatus==='LIKELY_RESTRICTED'?
+   message:bonusStatus==='PRODUCT_INELIGIBLE'?
+     '按目前参考条款，你不符合这次开卡奖励条件，因为已触发明确的产品申请限制':
+    bonusStatus==='LIKELY_RESTRICTED'?
      '按目前参考条款，你这次可能拿不到开卡奖励':
      bonusStatus==='NEEDS_REVIEW'?'还要确认持卡或奖励记录，才能判断开卡奖励资格':
      '目前没发现已触发的开卡奖励限制，但不代表保证拿到奖励'

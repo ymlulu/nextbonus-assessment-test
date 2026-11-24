@@ -117,7 +117,8 @@
         "IHG One Rewards Traveler",
         "IHG One Rewards Premier"
       ],
-      "description": "目前是否持有个人 IHG 联名卡"
+      "description": "目前是否持有个人 IHG 联名卡",
+      "product_eligibility": true
     },
     "CHASE-PROD-002": {
       "mode": "bonus_history",
@@ -128,7 +129,8 @@
         "IHG One Rewards Premier"
       ],
       "bonus_window": "24M",
-      "description": "个人 IHG 卡过去 24 个月的开卡奖励"
+      "description": "个人 IHG 卡过去 24 个月的开卡奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-005": {
       "mode": "current_or_bonus",
@@ -145,7 +147,8 @@
         "Southwest Priority"
       ],
       "bonus_window": "24M",
-      "description": "Southwest 个人卡持卡及 24 个月奖励记录"
+      "description": "Southwest 个人卡持卡及 24 个月奖励记录",
+      "product_eligibility": true
     },
     "CHASE-PROD-006": {
       "mode": "current_or_bonus",
@@ -158,7 +161,8 @@
         "$TARGET"
       ],
       "bonus_window": "24M",
-      "description": "World of Hyatt 个人卡持卡及 24 个月奖励"
+      "description": "World of Hyatt 个人卡持卡及 24 个月奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-007": {
       "mode": "current_or_bonus",
@@ -171,7 +175,8 @@
         "$TARGET"
       ],
       "bonus_window": "24M",
-      "description": "Aeroplan 持卡及 24 个月奖励"
+      "description": "Aeroplan 持卡及 24 个月奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-011": {
       "mode": "current_or_bonus",
@@ -184,7 +189,8 @@
         "$TARGET"
       ],
       "bonus_window": "24M",
-      "description": "Freedom 同一产品持卡及 24 个月奖励"
+      "description": "Freedom 同一产品持卡及 24 个月奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-012": {
       "mode": "current_or_bonus",
@@ -197,7 +203,8 @@
         "$TARGET"
       ],
       "bonus_window": "24M",
-      "description": "United 同一产品持卡及 24 个月奖励"
+      "description": "United 同一产品持卡及 24 个月奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-013": {
       "mode": "club_current_or_bonus",
@@ -210,7 +217,8 @@
         "United Club"
       ],
       "bonus_window": "24M",
-      "description": "United Club 系列持卡历史"
+      "description": "United Club 系列持卡历史",
+      "product_eligibility": true
     },
     "CHASE-PROD-014": {
       "mode": "current_or_bonus",
@@ -223,7 +231,8 @@
         "$TARGET"
       ],
       "bonus_window": "24M",
-      "description": "Avios 同一产品持卡及 24 个月奖励"
+      "description": "Avios 同一产品持卡及 24 个月奖励",
+      "product_eligibility": true
     },
     "CHASE-PROD-015": {
       "mode": "current_or_bonus",
@@ -258,7 +267,8 @@
       "history_scope": [
         "$TARGET"
       ],
-      "description": "目前是否持有 Chase Sapphire Preferred"
+      "description": "目前是否持有 Chase Sapphire Preferred",
+      "product_eligibility": true
     },
     "CHASE-PROD-018": {
       "mode": "held_current",
@@ -267,11 +277,13 @@
       "history_scope": [
         "$TARGET"
       ],
-      "description": "目前是否持有 Chase Sapphire Reserve"
+      "description": "目前是否持有 Chase Sapphire Reserve",
+      "product_eligibility": true
     }
   },
   "history_display_names": {
-    "OTHER_CHASE_NO_FEE_BUSINESS": "其他无年费 Chase 商业信用卡（具体产品待核实）"
+    "OTHER_CHASE_NO_FEE_BUSINESS": "其他无年费 Chase 商业信用卡（具体产品待核实）",
+    "Chase Aeroplan Card": "Chase Aeroplan Card（包括旧版本）"
   },
   "question_templates": {
     "F01_RECENT_NEW_ACCOUNTS": {
