@@ -7,7 +7,10 @@ else root.NextBonusAmexDecisionV1=api;
 'use strict';
 const APP=new Set(['AMEX-006','AMEX-007','AMEX-008','AMEX-010','AMEX-011','AMEX-REL-001','AMEX-REL-002']);
 const BONUS=new Set(['AMEX-001','AMEX-FL-001','AMEX-FL-002','AMEX-FL-003','AMEX-FL-004','AMEX-FL-005','AMEX-FL-006','AMEX-FL-007','AMEX-FL-008','AMEX-FL-009','AMEX-FL-010','AMEX-FL-012','AMEX-FL-013','AMEX-BIZ-001','AMEX-BIZ-002','AMEX-BIZ-005']);
-const OLD=new Set(['该系列的旧版本','这些产品的旧版本','该卡旧版本','该卡的旧版本','以前的 SPG Business','以前的 SPG Luxury']);
+// Only unidentifiable old-version phrases are review-only. Named and mapped
+// historical products (e.g. SPG predecessors) are actionable facts under the
+// assumed standard offer's explicitly modeled family scope.
+const OLD=new Set(['该系列的旧版本','该系列旧版本','这些产品的旧版本','该卡旧版本','该卡的旧版本']);
 const AGE={NO_US_CARD:'None',LT_6M:'<6m',M6_11:'6–11m',Y1_2:'1–2y',Y2_PLUS:'2y+',UNKNOWN:'Unknown'};
 const SCORE={SCORE_740_PLUS:'740+',SCORE_700_739:'700–739',SCORE_670_699:'670–699',SCORE_LT_670:'<670',UNKNOWN:'Unknown'};
 const SEV={N0:0,N1:0,N2_3:1,N4_5:2,N6_PLUS:3};
