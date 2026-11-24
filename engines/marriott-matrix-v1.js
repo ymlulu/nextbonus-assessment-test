@@ -79,11 +79,14 @@ function createMatrix(index){
       title:'你现在或以前持有过哪些 Marriott / Ritz-Carlton 信用卡？',
       description:'仅用于筛选与目标卡有关的限制，不需要填写与目标卡无关的产品。',
       options:index.prior_products.filter(p=>{
-        const v=p.cells[target];return v!=='OK';
+        const v=p.cells[target];return v!=='OK'&&v!=='LL'&&v!=='LL / family';
       }).map(p=>({value:Object.entries(LABEL_TO_ID).find(([,id])=>id===p.id)?.[0]||p.label,
         label:p.label})),allow_none:true,
       rule_ids:['MARRIOTT-MATRIX']}]};
   // Only the selected histories can ever influence the decision.
+  // LL restrictions are evaluated by the separate AMEX family/lifetime rules.
+  // A cross-issuer history list containing only LL/irrelevant products is clear
+  // for this matrix, not proof that all lifetime restrictions are absent.
   const pending=[],events=[],questions=[];
   const facts=known_facts.F07_MARRIOTT_DETAILS&&typeof known_facts.F07_MARRIOTT_DETAILS==='object'?
     known_facts.F07_MARRIOTT_DETAILS:{};
