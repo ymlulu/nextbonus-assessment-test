@@ -283,8 +283,10 @@
   async function start(){
     const files=['dynamic-questionnaire-rule-index.json','products.json',
       'questions.json','frozen-offer-facts.json','card-identity-index.json',
-      'amex-questionnaire-policy.json','approval-config.json'];
-    const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,amexPolicy,approvalConfig]=
+      'amex-questionnaire-policy.json','approval-config.json',
+      'marriott-eligibility-matrix.json'];
+    const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,amexPolicy,
+      approvalConfig,marriottMatrixConfig]=
       await Promise.all(files.map(async name=>{
         const response=await fetch('data/'+name,{cache:'no-cache'});
         if(!response.ok)throw Error('无法读取 Assessment 独立数据：'+name);
@@ -299,7 +301,8 @@
       planner,lookup,amexEnricher,ruleIndex,
       targetState:window.NextBonusQuestionnairePlannerV1.targetState,
       amexOfferContext:window.NextBonusAmexOfferContextV1,
-      amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig
+      amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
+      marriottMatrix:window.NextBonusMarriottMatrixV1.createMatrix(marriottMatrixConfig)
     });
     $('version').textContent='独立目录 '+facade.getVersion().source_count+
       ' 张卡 · 规则索引 '+facade.getVersion().rules_indexed+' 条';
