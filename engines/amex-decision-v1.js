@@ -33,6 +33,17 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
  const ids=new Set(plan.diagnostics?.applicable_rule_ids||[]),listed=new Set(policy.source.rule_ids);
  const a=answers&&typeof answers==='object'&&!Array.isArray(answers)?answers:{};
  const held=history(a.F03_CARD_HISTORY);
+ const reportedMarriott=Array.isArray(a.F07_MARRIOTT_HISTORY)?
+   a.F07_MARRIOTT_HISTORY:[];
+ const knownMarriottNames=new Set([
+   ...((held===null)?[]:held),
+   ...reportedMarriott.map(x=>({
+     'AMEX Marriott Bonvoy Bevy':'Marriott Bonvoy Bevy',
+     'AMEX Marriott Bonvoy Brilliant':'Marriott Bonvoy Brilliant'
+   })[x]).filter(Boolean)
+ ]);
+ const ambiguousLegacyBusiness=reportedMarriott.includes(
+   'AMEX Marriott Bonvoy Business / Legacy SPG Business');
  const activity=a.F02_ISSUER_APPLICATION_HISTORY&&typeof a.F02_ISSUER_APPLICATION_HISTORY==='object'
   ?a.F02_ISSUER_APPLICATION_HISTORY:{};
  const events=[];
@@ -45,13 +56,17 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    // source-backed target-by-history Marriott matrix.
    if(id==='AMEX-FL-012'||id==='AMEX-FL-013'||id==='AMEX-BIZ-005'){
     const scope=(policy.history_choices_by_rule[id]||[]);
-    if(held===null){
+    const matches=scope.filter(x=>knownMarriottNames.has(x));
+    if(matches.length){
+      events.push(result(id,matches.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',
+        dim,'标准 Offer 家族条款下曾持有：'+matches.join('、')));
+    }else if(id==='AMEX-BIZ-005'&&ambiguousLegacyBusiness){
+      events.push(result(id,'REVIEW',dim,
+        '已报告 Marriott Business / SPG Business 历史，需要确认具体旧版本'));
+    }else if(held===null){
       events.push(result(id,'MISSING',dim,'需要相关 Amex Marriott 持卡经历'));
     }else{
-      const matches=scope.filter(x=>held.includes(x));
-      events.push(result(id,matches.some(x=>OLD.has(x))?'REVIEW':
-        matches.length?'TRIGGERED':'CLEAR',dim,matches.length?
-        '标准 Offer 家族条款下曾持有：'+matches.join('、'):
+      events.push(result(id,'CLEAR',dim,
         '未发现适用的 Amex Marriott lifetime / family 持卡历史'));
     }
     continue;
@@ -59,7 +74,9 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    const scope=(policy.history_choices_by_rule[id]||[]).map(x=>x==='$TARGET'?product.product_name:x);
    if(!scope.length){events.push(result(id,'REVIEW',dim,'本规则没有审核过的持卡范围'));continue;}
    if(held===null){events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;}
-   const hits=scope.filter(x=>held.includes(x));
+   const hits=scope.filter(x=>(id==='AMEX-001'&&
+     product.product_name.startsWith('Marriott Bonvoy'))
+     ?knownMarriottNames.has(x):held.includes(x));
    events.push(result(id,!hits.length?'CLEAR':hits.some(x=>OLD.has(x))?'REVIEW':'TRIGGERED',dim,
     hits.length?'标准 Offer 假设下，持有历史：'+hits.join('、'):'未报告此规则所涵盖的持卡历史'));
    continue;
