@@ -105,14 +105,14 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    n.className==='question');
  assert.ok(questionCards.length>=4,'all four baseline questions persist after answering');
  const redNotes=walk(get('questions')).filter(n=>n.className==='rule-delta');
- assert.ok(redNotes.some(n=>/基础档位：资料不足 → 一般/.test(n.textContent)),
+ assert.ok(redNotes.some(n=>/基础信用档位：还没算出来 → 一般/.test(n.textContent)),
    'selected baseline answer displays actual rule change in red');
  const answeredSelect=optionSelector('Y1_2');
  assert.equal(answeredSelect.value,'Y1_2','first answer remains visible/editable');
  assert.ok(redNotes.every(n=>!n.textContent.includes('保证获批')),
    'no fabricated approval guarantees in inline feedback');
  const uiSource=fs.readFileSync(path.join(root,'assets/dynamic-questionnaire-demo.js'),'utf8');
- assert.match(uiSource,/'AMEX-011':'Amex 同产品 90 天申请间隔限制'/);
+ assert.match(uiSource,/'AMEX-011':'90 天内重复申请同一张 Amex 卡'/);
  assert.match(uiSource,/ruleLabel\(id\)\+'：'/,
    'inline before/after rule changes show the readable 90-day rule name');
  // The AMEX same-card 90-day fact is a structured choice, not free text.
@@ -122,7 +122,7 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(walk(get('questions')).some(n=>n.tag==='select'&&n.value==='NO'),
    'completed activity question must still show its chosen option');
  assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
-   /AMEX-011（Amex 同产品 90 天申请间隔限制）：待补充 → 未触发/.test(n.textContent)),
+   /AMEX-011（90 天内重复申请同一张 Amex 卡）：待补充 → 未发现限制/.test(n.textContent)),
    'rule-specific answer must show its exact source rule status transition in red');
  // The question should remain even though the planner removed the answered
  // F02 fact from its still-pending question list.
