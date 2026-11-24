@@ -111,6 +111,10 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.equal(answeredSelect.value,'Y1_2','first answer remains visible/editable');
  assert.ok(redNotes.every(n=>!n.textContent.includes('保证获批')),
    'no fabricated approval guarantees in inline feedback');
+ const uiSource=fs.readFileSync(path.join(root,'assets/dynamic-questionnaire-demo.js'),'utf8');
+ assert.match(uiSource,/'AMEX-011':'Amex 同产品 90 天申请间隔限制'/);
+ assert.match(uiSource,/ruleLabel\(id\)\+'：'/,
+   'inline before/after rule changes show the readable 90-day rule name');
  // The AMEX same-card 90-day fact is a structured choice, not free text.
  const appAnswered=optionSelector('NO');
  assert.ok(appAnswered,'Yes/No options rendered for structured application activity');
