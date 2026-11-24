@@ -68,3 +68,13 @@ facade.plan({input:"American Express Gold Card",offer_variant:"NLL",
 - All user answers remain in browser memory; `evaluation_ready` stays false. The business-rule evaluation source workbook is unchanged, and standard-offer assumptions cannot be presented as verified official terms.
 
 Regression: `node tests/amex-offer-context.cjs`.
+
+## Actionable previous versions in Family Language (2026-11-24)
+
+A vague checkbox such as "这些产品的旧版本" is **not a distinct card identity** and cannot determine an applicant's bonus status. The UI no longer offers the five generic "old version" labels as standalone facts. In standard-offer family rules with a documented previous-version scope, the historical version is now included with its exact modern card choice, e.g. `Delta SkyMiles Platinum (Personal)（含同产品旧版本）`. Selecting the card sends the **canonical product value** to the unchanged rule ID, resulting in a meaningful `TRIGGERED` vs `CLEAR` determination.
+
+The 10 source-mapped generic labels were converted to `legacy_variant_scope_by_rule` metadata rather than deleting the underlying old-version scope. Specifically, the personal Delta family scopes `AMEX-FL-007` through `AMEX-FL-010` model old versions of Delta Blue, Gold, Platinum and Reserve in their target-appropriate rules. The exact target by history remains asymmetric. This is a standard-public-offer assumption, not a claim that a particular current special offer has that language.
+
+The verification trail includes historical public Delta offer wording (Doctor of Credit) and 2026 independent family-language reporting (The Points Guy), recorded in `data/amex-questionnaire-policy.json`. The exact live application Offer remains unverified. Distinct predecessor products such as SPG Business and SPG Luxury remain individually identifiable options and, under their modeled current family scope, their selection now triggers the applicable bonus rule instead of an indefinite generic REVIEW. The internal test `tests/amex-previous-versions-actionable.cjs` confirms the choice changes the bonus result, rather than merely changing `MISSING` to `REVIEW`.
+
+No approval prediction or guaranteed bonus is implied. No answers leave browser memory.
