@@ -13,9 +13,16 @@
       "profile": "packages/card-catalog/data/amex.json",
       "rule": "NB formal identity only; no offer terms or benefits imported",
       "amex_formal_count": 32
+    },
+    "chase_official_identity_additions": {
+      "reviewed_on": "2026-11-24",
+      "product_ids": [
+        "chase_ink_business_premier"
+      ],
+      "note": "Issuer official product identity only; no offer history invented."
     }
   },
-  "count": 109,
+  "count": 110,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -2260,6 +2267,26 @@
       "canonical_rule_product_name": "Marriott Bonvoy Card",
       "formal_source_reviewed_on": "2026-10-29",
       "formal_application_availability": "UNKNOWN"
+    },
+    {
+      "product_id": "chase_ink_business_premier",
+      "name": "Chase Ink Business Premier",
+      "product_name": "Ink Business Premier",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase Ink Business Premier",
+        "Ink Business Premier",
+        "Ink Premier"
+      ],
+      "application_url": "https://creditcards.chase.com/business-credit-cards/ink/premier"
     }
   ]
 }

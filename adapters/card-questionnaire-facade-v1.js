@@ -97,7 +97,7 @@
         :chaseEnricher&&metadata.issuer==='CHASE'
           ?chaseEnricher.enrich({plan:initialPlan,product:metadata,known_facts})
           :initialPlan;
-      const marriottResult=marriottMatrix&&metadata.issuer==='AMEX'
+      const marriottResult=marriottMatrix&&['AMEX','CHASE'].includes(metadata.issuer)
         ?marriottMatrix.evaluate({product:metadata,known_facts}):null;
       const plan=marriottResult?.applicable
         ?{...enriched,questionnaire:{...enriched.questionnaire,
@@ -110,19 +110,20 @@
           marriottResult})
         :chaseDecision&&metadata.issuer==='CHASE'
           ?chaseDecision.evaluate({plan,product:metadata,answers:known_facts,
-              policy:chasePolicy,approvalConfig})
+              policy:chasePolicy,approvalConfig,marriottResult})
           :null;
       // Once a bonus-specific blocker is established, other bonus-history
       // questions cannot change the restriction conclusion. Preserve all
       // independent application-risk questions.
       const bonusBlocked=!!evaluation?.bonus?.triggered_rules?.length;
-      const finalPlan=bonusBlocked&&marriottResult?.applicable
+      const skipMatrix=metadata.issuer==='AMEX'&&bonusBlocked;
+      const finalPlan=skipMatrix&&marriottResult?.applicable
         ?{...plan,questionnaire:{...plan.questionnaire,
           specific:plan.questionnaire.specific.filter(q=>
             q.id!=='F03_CARD_HISTORY'&&q.id!=='F07_MARRIOTT_HISTORY'&&
             q.type!=='structured_marriott')}}
         :plan;
-      const matrixStatus=bonusBlocked&&marriottResult?.status==='MISSING'
+      const matrixStatus=skipMatrix&&marriottResult?.status==='MISSING'
         ?'SKIPPED_AFTER_BONUS_BLOCK':marriottResult?.status;
       return {
         status,identity:{product_id:metadata.product_id,
@@ -133,7 +134,7 @@
           formal_nb_card_id:metadata.formal_nb_card_id||null},
         questionnaire:finalPlan,evaluation,marriott_matrix:marriottResult?.applicable
           ?{status:matrixStatus,history_known:marriottResult.history_known,
-            pending_ids:bonusBlocked?[]:(marriottResult.pending_ids||[])} :null,
+            pending_ids:skipMatrix?[]:(marriottResult.pending_ids||[])} :null,
           offer_context:amexContext?.context||null,limitations:{
           full_eligibility_result_available:false,
           offer_terms_verified:amexContext?false:identitySource==='REVIEWED_PRODUCT',

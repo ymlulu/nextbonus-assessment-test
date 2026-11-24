@@ -23,7 +23,8 @@ const QUESTIONS={
  held_now:{title:'这张卡现在还在你名下吗？',type:'single'},
  closed_within_30d:{title:'如果已经关卡，是过去 30 天内关掉的吗？',type:'single'},
  approved_within_90d:{title:'这张卡是在过去 90 天内获批的吗？',type:'single'},
- bonus_or_upgrade_within_24m:{title:'过去 24 个月，你拿到过这张卡的开卡奖励或升级奖励吗？',type:'single'}
+ bonus_or_upgrade_within_24m:{title:'过去 24 个月，你拿到过这张卡的开卡奖励或升级奖励吗？',type:'single'},
+ new_card_bonus_within_24m:{title:'过去 24 个月，你拿到过这类卡的开卡奖励吗？（不包括升级奖励）',type:'single'}
 };
 const YESNO=[{value:'YES',label:'是'},{value:'NO',label:'否'}];
 function parseHistories(v){
@@ -70,18 +71,26 @@ function createMatrix(index){
   if(index.targets.some(t=>!allowed.has(p.cells[t.id])))throw Error('UNREVIEWED_MARRIOTT_CELL');
  }
  function evaluate({product,known_facts={}}={}){
-  if(!product||!TARGETS.has(product.product_name))
+  const chase=product?.issuer==='CHASE';
+  const target=chase?index.chase_targets?.[product?.product_name]:
+    product?.issuer==='AMEX'&&TARGETS.has(product.product_name)?product.product_name:null;
+  if(!target||!index.targets.some(x=>x.id===target))
    return {applicable:false,status:'NOT_APPLICABLE',rule_results:[],questions:[],
      history_known:false};
-  const target=product.product_name,selected=parseHistories(known_facts.F07_MARRIOTT_HISTORY);
+  const isProductGate=id=>chase&&index.policy.chase_product_gates?.[target]?.includes(id);
+  const labelFor=p=>chase?(index.chase_history_labels?.[p.id]||p.label):p.label;
+  const choiceFor=p=>Object.entries(LABEL_TO_ID).find(([,id])=>id===p.id)?.[0]||p.label;
+  const selected=parseHistories(known_facts.F07_MARRIOTT_HISTORY);
   if(selected===null)return {applicable:true,status:'MISSING',history_known:false,
-    rule_results:[],questions:[{id:'F07_MARRIOTT_HISTORY',type:'multi',
+    rule_results:chase?[
+      {rule_id:'MARRIOTT-MATRIX:product-history',dimension:'APPLICATION',product_eligibility:true,status:'MISSING',reason:'还要确认有没有办过这张卡对应的 Chase Marriott 卡'},
+      {rule_id:'MARRIOTT-MATRIX:cross-bank-history',dimension:'BONUS',status:'MISSING',reason:'还要确认有没有办过可能影响开卡奖励的 Amex Marriott 卡'}
+    ]:[],questions:[{id:'F07_MARRIOTT_HISTORY',type:'multi',
       title:'下面这些 Marriott / Ritz-Carlton 卡，你办过哪些？',
-      description:'包括已经关掉的卡。只列出可能影响你这次开卡奖励的产品。',
+      description:chase?'包括已经关掉的卡。只列出可能影响这次申请或开卡奖励的产品。':'包括已经关掉的卡。只列出可能影响你这次开卡奖励的产品。',
       options:index.prior_products.filter(p=>{
         const v=p.cells[target];return v!=='OK'&&v!=='LL'&&v!=='LL / family';
-      }).map(p=>({value:Object.entries(LABEL_TO_ID).find(([,id])=>id===p.id)?.[0]||p.label,
-        label:p.label})),allow_none:true,
+      }).map(p=>({value:choiceFor(p),label:labelFor(p)})),allow_none:true,
       rule_ids:['MARRIOTT-MATRIX']}]};
   // Only the selected histories can ever influence the decision.
   // LL restrictions are evaluated by the separate AMEX family/lifetime rules.
@@ -94,39 +103,58 @@ function createMatrix(index){
    const prior=byId.get(id);if(!prior)continue;
    const cell=prior.cells[target];
    if(cell==='OK'||cell==='LL'||cell==='LL / family')continue;
-   const clauses=index.interpretation[cell]||[];
+   const productGate=isProductGate(id),label=labelFor(prior);
+   const clauses=(index.interpretation[cell]||[]).map(kind=>
+    productGate&&kind==='bonus_or_upgrade_within_24m'?'new_card_bonus_within_24m':kind);
    const current=facts[id]&&typeof facts[id]==='object'?facts[id]:{};
+   const eventBase={rule_id:'MARRIOTT-MATRIX:'+id,dimension:productGate?'APPLICATION':'BONUS',
+    ...(productGate?{product_eligibility:true}:chase?{hard_bonus_eligibility:true}:{})};
    const checks=clauses.map(type=>({type,result:condition(type,current),required:fields(type,current)}));
    const positive=checks.filter(x=>x.result===true);
    if(positive.length){
-    events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-      status:'TRIGGERED',reason:'根据 '+prior.label+' 的持卡时间或奖励记录，这次开卡奖励可能受限（条件：'+positive.map(x=>x.type).join('、')+'）'});
+    const reasons={held_now:'目前仍持有相关卡',closed_within_30d:'过去 30 天内持有过相关卡',
+      approved_within_90d:'过去 90 天内申请并获批相关卡',
+      bonus_or_upgrade_within_24m:'过去 24 个月拿过开卡或升级奖励',
+      new_card_bonus_within_24m:'过去 24 个月拿过开卡奖励'};
+    const fields=positive.map(x=>x.type==='held_now_or_closed_30d'?
+      current.held_now==='YES'?'held_now':'closed_within_30d':x.type);
+    const reason=chase?label+'：'+fields.map(k=>reasons[k]).join('；'):
+      '根据 '+prior.label+' 的持卡时间或奖励记录，这次开卡奖励可能受限（条件：'+positive.map(x=>x.type).join('、')+'）';
+    events.push({...eventBase,status:'TRIGGERED',reason,
+      ...(chase?{trigger_sources:[
+        {question_id:'F07_MARRIOTT_HISTORY',value:choiceFor(prior),reason},
+        ...fields.map(field=>({question_id:'F07_MARRIOTT_DETAILS:'+id,field,reason:reasons[field]}))
+      ]}:{})});
     continue;
    }
    const unknown=checks.filter(x=>x.result===null);
    if(!unknown.length){
-    events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-      status:'CLEAR',reason:'按目前填写的时间，'+prior.label+' 的相关限制没有触发'});
+    events.push({...eventBase,status:'CLEAR',reason:'按目前填写的时间，'+label+' 的相关限制没有触发'});
     continue;
    }
    pending.push(id);
    const needed=[...new Set(unknown.flatMap(x=>x.required))];
-   const fieldsNeeded=needed.map(k=>({id:k,type:QUESTIONS[k].type,label:QUESTIONS[k].title,options:YESNO}));
+   const chaseCopy={held_now:'现在还持有上面这类卡中的任何一张吗？',
+    closed_within_30d:'过去 30 天内还持有过这类卡吗？（包括后来关卡或转卡）',
+    approved_within_90d:'过去 90 天内，你申请并获批过这类卡吗？',
+    bonus_or_upgrade_within_24m:'过去 24 个月，你拿过这类卡的开卡奖励或升级奖励吗？'};
+   const fieldsNeeded=needed.map(k=>({id:k,type:QUESTIONS[k].type,label:chase?(chaseCopy[k]||QUESTIONS[k].title):QUESTIONS[k].title,options:YESNO}));
    questions.push({id:'F07_MARRIOTT_DETAILS:'+id,type:'structured_marriott',
-    prior_id:id,title:'关于 '+prior.label+'，再确认一下时间',description:'只问可能影响这次开卡奖励的时间，其他问题不需要多答。',
+    prior_id:id,title:'关于 '+label+'，再确认一下时间',description:productGate?'这些时间会影响你能不能申请这张卡和拿到开卡奖励。':'只问可能影响这次开卡奖励的时间，其他问题不需要多答。',
     fields:fieldsNeeded,rule_ids:['MARRIOTT-MATRIX:'+id]});
-   events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-    status:'MISSING',reason:'还需要确认 '+prior.label+' 的持卡或拿奖励时间'});
+   events.push({...eventBase,status:'MISSING',reason:'还需要确认 '+label+' 的持卡或拿奖励时间'});
   }
   // A confirmed trigger resolves bonus eligibility under the assumed standard
   // matrix. Drop irrelevant pending questions, but still return explanation rows.
-  if(events.some(e=>e.status==='TRIGGERED'))return{
+  if(!chase&&events.some(e=>e.status==='TRIGGERED'))return{
    applicable:true,status:'TRIGGERED',history_known:true,
    rule_results:events,questions:[],pending_ids:[]};
-  return{applicable:true,status:questions.length?'MISSING':'CLEAR',history_known:true,
+  // Chase must keep checking card availability even after a bonus-only
+  // blocker, and retain every independent answer for QA.
+  return{applicable:true,status:events.some(e=>e.status==='TRIGGERED')?'TRIGGERED':questions.length?'MISSING':'CLEAR',history_known:true,
    rule_results:events,questions,pending_ids:pending};
  }
- return Object.freeze({evaluate,version:'1',targetNames:[...TARGETS]});
+ return Object.freeze({evaluate,version:'1',targetNames:[...TARGETS,...Object.keys(index.chase_targets||{})]});
 }
 return Object.freeze({version:'1',createMatrix,parseHistories});
 });

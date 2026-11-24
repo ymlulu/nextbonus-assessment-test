@@ -32,7 +32,7 @@
   const riskStates={HIGH:'优秀（最高档）',MEDIUM:'一般',
     HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'还没算出来'};
   const outcomeStates={MODEL_ONLY:'已检查',INSUFFICIENT_DATA:'尚未完成',
-    ELEVATED_RISK:'有需要注意的申请风险',PRODUCT_INELIGIBLE:'不符合当前产品条件',
+    ELEVATED_RISK:'有需要注意的申请风险',PRODUCT_INELIGIBLE:'不符合当前产品条件',BONUS_INELIGIBLE:'不符合开卡奖励条件',
     NO_TRIGGER_FOUND:'未发现开卡奖励限制',NEEDS_REVIEW:'开卡奖励还要确认',
     LIKELY_RESTRICTED:'可能拿不到奖励'};
   const structuredRuleIds={
@@ -103,10 +103,11 @@
       const before=oldMap.get(id)?.status||'MISSING';
       const rule=newMap.get(id);
       const after=rule?.status||'MISSING';
-      const sources=choiceValue===undefined?[]:(rule?.trigger_sources||[])
-        .filter(x=>x.question_id===item.id&&x.value===choiceValue);
+      const sources=(rule?.trigger_sources||[]).filter(x=>x.question_id===item.id&&
+        (choiceValue!==undefined?x.value===choiceValue:item.type==='structured_marriott'&&field&&x.field===field));
       if(after==='TRIGGERED'&&sources.length){
         const consequence=rule.product_eligibility?'不符合申请及开卡奖励条件':
+          rule.hard_bonus_eligibility?'不符合开卡奖励条件':
           rule.dimension==='BONUS'?'可能影响开卡奖励':'可能影响申请';
         effects.push(ruleLabel(id)+'：'+sources.map(x=>x.reason).join('、')+'，'+consequence);
       }
@@ -471,21 +472,21 @@
       }
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','能不能拿到开卡奖励'));
-      bonus.append(el('p',d.bonus.status==='PRODUCT_INELIGIBLE'?'rule-delta':'',d.bonus.message));
+      bonus.append(el('p',['PRODUCT_INELIGIBLE','BONUS_INELIGIBLE'].includes(d.bonus.status)?'rule-delta':'',d.bonus.message));
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
       itemized.append(el('summary','','查看每条规则的判断（'+d.rule_results.length+' 项）'));
       for(const rule of d.rule_results){
         const desc=el('p','small',
-          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:rule.product_eligibility?'不符合产品申请条件':'可能受限',CLEAR:'没有触发',
+          ruleLabel(rule.rule_id)+' · '+({TRIGGERED:rule.product_eligibility?'不符合产品申请条件':rule.hard_bonus_eligibility?'不符合开卡奖励条件':'可能受限',CLEAR:'没有触发',
             MISSING:'还没回答',REVIEW:'需要核实'})[rule.status]+' · '+rule.reason);
         itemized.append(desc);
       }
       report.append(itemized,el('p','small',d.caveat));
       if(result.marriott_matrix){
         const pending=result.marriott_matrix;
-        report.append(el('p','small','Marriott 跨银行开卡奖励限制：'+
+        report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
           ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'有可能影响奖励的持卡记录',
              MISSING:'还需要补充相关持卡时间',
              SKIPPED_AFTER_BONUS_BLOCK:'已经发现其他奖励限制，不再重复追问',

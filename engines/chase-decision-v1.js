@@ -38,7 +38,7 @@ const event=(rule_id,status,dimension,reason,trigger_sources=[])=>({rule_id,stat
 const evidence=(question_id,hits,prefix,suffix='')=>(hits||[]).map(value=>({
  question_id,value,reason:prefix+value+suffix
 }));
-function evaluate({plan,product,answers={},policy,approvalConfig}={}){
+function evaluate({plan,product,answers={},policy,approvalConfig,marriottResult}={}){
  if(product?.issuer!=='CHASE'||!plan?.diagnostics||!policy?.rules||!approvalConfig)
   throw Error('CHASE_EVALUATION_INPUT_REQUIRED');
  const a=answers&&typeof answers==='object'&&!Array.isArray(answers)?answers:{};
@@ -149,10 +149,12 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
   if(x.dimension==='APPLICATION'&&policy.rules[x.rule_id]?.product_eligibility===true)
    x.product_eligibility=true;
  }
+ if(marriottResult?.applicable)events.push(...marriottResult.rule_results);
  const app=events.filter(x=>x.dimension==='APPLICATION');
  const bonusEvents=events.filter(x=>x.dimension==='BONUS'||x.product_eligibility);
  const productBlockers=app.filter(x=>x.product_eligibility&&x.status==='TRIGGERED');
  const productBlockingRules=productBlockers.map(x=>x.rule_id);
+ const hardBonusBlockers=bonusEvents.filter(x=>x.hard_bonus_eligibility&&x.status==='TRIGGERED');
  const any=(rs,status)=>rs.some(x=>x.status===status);
  const base=approvalBase(a,approvalConfig);
  const incomplete=app.filter(x=>x.status==='MISSING'||x.status==='REVIEW');
@@ -160,6 +162,7 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
   any(app,'TRIGGERED')?'ELEVATED_RISK':
   incomplete.length||base.rating==='INSUFFICIENT_DATA'?'INSUFFICIENT_DATA':'MODEL_ONLY';
  const bonusStatus=productBlockers.length?'PRODUCT_INELIGIBLE':
+  hardBonusBlockers.length?'BONUS_INELIGIBLE':
   any(bonusEvents,'TRIGGERED')?'LIKELY_RESTRICTED':
   any(bonusEvents,'MISSING')||any(bonusEvents,'REVIEW')?'NEEDS_REVIEW':'NO_TRIGGER_FOUND';
  return {
@@ -188,6 +191,8 @@ function evaluate({plan,product,answers={},policy,approvalConfig}={}){
    missing_rules:bonusEvents.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
    message:bonusStatus==='PRODUCT_INELIGIBLE'?
      '按目前参考条款，你不符合这次开卡奖励条件，因为已触发明确的产品申请限制':
+    bonusStatus==='BONUS_INELIGIBLE'?
+     '按目前参考条款，你不符合这次开卡奖励条件：'+hardBonusBlockers.map(x=>x.reason).join('；'):
     bonusStatus==='LIKELY_RESTRICTED'?
      '按目前参考条款，你这次可能拿不到开卡奖励':
      bonusStatus==='NEEDS_REVIEW'?'还要确认持卡或奖励记录，才能判断开卡奖励资格':

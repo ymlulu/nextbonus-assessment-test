@@ -146,9 +146,39 @@
   ],
   "policy": {
     "no_cross_issuer_symmetry": true,
-    "bonus_only": true,
+    "bonus_only": false,
     "never_ask_system_terms": true,
     "prompt_only_unresolved_user_facts": true,
-    "do_not_disable_with_nll": true
+    "do_not_disable_with_nll": true,
+    "chase_product_gates": {
+      "chase_bold_boundless": [
+        "chase_bold_boundless"
+      ],
+      "chase_bountiful": [
+        "chase_bountiful"
+      ]
+    }
+  },
+  "chase_targets": {
+    "Marriott Bonvoy Bold": "chase_bold_boundless",
+    "Marriott Bonvoy Boundless": "chase_bold_boundless",
+    "Marriott Bonvoy Bountiful": "chase_bountiful"
+  },
+  "chase_history_labels": {
+    "chase_bold_boundless": "Chase Marriott Bold / Boundless / Marriott Premier / Rewards Premier / Premier Plus",
+    "chase_bountiful": "Chase Marriott Bountiful",
+    "amex_marriott_legacy_personal": "Amex Marriott Bonvoy / 旧版 SPG Personal",
+    "amex_marriott_business": "Amex Marriott Business / 旧版 SPG Business",
+    "amex_marriott_brilliant": "Amex Marriott Brilliant / 旧版 SPG Luxury",
+    "amex_marriott_bevy": "Amex Marriott Bevy"
+  },
+  "chase_terms_review": {
+    "reviewed_on": "2026-11-24",
+    "source_urls": [
+      "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
+      "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
+      "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bountiful"
+    ],
+    "note": "The two diagonal Chase cells gate card availability and the new-card bonus; their 24-month clause is new-card bonus only. The Amex history cells gate new-card bonus only; 24-month clauses include new-card or upgrade awards. Other cells remain exactly as in the reviewed source matrix."
   }
 }
