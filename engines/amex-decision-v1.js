@@ -130,16 +130,26 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
  const base=approvalBase(a,approvalConfig);
  const appStatus=any(app,'TRIGGERED')?'ELEVATED_RISK':
   any(app,'MISSING')||any(app,'REVIEW')||base.rating==='INSUFFICIENT_DATA'?'INSUFFICIENT_DATA':'MODEL_ONLY';
+ const baseComplete=base.rating!=='INSUFFICIENT_DATA';
+ const unresolvedApplication=app.filter(x=>x.status==='MISSING'||x.status==='REVIEW');
+ const missingApplication=unresolvedApplication.filter(x=>x.status==='MISSING');
+ const reviewApplication=unresolvedApplication.filter(x=>x.status==='REVIEW');
  const bonusStatus=any(bonus,'TRIGGERED')?'LIKELY_RESTRICTED':
   any(bonus,'MISSING')||any(bonus,'REVIEW')?'NEEDS_REVIEW':'NO_TRIGGER_FOUND';
  return{contract_version:'1',issuer:'AMEX',product_id:product.product_id,
   offer_variant:offerContext?.variant||'STANDARD',
   assumption:offerContext?.assumption||'UNVERIFIED_STANDARD_OFFER_MODEL',
   application:{status:appStatus,base_risk:base.rating,activity:base.activity,
+   base_completed:baseComplete,
+   issuer_rules_completed:unresolvedApplication.length===0,
    triggered_rules:app.filter(x=>x.status==='TRIGGERED').map(x=>x.rule_id),
-   missing_rules:app.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
+   missing_rules:missingApplication.map(x=>x.rule_id),
+   unresolved_rules:unresolvedApplication.map(x=>({rule_id:x.rule_id,
+     status:x.status,reason:x.reason})),
    message:appStatus==='ELEVATED_RISK'?'存在 Amex 申请限制或风险信号':
-    appStatus==='INSUFFICIENT_DATA'?'申请数据不足，无法完成风险档位':'未发现已触发的发行方风险规则（非获批保证）'},
+    !baseComplete?'基础信用资料不足，暂无法计算通用风险档位':
+    unresolvedApplication.length?'通用信用风险档位已计算；Amex 专属规则仍有待补充或核实的条件':
+    '已完成通用风险档位及当前可执行的 Amex 规则检查（非获批保证）'},
   bonus:{status:bonusStatus,
    triggered_rules:bonus.filter(x=>x.status==='TRIGGERED').map(x=>x.rule_id),
    missing_rules:bonus.filter(x=>x.status==='MISSING').map(x=>x.rule_id),

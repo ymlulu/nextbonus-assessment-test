@@ -298,6 +298,21 @@
         HIGH:'相对较好',MEDIUM:'一般',HIGH_RISK:'偏高风险',
         INSUFFICIENT_DATA:'资料不足'
       })[d.application.base_risk]+'。不代表银行审批概率。'));
+      const unfinished=d.application.unresolved_rules||[];
+      if(unfinished.length){
+        app.append(el('p','small','Amex 专属规则：'+
+          unfinished.filter(x=>x.status==='MISSING').length+' 项需要补充答案，'+
+          unfinished.filter(x=>x.status==='REVIEW').length+' 项需要核实。'));
+        const detail=el('details','approval-gaps');
+        detail.append(el('summary','','查看尚未完成的条件（'+unfinished.length+' 项）'));
+        for(const row of unfinished){
+          detail.append(el('p','small',row.rule_id+' · '+
+            (row.status==='MISSING'?'需要回答':'需核实')+'：'+row.reason));
+        }
+        app.append(detail);
+      }else if(d.application.base_completed){
+        app.append(el('p','small','当前适用的 Amex 专属申请规则已完成检查。'));
+      }
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','开卡奖励资格'));
       bonus.append(el('p','',d.bonus.message));

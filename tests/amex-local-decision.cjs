@@ -119,6 +119,12 @@ assert.ok(r.evaluation.bonus.missing_rules.includes('AMEX-001'));
 r=call('Delta SkyMiles Gold Card',{...clean,
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:1}});
 assert.equal(r.evaluation.application.status,'INSUFFICIENT_DATA');
+assert.equal(r.evaluation.application.base_completed,true);
+assert.equal(r.evaluation.application.base_risk,'HIGH');
+assert.equal(r.evaluation.application.issuer_rules_completed,false);
+assert.match(r.evaluation.application.message,/通用信用风险档位已计算/);
+assert.ok(r.evaluation.application.unresolved_rules.some(x=>
+  x.rule_id==='AMEX-010'&&x.status==='MISSING'));
 assert.ok(r.questionnaire.questionnaire.specific.some(x=>
  x.id==='F02_ISSUER_APPLICATION_HISTORY'));
 r=call(gold,{...clean,F02_ISSUER_APPLICATION_HISTORY:{
@@ -127,6 +133,20 @@ assert.ok(!r.questionnaire.questionnaire.specific.some(x=>x.id==='F02_ISSUER_APP
  'charge-card F02 needs same-product only');
 r=call('Blue Cash Everyday Card',{...clean,a2:'UNKNOWN'});
 assert.equal(r.evaluation.application.base_risk,'INSUFFICIENT_DATA');
+assert.equal(r.evaluation.application.base_completed,false);
+assert.match(r.evaluation.application.message,/基础信用资料不足/);
+const onlyIssuerGap=call('Delta SkyMiles Gold Card',{
+ ...clean,a2:'SCORE_700_739',
+ F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0}
+});
+assert.equal(onlyIssuerGap.evaluation.application.base_risk,'HIGH');
+assert.equal(onlyIssuerGap.evaluation.application.base_completed,true);
+assert.equal(onlyIssuerGap.evaluation.application.issuer_rules_completed,false);
+assert.ok(onlyIssuerGap.evaluation.application.unresolved_rules.length>0);
+assert.match(onlyIssuerGap.evaluation.application.message,/Amex 专属规则仍有待补充或核实/);
+const completeIssuer=call('Delta SkyMiles Gold Card',clean);
+assert.equal(completeIssuer.evaluation.application.issuer_rules_completed,true);
+assert.equal(completeIssuer.evaluation.application.unresolved_rules.length,0);
 const secret='PRIVATE_CREDIT_FACT_DO_NOT_ECHO';
 r=call(gold,{...clean,F03_CARD_HISTORY:[secret]});
 assert.ok(!JSON.stringify(r.evaluation).includes(secret),
