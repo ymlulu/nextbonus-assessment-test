@@ -23,7 +23,7 @@ const facade=createFacade({planner,lookup,
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0'};
 const clean={...base,
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,
-   approved_revolving_5d:'NO',same_product_applied_or_approved_90d:'NO'},
+   same_product_applied_or_approved_90d:'NO'},
  F03_CARD_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],
  F08_RELATIONSHIP:'YES',F10_ISSUER_PORTFOLIO_COUNT:0};
 function call(input,known_facts=clean,opts={}){
@@ -34,9 +34,9 @@ function call(input,known_facts=clean,opts={}){
  return result;
 }
 const active=idx.rules.filter(x=>x.id.startsWith('AMEX')&&x.runtime_class==='EXECUTABLE_RULE');
-assert.equal(active.length,23);
+assert.equal(active.length,22);
 const executable=new Set([...active].map(x=>x.id));
-assert.equal(executable.size,23);
+assert.equal(executable.size,22);
 assert.equal(identity.products.length,32);
 for(const card of identity.products){
  const o=call(card.display_name);
@@ -54,7 +54,7 @@ for(const card of identity.products){
  assert.ok(ids.every(x=>executable.has(x)),'no reference/meta rule execution');
  const wrongCategory=o.evaluation.rule_results.find(x=>
    card.card_form==='CHARGE_OR_PAY_OVER_TIME'&&
-   ['AMEX-006','AMEX-007','AMEX-010'].includes(x.rule_id));
+   ['AMEX-006','AMEX-007'].includes(x.rule_id));
  assert.ok(!wrongCategory,'charge must never run revolving rules');
  const q=o.questionnaire.questionnaire;
  assert.equal(q.benefits,null);
@@ -102,9 +102,9 @@ assert.ok(r.evaluation.application.triggered_rules.includes('AMEX-REL-002'));
 assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND');
 
 r=call('Delta SkyMiles Gold Card',{...clean,F02_ISSUER_APPLICATION_HISTORY:{
- approved_revolving_90d:2,approved_revolving_5d:'YES',
+ approved_revolving_90d:2,
  same_product_applied_or_approved_90d:'YES'}});
-for(const id of ['AMEX-006','AMEX-010','AMEX-011'])
+for(const id of ['AMEX-006','AMEX-011'])
  assert.ok(r.evaluation.application.triggered_rules.includes(id),id+' triggered');
 assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND');
 
@@ -124,7 +124,7 @@ assert.equal(r.evaluation.application.base_risk,'HIGH');
 assert.equal(r.evaluation.application.issuer_rules_completed,false);
 assert.match(r.evaluation.application.message,/通用信用风险档位已计算/);
 assert.ok(r.evaluation.application.unresolved_rules.some(x=>
-  x.rule_id==='AMEX-010'&&x.status==='MISSING'));
+  x.rule_id==='AMEX-011'&&x.status==='MISSING'));
 assert.ok(r.questionnaire.questionnaire.specific.some(x=>
  x.id==='F02_ISSUER_APPLICATION_HISTORY'));
 r=call(gold,{...clean,F02_ISSUER_APPLICATION_HISTORY:{
@@ -159,5 +159,5 @@ const demo=fs.readFileSync(path.join(root,'assets/dynamic-questionnaire-demo.js'
 assert.match(demo,/assessment-result/);
 assert.match(demo,/item\.type==='structured'/);
 console.log(JSON.stringify({suite:'amex-local-rule-evaluation',
- formalAmexCards:32,rules:23,approvalSeparated:true,bonusSeparated:true,
+ formalAmexCards:32,rules:22,approvalSeparated:true,bonusSeparated:true,
  standardAndNLL:true,structuredInput:true,private:true,status:'PASS'}));
