@@ -87,4 +87,4 @@ assert.equal(policy.source.rule_ids.includes('AMEX-010'),true,
  'source audit inventory keeps the ID, disabled at runtime');
 console.log(JSON.stringify({suite:'retire-amex-1-5-only',
  ruleRecords:31,activeRuleDefinitions:22,
- 2_90_retained:true,oneFiveFullyDisabled:true,formalProducts:32,status:'PASS'}));
+ twoNinetyRetained:true,oneFiveFullyDisabled:true,formalProducts:32,status:'PASS'}));
