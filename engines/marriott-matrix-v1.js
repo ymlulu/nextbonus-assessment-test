@@ -20,10 +20,10 @@ const LABEL_TO_ID={
  'AMEX Marriott Bonvoy Business / Legacy SPG Business':'amex_marriott_business'
 };
 const QUESTIONS={
- held_now:{title:'这张卡目前还在持有吗？',type:'single'},
- closed_within_30d:{title:'如果已经关闭，这张卡是否在过去 30 天内关闭？',type:'single'},
- approved_within_90d:{title:'这张卡是否在过去 90 天内获批/开立？',type:'single'},
- bonus_or_upgrade_within_24m:{title:'过去 24 个月是否从这张卡获得开卡奖励或升级奖励？',type:'single'}
+ held_now:{title:'这张卡现在还在你名下吗？',type:'single'},
+ closed_within_30d:{title:'如果已经关卡，是过去 30 天内关掉的吗？',type:'single'},
+ approved_within_90d:{title:'这张卡是在过去 90 天内获批的吗？',type:'single'},
+ bonus_or_upgrade_within_24m:{title:'过去 24 个月，你拿到过这张卡的开卡奖励或升级奖励吗？',type:'single'}
 };
 const YESNO=[{value:'YES',label:'是'},{value:'NO',label:'否'}];
 function parseHistories(v){
@@ -76,8 +76,8 @@ function createMatrix(index){
   const target=product.product_name,selected=parseHistories(known_facts.F07_MARRIOTT_HISTORY);
   if(selected===null)return {applicable:true,status:'MISSING',history_known:false,
     rule_results:[],questions:[{id:'F07_MARRIOTT_HISTORY',type:'multi',
-      title:'你现在或以前持有过哪些 Marriott / Ritz-Carlton 信用卡？',
-      description:'仅用于筛选与目标卡有关的限制，不需要填写与目标卡无关的产品。',
+      title:'下面这些 Marriott / Ritz-Carlton 卡，你办过哪些？',
+      description:'包括已经关掉的卡。只列出可能影响你这次开卡奖励的产品。',
       options:index.prior_products.filter(p=>{
         const v=p.cells[target];return v!=='OK'&&v!=='LL'&&v!=='LL / family';
       }).map(p=>({value:Object.entries(LABEL_TO_ID).find(([,id])=>id===p.id)?.[0]||p.label,
@@ -100,24 +100,23 @@ function createMatrix(index){
    const positive=checks.filter(x=>x.result===true);
    if(positive.length){
     events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-      status:'TRIGGERED',reason:'已满足 '+positive.map(x=>x.type).join('、')+
-       ' 的跨银行限制条件（历史卡：'+prior.label+'）'});
+      status:'TRIGGERED',reason:'根据 '+prior.label+' 的持卡时间或奖励记录，这次开卡奖励可能受限（条件：'+positive.map(x=>x.type).join('、')+'）'});
     continue;
    }
    const unknown=checks.filter(x=>x.result===null);
    if(!unknown.length){
     events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-      status:'CLEAR',reason:'现有信息排除了 '+prior.label+' 的适用时间窗口'});
+      status:'CLEAR',reason:'按目前填写的时间，'+prior.label+' 的相关限制没有触发'});
     continue;
    }
    pending.push(id);
    const needed=[...new Set(unknown.flatMap(x=>x.required))];
    const fieldsNeeded=needed.map(k=>({id:k,type:QUESTIONS[k].type,label:QUESTIONS[k].title,options:YESNO}));
    questions.push({id:'F07_MARRIOTT_DETAILS:'+id,type:'structured_marriott',
-    prior_id:id,title:'确认 '+prior.label+' 的关键时间',description:'这里只问影响所选目标卡结论的历史；符合任一限制即可停止其他不必要追问。',
+    prior_id:id,title:'关于 '+prior.label+'，再确认一下时间',description:'只问可能影响这次开卡奖励的时间，其他问题不需要多答。',
     fields:fieldsNeeded,rule_ids:['MARRIOTT-MATRIX:'+id]});
    events.push({rule_id:'MARRIOTT-MATRIX:'+id,dimension:'BONUS',
-    status:'MISSING',reason:'缺少 '+prior.label+' 的决定性时间/持有事实'});
+    status:'MISSING',reason:'还需要确认 '+prior.label+' 的持卡或拿奖励时间'});
   }
   // A confirmed trigger resolves bonus eligibility under the assumed standard
   // matrix. Drop irrelevant pending questions, but still return explanation rows.
