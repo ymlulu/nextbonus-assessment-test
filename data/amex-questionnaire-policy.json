@@ -135,26 +135,26 @@
     "AMEX Marriott Bonvoy Business / Legacy SPG Business"
   ],
   "relationship_options": {
-    "Platinum for Charles Schwab": "Schwab 合格账户",
-    "Platinum for Morgan Stanley": "Morgan Stanley / E*TRADE 合格账户"
+    "Platinum for Charles Schwab": "符合要求的 Schwab 账户",
+    "Platinum for Morgan Stanley": "符合要求的 Morgan Stanley 或 E*TRADE 账户"
   },
   "question_templates": {
     "F02_ISSUER_APPLICATION_HISTORY": {
-      "title": "你近期在 American Express 的申请与获批记录",
-      "description": "分别填写适用的 Amex 90 天获批记录及同产品申请记录；循环信用卡获批、申请与签账卡不同。",
+      "title": "你最近申请 Amex 的情况",
+      "description": "以下问题用来检查 Amex 的申请间隔要求。只统计获批的 Amex 普通信用卡，Platinum、Gold 这类签账卡不算在内。",
       "type": "structured",
       "fields": [
         {
           "id": "approved_revolving_90d",
           "type": "number",
-          "label": "过去 90 天获批了几张 Amex 循环信用卡？",
+          "label": "过去 90 天，你获批过几张 Amex 普通信用卡？",
           "min": 0,
           "max": 30
         },
         {
           "id": "same_product_applied_or_approved_90d",
           "type": "single",
-          "label": "过去 90 天内是否申请或获批过目前选中的这张 Amex 卡？",
+          "label": "过去 90 天，你申请过现在选中的这张卡吗？（无论是否获批）",
           "options": [
             {
               "value": "NO",
@@ -169,18 +169,18 @@
       ]
     },
     "F03_CARD_HISTORY": {
-      "title": "以下 Amex 产品，你现在或以前持有过哪些？",
-      "description": "这里只问持卡经历，包括没有领取开卡奖励的情况；与拿过 Welcome Bonus 是两项不同的事实。",
+      "title": "下面这些卡，你现在有或者以前办过哪些？",
+      "description": "以前办过、现在已经关掉的也算；即使当时没拿到开卡奖励，也请选上。",
       "type": "multi"
     },
     "F07_MARRIOTT_HISTORY": {
-      "title": "你有哪些 Marriott 或 Ritz-Carlton 联名卡历史？",
-      "description": "可多选。后续核实持卡、开户、关闭、获批和奖金日期，以区别 30/90/24 限制；并非所有选项都造成限制。",
+      "title": "你以前办过哪些 Marriott 或 Ritz-Carlton 联名信用卡？",
+      "description": "包括目前还在持有的卡，可多选；只有可能影响这张卡奖励的历史才会继续追问时间。",
       "type": "multi"
     },
     "F08_RELATIONSHIP": {
-      "title": "你拥有该卡所需的合格合作机构账户吗？",
-      "description": "不同联名卡的账户关系要求不同，请按所选具体产品回答。",
+      "title": "你有申请这张卡所需的合作机构账户吗？",
+      "description": "Schwab 和 Morgan Stanley 联名 Platinum 需要符合要求的关联账户。",
       "type": "single",
       "options": [
         {
@@ -198,8 +198,8 @@
       ]
     },
     "F10_ISSUER_PORTFOLIO_COUNT": {
-      "title": "你目前持有多少张 American Express 卡？",
-      "description": "请按该申请对应的信用卡或签账卡类别统计，不包括附属卡。",
+      "title": "你现在持有几张 Amex 卡？",
+      "description": "只算自己名下的主卡，不算副卡。",
       "type": "number",
       "min": 0,
       "max": 99
