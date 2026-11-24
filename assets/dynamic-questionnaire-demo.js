@@ -2,7 +2,7 @@
   'use strict';
   const $=id=>document.getElementById(id);
   const answers=Object.create(null);
-  let facade=null,lastInput='',confirmedId=null;
+  let facade=null,selectedProductId='',cards=[],loading=false;
   function el(tag,cls,text){
     const n=document.createElement(tag);
     if(cls)n.className=cls;
@@ -156,48 +156,93 @@
     if(item.rule_ids?.length)card.append(el('p','small','依据规则：'+item.rule_ids.join('、')));
     return card;
   }
-  function showSuggestions(info){
-    const choices=[
-      ...(info.identity?.candidates||[]),
-      ...(info.identity?.suggestions||[])
-    ];
-    const unique=[...new Map(choices.map(x=>[x.product_id,x])).values()];
-    const selector=$('candidate');
-    selector.replaceChildren();
-    const empty=el('option','','请选择匹配的产品，或补充银行信息');
-    empty.value='';selector.append(empty);
-    for(const item of unique){
-      const option=el('option','',item.name+' · '+(item.issuer||'发行方未确认'));
-      option.value=item.product_id;selector.append(option);
-    }
-    $('candidate-controls').hidden=!unique.length;
+  const ISSUER_LABELS={
+    AMEX:'American Express',CHASE:'Chase',CITI:'Citi',
+    CAPITAL_ONE:'Capital One',BOFA:'Bank of America',US_BANK:'U.S. Bank',
+    WELLS_FARGO:'Wells Fargo',BARCLAYS:'Barclays',COLUMN_NA:'Bilt / Column'
+  };
+  function option(value,label){
+    const n=el('option','',label);
+    n.value=value;return n;
+  }
+  function resetAnswers(){
+    for(const key of Object.keys(answers))delete answers[key];
+  }
+  function clearReport(note='请选择信用卡以生成申请问卷'){
+    $('summary').textContent=note;
+    $('questions').replaceChildren();
+    $('assessment-result').replaceChildren();
+    $('identity-note').textContent='';
+    $('scope').textContent='';
+    $('gaps').textContent='';
+    $('amex-offer-settings').hidden=true;
+  }
+  function fillSelect(select,placeholder,options){
+    select.replaceChildren(option('',placeholder));
+    for(const item of options)select.append(option(item.value,item.label));
+  }
+  function populateBanks(){
+    const issuer=$('issuer');
+    const known=[...new Set(cards.map(p=>p.issuer).filter(Boolean))]
+      .sort((a,b)=>(ISSUER_LABELS[a]||a).localeCompare(ISSUER_LABELS[b]||b));
+    fillSelect(issuer,'请选择银行',known.map(key=>({
+      value:key,label:ISSUER_LABELS[key]||key
+    })));
+    issuer.disabled=false;
+    $('customer-type').disabled=true;
+    $('card-select').disabled=true;
+    $('generate').disabled=true;
+  }
+  function populateTypes(){
+    const bank=$('issuer').value,type=$('customer-type');
+    const available=[...new Set(cards.filter(p=>p.issuer===bank)
+      .map(p=>p.customer_type).filter(Boolean))];
+    fillSelect(type,'请选择个人卡或商业卡',[
+      {value:'PERSONAL',label:'个人卡'},
+      {value:'BUSINESS',label:'商业卡'}
+    ].filter(v=>available.includes(v.value)));
+    type.disabled=!bank;
+    fillSelect($('card-select'),'请先选择卡片类型',[]);
+    $('card-select').disabled=true;
+    selectedProductId='';
+    $('generate').disabled=true;
+    resetAnswers();clearReport(bank?'请选择卡片类型':'请选择银行');
+  }
+  function populateCards(){
+    const issuer=$('issuer').value,type=$('customer-type').value;
+    const select=$('card-select');
+    const matches=cards.filter(p=>p.issuer===issuer&&p.customer_type===type)
+      .sort((a,b)=>a.name.localeCompare(b.name,'en'));
+    fillSelect(select,'请选择具体信用卡',matches.map(p=>({
+      value:p.product_id,label:p.name
+    })));
+    select.disabled=!type||!matches.length;
+    selectedProductId='';
+    $('generate').disabled=true;
+    resetAnswers();
+    clearReport(matches.length?'请选择信用卡':'该类别暂无信用卡');
+  }
+  function selectCard(){
+    const id=$('card-select').value;
+    const matched=cards.find(p=>p.product_id===id);
+    selectedProductId=matched&&matched.issuer===$('issuer').value&&
+      matched.customer_type===$('customer-type').value?id:'';
+    $('generate').disabled=!selectedProductId;
+    resetAnswers();
+    if(selectedProductId){
+      $('offer-variant').value='STANDARD';
+      render();
+    }else clearReport();
   }
   function render(){
-    if(!facade||!lastInput)return;
-    const issuer=$('issuer').value||undefined;
-    const type=$('customer-type').value||undefined;
-    const result=facade.plan({input:lastInput,issuer,customer_type:type,
-      known_facts:answers,confirm_product_id:confirmedId||undefined,
-      offer_variant:$('offer-variant').value});
+    if(!facade||!selectedProductId)return;
+    const result=facade.plan({product_id:selectedProductId,
+      known_facts:answers,offer_variant:$('offer-variant').value});
     const status=$('summary'),list=$('questions');
     if(!result.questionnaire){
-      status.textContent=({
-        NEEDS_CONFIRMATION:'找到可能匹配的信用卡，请确认具体产品',
-        AMBIGUOUS:'名称存在多个匹配，请选择具体产品',
-        NOT_FOUND:'暂未找到可信的产品身份；可补充发行银行和个人/商业类型预览通用问卷',
-        INVALID_INPUT:'输入不是有效的信用卡名称或网址',
-        INVALID_ISSUER:'银行代码无效',
-        ISSUER_CONFLICT:'所选银行与已确认的产品冲突',
-        CUSTOMER_TYPE_CONFLICT:'个人/商业卡类型冲突'
-      })[result.status]||result.note||'请补充产品身份';
-      list.replaceChildren();
-      $('assessment-result').replaceChildren();
-      $('scope').textContent='';
-      $('gaps').textContent='';
-      showSuggestions(result);
+      clearReport('无法读取选定信用卡：'+(result.status||'请重新选择'));
       return;
     }
-    $('candidate-controls').hidden=true;
     $('amex-offer-settings').hidden=result.identity.issuer!=='AMEX';
     const plan=result.questionnaire,info=plan.diagnostics;
     const label=result.identity.name;
@@ -282,57 +327,74 @@
       '；目标属性不完整：'+(info.unresolved_target_mappings.map(x=>x.rule_id).join('、')||'无');
   }
   async function start(){
-    const files=['dynamic-questionnaire-rule-index.json','products.json',
-      'questions.json','frozen-offer-facts.json','card-identity-index.json',
-      'amex-questionnaire-policy.json','approval-config.json',
-      'marriott-eligibility-matrix.json'];
-    const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,amexPolicy,
-      approvalConfig,marriottMatrixConfig]=
-      await Promise.all(files.map(async name=>{
-        const response=await fetch('data/'+name,{cache:'no-cache'});
-        if(!response.ok)throw Error('无法读取 Assessment 独立数据：'+name);
-        return response.json();
-      }));
-    const planner=window.NextBonusQuestionnairePlannerV1.makePlanner({
-      ruleIndex,products,baseQuestions:questions.common,frozenOfferFacts
-    });
-    const lookup=window.NextBonusCardIdentityV1.createLookup(identityIndex);
-    const amexEnricher=window.NextBonusAmexQuestionnaireV1.createEnricher({policy:amexPolicy});
-    facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
-      planner,lookup,amexEnricher,ruleIndex,
-      targetState:window.NextBonusQuestionnairePlannerV1.targetState,
-      amexOfferContext:window.NextBonusAmexOfferContextV1,
-      amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
-      marriottMatrix:window.NextBonusMarriottMatrixV1.createMatrix(marriottMatrixConfig)
-    });
-    $('version').textContent='独立目录 '+facade.getVersion().source_count+
-      ' 张卡 · 规则索引 '+facade.getVersion().rules_indexed+' 条';
-    $('generate').addEventListener('click',()=>{
-      lastInput=$('card-query').value.trim();
-      confirmedId=null;
-      for(const key of Object.keys(answers))delete answers[key];
-      render();
-    });
-    $('card-query').addEventListener('keydown',e=>{
-      if(e.key==='Enter'){$('generate').click();}
-    });
-    $('confirm').addEventListener('click',()=>{
-      confirmedId=$('candidate').value||null;
-      if(confirmedId)render();
-    });
-    for(const id of ['issuer','customer-type'])$(id).addEventListener('change',()=>{
-      confirmedId=null;if(lastInput)render();
-    });
-    $('reset').addEventListener('click',()=>{
-      for(const key of Object.keys(answers))delete answers[key];
-      if(lastInput)render();
-    });
-    $('offer-variant').addEventListener('change',()=>{
-      for(const key of Object.keys(answers))delete answers[key];
-      if(lastInput)render();
-    });
-    $('card-query').value='American Express Blue Cash Preferred Card';
-    $('generate').click();
+    if(loading)return;
+    loading=true;
+    $('retry').hidden=true;
+    $('summary').textContent='正在读取独立卡片目录和规则…';
+    $('generate').disabled=true;
+    try{
+      const files=['dynamic-questionnaire-rule-index.json','products.json',
+        'questions.json','frozen-offer-facts.json','card-identity-index.json',
+        'amex-questionnaire-policy.json','approval-config.json',
+        'marriott-eligibility-matrix.json'];
+      const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,
+        amexPolicy,approvalConfig,marriottMatrixConfig]=
+        await Promise.all(files.map(async name=>{
+          const response=await fetch('data/'+name,{cache:'no-cache'});
+          if(!response.ok)throw Error('数据文件加载失败：'+name+' (HTTP '+response.status+')');
+          return response.json();
+        }));
+      if(!window.NextBonusQuestionnairePlannerV1||
+         !window.NextBonusCardIdentityV1||!window.NextBonusAmexQuestionnaireV1||
+         !window.NextBonusAmexOfferContextV1||!window.NextBonusAmexDecisionV1||
+         !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1)
+        throw Error('评估引擎文件未完全加载，请刷新页面');
+      const planner=window.NextBonusQuestionnairePlannerV1.makePlanner({
+        ruleIndex,products,baseQuestions:questions.common,frozenOfferFacts
+      });
+      const lookup=window.NextBonusCardIdentityV1.createLookup(identityIndex);
+      const amexEnricher=window.NextBonusAmexQuestionnaireV1.createEnricher({policy:amexPolicy});
+      facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
+        planner,lookup,amexEnricher,ruleIndex,
+        targetState:window.NextBonusQuestionnairePlannerV1.targetState,
+        amexOfferContext:window.NextBonusAmexOfferContextV1,
+        amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
+        marriottMatrix:window.NextBonusMarriottMatrixV1.createMatrix(marriottMatrixConfig)
+      });
+      cards=facade.listCards().filter(p=>p.issuer&&p.customer_type);
+      $('version').textContent='独立目录 '+facade.getVersion().source_count+
+        ' 张卡 · 已确认发行方 '+cards.length+' 张 · 规则索引 '+
+        facade.getVersion().rules_indexed+' 条';
+      populateBanks();
+      // Start at the most mature coverage area, but never silently choose
+      // a specific card or execute an unrelated old evaluation.
+      $('issuer').value='AMEX';
+      populateTypes();
+      $('customer-type').value='PERSONAL';
+      populateCards();
+    }catch(error){
+      facade=null;cards=[];selectedProductId='';
+      clearReport('初始化失败：'+(error?.message||'未知错误'));
+      $('retry').hidden=false;
+      $('issuer').disabled=true;$('customer-type').disabled=true;
+      $('card-select').disabled=true;
+      $('version').textContent='未完成加载；不会显示旧卡片或旧评估结果';
+    }finally{loading=false;}
   }
-  start().catch(error=>{$('summary').textContent=error.message;});
+  $('issuer').addEventListener('change',populateTypes);
+  $('customer-type').addEventListener('change',populateCards);
+  $('card-select').addEventListener('change',selectCard);
+  $('generate').addEventListener('click',()=>{
+    if(selectedProductId){resetAnswers();render();}
+  });
+  $('reset').addEventListener('click',()=>{
+    resetAnswers();
+    if(selectedProductId)render();
+    else clearReport();
+  });
+  $('offer-variant').addEventListener('change',()=>{
+    resetAnswers();if(selectedProductId)render();
+  });
+  $('retry').addEventListener('click',start);
+  start();
 })();
