@@ -73,7 +73,12 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
    }
    const scope=(policy.history_choices_by_rule[id]||[]).map(x=>x==='$TARGET'?product.product_name:x);
    if(!scope.length){events.push(result(id,'REVIEW',dim,'本规则没有审核过的持卡范围'));continue;}
-   if(held===null){events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;}
+   const verifiedMarriottTarget=id==='AMEX-001'&&
+     product.product_name.startsWith('Marriott Bonvoy')&&
+     knownMarriottNames.has(product.product_name);
+   if(held===null&&!verifiedMarriottTarget){
+     events.push(result(id,'MISSING',dim,'需要相关 Amex 持卡经历'));continue;
+   }
    const hits=scope.filter(x=>(id==='AMEX-001'&&
      product.product_name.startsWith('Marriott Bonvoy'))
      ?knownMarriottNames.has(x):held.includes(x));
