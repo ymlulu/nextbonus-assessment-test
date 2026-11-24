@@ -84,6 +84,18 @@
           policy:amexPolicy,approvalConfig,offerContext:amexContext?.context,
           marriottResult})
         :null;
+      // Once a bonus-specific blocker is established, other bonus-history
+      // questions cannot change the restriction conclusion. Preserve all
+      // independent application-risk questions.
+      const bonusBlocked=!!evaluation?.bonus?.triggered_rules?.length;
+      const finalPlan=bonusBlocked&&marriottResult?.applicable
+        ?{...plan,questionnaire:{...plan.questionnaire,
+          specific:plan.questionnaire.specific.filter(q=>
+            q.id!=='F03_CARD_HISTORY'&&q.id!=='F07_MARRIOTT_HISTORY'&&
+            q.type!=='structured_marriott')}}
+        :plan;
+      const matrixStatus=bonusBlocked&&marriottResult?.status==='MISSING'
+        ?'SKIPPED_AFTER_BONUS_BLOCK':marriottResult?.status;
       return {
         status,identity:{product_id:metadata.product_id,
           name:product.name||String(input||'').trim(),issuer:metadata.issuer,
@@ -91,9 +103,9 @@
           metadata_completeness:identitySource==='REVIEWED_PRODUCT'?'REVIEWED':
           metadata.formal_nb_card_id?'FORMAL_IDENTITY_ONLY':'PARTIAL',
           formal_nb_card_id:metadata.formal_nb_card_id||null},
-        questionnaire:plan,evaluation,marriott_matrix:marriottResult?.applicable
-          ?{status:marriottResult.status,history_known:marriottResult.history_known,
-            pending_ids:marriottResult.pending_ids||[]} :null,
+        questionnaire:finalPlan,evaluation,marriott_matrix:marriottResult?.applicable
+          ?{status:matrixStatus,history_known:marriottResult.history_known,
+            pending_ids:bonusBlocked?[]:(marriottResult.pending_ids||[])} :null,
           offer_context:amexContext?.context||null,limitations:{
           full_eligibility_result_available:false,
           offer_terms_verified:amexContext?false:identitySource==='REVIEWED_PRODUCT',
