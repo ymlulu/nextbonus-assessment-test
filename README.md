@@ -1,5 +1,7 @@
 # NextBonus Assessment Test
 
+**Current rule-driven questionnaire:** [`dynamic-questionnaire.html`](dynamic-questionnaire.html). Edit only [`bank-rules/`](bank-rules/README.md) for its AMEX/Chase eligibility rules. All predicates, thresholds, scope and impacts are data-driven. The earlier full-report `index.html` / `bridge.html` pipeline and its data are preserved as a legacy integration baseline, not the source for this questionnaire. The descriptions below document those earlier phases.
+
 Standalone test deployment for the NextBonus deterministic Assessment flow.
 
 ## What this repo is

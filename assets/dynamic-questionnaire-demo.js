@@ -4,26 +4,13 @@
   const answers=Object.create(null);
   let facade=null,selectedProductId='',cards=[],loading=false;
   let baseQuestionLibrary=[];
-  const seenQuestions=new Map();
-  function el(tag,cls,text){
+    function el(tag,cls,text){
     const n=document.createElement(tag);
     if(cls)n.className=cls;
     if(text!=null)n.textContent=text;
     return n;
   }
-  function rememberQuestion(q){
-    const old=seenQuestions.get(q.id);
-    if(!old){seenQuestions.set(q.id,{...q});return;}
-    const mergeById=(a,b,key)=>
-      [...new Map([...(a||[]),...(b||[])].map(x=>[x[key],x])).values()];
-    seenQuestions.set(q.id,{...old,...q,
-      fields:mergeById(old.fields,q.fields,'id'),
-      options:mergeById(old.options,q.options,'value'),
-      rule_ids:[...new Set([...(old.rule_ids||[]),...(q.rule_ids||[])])]});
-  }
-  const readableRuleNames={
-    'AMEX-011':'90 天内重复申请同一张 Amex 卡'
-  };
+  const readableRuleNames=Object.create(null);
   function ruleLabel(id){
     return readableRuleNames[id]?id+'（'+readableRuleNames[id]+'）':id;
   }
@@ -32,37 +19,32 @@
   const riskStates={HIGH:'优秀（最高档）',MEDIUM:'一般',
     HIGH_RISK:'偏高风险',INSUFFICIENT_DATA:'还没算出来'};
   const outcomeStates={MODEL_ONLY:'已检查',INSUFFICIENT_DATA:'尚未完成',
-    ELEVATED_RISK:'有需要注意的申请风险',PRODUCT_INELIGIBLE:'不符合当前产品条件',BONUS_INELIGIBLE:'不符合开卡奖励条件',
+    WAIT:'需等待限制解除',APPLICATION_INELIGIBLE:'不符合申请条件',ELEVATED_RISK:'有需要注意的申请风险',PRODUCT_INELIGIBLE:'不符合当前产品条件',BONUS_INELIGIBLE:'不符合开卡奖励条件',
     NO_TRIGGER_FOUND:'未发现开卡奖励限制',NEEDS_REVIEW:'开卡奖励还要确认',
     LIKELY_RESTRICTED:'可能拿不到奖励'};
-  const structuredRuleIds={
-    approved_revolving_90d:['AMEX-006'],
-    same_product_applied_or_approved_90d:['AMEX-011'],
-    approved_chase_30d:['CHASE-002'],
-    approved_chase_business_30d:['CHASE-012']
-  };
+  
   // All grouped time answers are stored under the existing per-card facts.
   // A newly selected historical card has no answer until explicitly confirmed.
   function groupFact(item,priorId){
-    return answers.F07_MARRIOTT_DETAILS?.[priorId]?.[item.fact_field];
+    return answers[item.details_id]?.[priorId]?.[item.fact_field];
   }
   function patchGroupFacts(item,choiceIds,valueFor){
-    const groups={...(answers.F07_MARRIOTT_DETAILS||{})};
+    const groups={...(answers[item.details_id]||{})};
     for(const id of choiceIds){
       const row={...(groups[id]||{})};
       const value=valueFor(id);
       if(value==='YES'||value==='NO')row[item.fact_field]=value;
       else delete row[item.fact_field];
       // A close date only applies while the card is no longer held.
-      if(item.fact_field==='held_now'&&value!=='NO')delete row.closed_within_30d;
+      if(value!=='NO')for(const dependent of item.clear_when_not_no||[])delete row[dependent];
       if(Object.keys(row).length)groups[id]=row;
       else delete groups[id];
     }
     return groups;
   }
-  function setMarriottDetails(groups){
-    if(Object.keys(groups).length)answers.F07_MARRIOTT_DETAILS=groups;
-    else delete answers.F07_MARRIOTT_DETAILS;
+  function setGroupedDetails(item,groups){
+    if(Object.keys(groups).length)answers[item.details_id]=groups;
+    else delete answers[item.details_id];
   }
   function minusAnswer(item,field,choiceValue){
     const previous={...answers};
@@ -75,8 +57,8 @@
       const ids=item.options.map(o=>o.value)
         .filter(id=>choiceValue===undefined||choiceValue==='NONE'||id===choiceValue);
       const previousGroups=patchGroupFacts(item,ids,()=>undefined);
-      if(Object.keys(previousGroups).length)previous.F07_MARRIOTT_DETAILS=previousGroups;
-      else delete previous.F07_MARRIOTT_DETAILS;
+      if(Object.keys(previousGroups).length)previous[item.details_id]=previousGroups;
+      else delete previous[item.details_id];
     }else if(choiceValue!==undefined&&Array.isArray(answers[item.id])){
       const remaining=answers[item.id].filter(value=>value!==choiceValue);
       if(remaining.length)previous[item.id]=remaining;
@@ -112,12 +94,9 @@
     const oldMap=new Map((a.rule_results||[]).map(x=>[x.rule_id,x]));
     const newMap=new Map((b.rule_results||[]).map(x=>[x.rule_id,x]));
     const scoped=item.type==='marriott_multi'&&choiceValue!==undefined&&choiceValue!=='NONE'
-      ?['MARRIOTT-MATRIX:'+choiceValue]
-      :field&&structuredRuleIds[field]?structuredRuleIds[field]:(item.rule_ids||[]);
-    const matching=id=>!scoped.length?false:scoped.some(rid=>
-      rid==='MARRIOTT-MATRIX'?
-        id==='MARRIOTT-MATRIX'||id.startsWith('MARRIOTT-MATRIX:'):
-        id===rid||id.startsWith(rid+':'));
+      ?(item.options.find(o=>o.value===choiceValue)?.rule_ids||item.rule_ids||[])
+      :field?(item.fields?.find(f=>f.id===field)?.rule_ids||item.rule_ids||[]):(item.rule_ids||[]);
+    const matching=id=>scoped.includes(id);
     const all=[...new Set([...oldMap.keys(),...newMap.keys()])]
       .filter(matching);
     for(const id of all){
@@ -129,7 +108,7 @@
       if(after==='TRIGGERED'&&sources.length){
         const consequence=rule.product_eligibility?'不符合申请及开卡奖励条件':
           rule.hard_bonus_eligibility?'不符合开卡奖励条件':
-          rule.dimension==='BONUS'?'可能影响开卡奖励':'可能影响申请';
+          rule.configured_bonus_impact>0?'可能影响开卡奖励':'可能影响申请';
         effects.push(ruleLabel(id)+'：'+sources.map(x=>x.reason).join('、')+'，'+consequence);
       }
       if(before!==after)effects.push(ruleLabel(id)+'：'+
@@ -228,7 +207,7 @@
       const allNo=ids.length>0&&ids.every(id=>groupFact(item,id)==='NO');
       const hasUnknown=ids.some(id=>!['YES','NO'].includes(groupFact(item,id)));
       function commit(yes,clear=false){
-        setMarriottDetails(patchGroupFacts(item,ids,id=>clear?undefined:yes.has(id)?'YES':'NO'));
+        setGroupedDetails(item,patchGroupFacts(item,ids,id=>clear?undefined:yes.has(id)?'YES':'NO'));
         render();
       }
       for(const choice of [...item.options,{value:'NONE',label:'以上都没有'}]){
@@ -298,18 +277,19 @@
           }else selected.delete(choice.value);
           if(selected.size)answers[item.id]=[...selected];
           else delete answers[item.id];
-          if(item.id==='F07_MARRIOTT_HISTORY'){
+          if(item.details_id){
             const activePriors=new Set(item.options.filter(o=>selected.has(o.value)).map(o=>o.prior_id));
-            const groups={...(answers.F07_MARRIOTT_DETAILS||{})};
+            const groups={...(answers[item.details_id]||{})};
             for(const id of Object.keys(groups))if(!activePriors.has(id))delete groups[id];
-            setMarriottDetails(groups);
+            if(Object.keys(groups).length)answers[item.details_id]=groups;
+            else delete answers[item.details_id];
           }
           render();
         });
         label.append(box,document.createTextNode(choice.label));
         if(box.checked){
           const note=feedback(item,result,undefined,
-            result.evaluation?.issuer==='CHASE'?choice.value:undefined);
+            choice.value);
           if(note)label.append(note);
         }
         options.append(label);
@@ -356,7 +336,7 @@
   }
   function resetAnswers(){
     for(const key of Object.keys(answers))delete answers[key];
-    seenQuestions.clear();
+
   }
   function clearReport(note='先选择一张信用卡，我们会根据这张卡生成问题'){
     $('summary').textContent=note;
@@ -450,7 +430,7 @@
     $('identity-note').textContent='身份来源：'+(result.identity.formal_nb_card_id
       ?'NB 正式版信用卡目录（仅卡片身份）':source)+
       '。'+(result.offer_context
-        ?'Amex 按普通 Offer 建模'+(result.offer_context.variant==='NLL'
+        ?'Amex 按选定 Offer 场景建模'+(result.offer_context.variant==='NLL'
           ?'，已启用 NLL 特殊变量。':'。')
         +'这里是问卷假设，并非实时核实的申请条款。'
         :result.identity.issuer==='CHASE'
@@ -459,43 +439,23 @@
     // The rule planner intentionally returns only unanswered facts, but this
     // QA page keeps all previously displayed questions editable and visible.
     const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
-    for(const q of plan.questionnaire.specific)if(q.type!=='marriott_multi')rememberQuestion(q);
     list.replaceChildren(el('h2','','先了解一下你的信用情况'));
     for(const q of baseQuestionLibrary)list.append(question(q,true,result,true));
     list.append(el('h2','','关于这张卡，还想了解这些情况'));
-    const grouped=plan.questionnaire.marriott_followups||[];
-    if(!seenQuestions.size&&!grouped.length)
-      list.append(el('p','muted','目前没有其他需要回答的问题。'));
-    for(const q of seenQuestions.values()){
-      if(q.visible_when&&answers[q.visible_when.fact]!==q.visible_when.equals)continue;
-      list.append(question(q,false,result,activeIds.has(q.id)));
-    }
-    // Group options depend on the CURRENT history, not the accumulated
-    // question cache. Removed historical cards must not leave stale options.
-    for(const q of grouped)list.append(question(q,false,result,activeIds.has(q.id)));
-    if(plan.questionnaire.pending_terms?.length){
-      const pending=el('details','pending-rules');
-      const label=el('summary','','还有几项开卡奖励条款需要核实（'+
-        plan.questionnaire.pending_terms.length+' 项，暂不需要你回答）');
-      pending.append(label,el('p','small','这些限制可能和这张卡有关，但还没核实你这次申请的具体条款，因此暂时不能判断。'));
-      for(const rule of plan.questionnaire.pending_terms){
-        const p=el('p','small',rule.rule_id+' · '+rule.title+
-          (rule.history_scope.length?' · 相关卡片：'+rule.history_scope.join('、'):''));
-        pending.append(p);
-      }
-      list.append(pending);
-    }
-
+    const currentQuestions=plan.questionnaire.editable||plan.questionnaire.specific;
+    if(!currentQuestions.length)list.append(el('p','muted','目前没有其他需要回答的问题。'));
+    for(const q of currentQuestions)list.append(question(q,false,result,activeIds.has(q.id)));
     const report=$('assessment-result');
     report.replaceChildren();
     if(result.evaluation){
       const d=result.evaluation;
-      const issuerLabel=d.issuer==='CHASE'?'Chase':'Amex';
+      const issuerLabel=ISSUER_LABELS[d.issuer]||d.issuer;
       report.append(el('h2','','这张 '+issuerLabel+' 卡适不适合现在申请？'));
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
-      app.append(el('p',d.application.status==='PRODUCT_INELIGIBLE'?'rule-delta':'',d.application.message));
+      app.append(el('p',['PRODUCT_INELIGIBLE','APPLICATION_INELIGIBLE','WAIT'].includes(d.application.status)?'rule-delta':'',d.application.message));
+      app.append(el('p','small','申请影响：'+d.application.impact+'/3 · '+({WAIT:'等待',BLOCK:'受限',RISK:'风险提示',UNKNOWN:'待确认',CLEAR:'未触发'}[d.application.action]||d.application.action)));
       app.append(el('p','small','基础信用情况：'+({
         HIGH:'优秀（最高档）',MEDIUM:'一般',HIGH_RISK:'偏高风险',
         INSUFFICIENT_DATA:'还没算出来'
@@ -518,6 +478,8 @@
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','能不能拿到开卡奖励'));
       bonus.append(el('p',['PRODUCT_INELIGIBLE','BONUS_INELIGIBLE'].includes(d.bonus.status)?'rule-delta':'',d.bonus.message));
+      bonus.append(el('p','small','奖励影响：'+d.bonus.impact+'/3 · '+({WAIT:'等待',BLOCK:'受限',RISK:'风险提示',UNKNOWN:'待确认',CLEAR:'未触发'}[d.bonus.action]||d.bonus.action)));
+      if(!d.bonus.complete)bonus.append(el('p','small','还有奖励相关事实或条款需要确认。'));
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
@@ -532,7 +494,7 @@
       if(result.marriott_matrix){
         const pending=result.marriott_matrix;
         report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
-          ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'有可能影响奖励的持卡记录',
+          ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'已触发持卡历史限制',
              MISSING:'还需要补充相关持卡时间',
              SKIPPED_AFTER_BONUS_BLOCK:'已经发现其他奖励限制，不再重复追问',
              NOT_APPLICABLE:'不适用'})[pending.status]+'。具体以这次申请的条款为准。'));
@@ -550,63 +512,22 @@
     $('summary').textContent='正在加载卡片和申请规则…';
     $('generate').disabled=true;
     try{
-      const files=['dynamic-questionnaire-rule-index.json','products.json',
-        'questions.json','frozen-offer-facts.json','card-identity-index.json',
-        'amex-questionnaire-policy.json','approval-config.json',
-        'marriott-eligibility-matrix.json','amex-formal-product-identities.json',
-        'chase-questionnaire-policy.json'];
-      const [ruleIndex,products,questions,frozenOfferFacts,identityIndex,
-        amexPolicy,approvalConfig,marriottMatrixConfig,formalAmex,chasePolicy]=
+      const files=['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json',
+        'bank-rules/approval.json','data/card-identity-index.json','data/amex-formal-product-identities.json'];
+      const [rulebook,factbook,products,approval,identityIndex,formalAmex]=
         await Promise.all(files.map(async name=>{
-          const response=await fetch('data/'+name,{cache:'no-cache'});
+          const response=await fetch(name,{cache:'no-cache'});
           if(!response.ok)throw Error('数据文件加载失败：'+name+' (HTTP '+response.status+')');
           return response.json();
         }));
-      if(!window.NextBonusQuestionnairePlannerV1||
-         !window.NextBonusCardIdentityV1||!window.NextBonusAmexQuestionnaireV1||
-         !window.NextBonusAmexOfferContextV1||!window.NextBonusAmexDecisionV1||
-         !window.NextBonusMarriottMatrixV1||!window.NextBonusQuestionnaireFacadeV1||
-         !window.NextBonusChaseQuestionnaireV1||!window.NextBonusChaseDecisionV1)
-        throw Error('评估引擎文件未完全加载，请刷新页面');
-      // Display-only copy. Runtime-owned questions.json is locked and must
-      // never be rewritten just to change reader-facing wording.
-      const commonTitles={
-        a1:'你的第一张美国信用卡，开卡到现在有多久了？',
-        a2:'你目前的信用分大约是多少？',
-        a3:'过去 12 个月，你一共获批过几张美国信用卡？',
-        a4:'过去 6 个月，你一共申请过几张美国信用卡？没批的也算。'
-      };
-      baseQuestionLibrary=window.NextBonusQuestionnairePlannerV1
-        .compactCommonQuestions(questions.common||[]).map(q=>({
-        ...q,title:commonTitles[q.id]||q.title,
-        options:(q.options||[]).map(x=>({...x,label:
-          x.value==='Y2_PLUS'?'2 年或更久':
-          x.value==='N6_PLUS'?'6 张或更多':
-          x.value==='UNKNOWN'?'记不清了':x.label}))
-      }));
-      const planner=window.NextBonusQuestionnairePlannerV1.makePlanner({
-        ruleIndex,products,baseQuestions:questions.common,frozenOfferFacts
-      });
-      const lookup=window.NextBonusCardIdentityV1.createLookup(identityIndex);
-      const amexEnricher=window.NextBonusAmexQuestionnaireV1.createEnricher({policy:amexPolicy});
-      const chaseEnricher=window.NextBonusChaseQuestionnaireV1.createEnricher({policy:chasePolicy});
-      for(const [id,rule] of Object.entries(chasePolicy.rules||{}))
-        readableRuleNames[id]=rule.description||id;
-      facade=window.NextBonusQuestionnaireFacadeV1.createFacade({
-        planner,lookup,amexEnricher,chaseEnricher,chasePolicy,
-        chaseDecision:window.NextBonusChaseDecisionV1,ruleIndex,
-        targetState:window.NextBonusQuestionnairePlannerV1.targetState,
-        amexOfferContext:window.NextBonusAmexOfferContextV1,
-        amexDecision:window.NextBonusAmexDecisionV1,amexPolicy,approvalConfig,
-        marriottMatrix:window.NextBonusMarriottMatrixV1.createMatrix(marriottMatrixConfig)
-      });
-      const formalNames=new Map((formalAmex.products||[])
-        .map(x=>[x.assessment_product_id,x.display_name]));
+      const runtime=window.NextBonusBankRulesRuntime.createRuntime({rulebook,factbook,products,approval});
+      baseQuestionLibrary=runtime.commonQuestions;
+      Object.assign(readableRuleNames,runtime.ruleLabels);
+      facade=runtime.createFacade(window.NextBonusCardIdentityV1.createLookup(identityIndex));
+      const formalNames=new Map((formalAmex.products||[]).map(x=>[x.assessment_product_id,x.display_name]));
       cards=facade.listCards().filter(p=>p.issuer&&p.customer_type)
         .map(p=>({...p,name:formalNames.get(p.product_id)||p.name}));
-      $('version').textContent='独立目录 '+facade.getVersion().source_count+
-        ' 张卡 · 已确认发行方 '+cards.length+' 张 · 规则索引 '+
-        facade.getVersion().rules_indexed+' 条';
+      $('version').textContent='规则库 '+runtime.version+' · '+facade.getVersion().rules_indexed+' 条 · '+cards.length+' 张卡';
       populateBanks();
       // Start at the most mature coverage area, but never silently choose
       // a specific card or execute an unrelated old evaluation.

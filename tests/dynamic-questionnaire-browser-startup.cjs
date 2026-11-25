@@ -118,7 +118,7 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(redNotes.every(n=>!n.textContent.includes('保证获批')),
    'no fabricated approval guarantees in inline feedback');
  const uiSource=fs.readFileSync(path.join(root,'assets/dynamic-questionnaire-demo.js'),'utf8');
- assert.match(uiSource,/'AMEX-011':'90 天内重复申请同一张 Amex 卡'/);
+ assert.doesNotMatch(uiSource,/['"]AMEX-011['"]\s*:/,'UI must not own rule IDs');
  assert.match(uiSource,/ruleLabel\(id\)\+'：'/,
    'inline before/after rule changes show the readable 90-day rule name');
  // The AMEX same-card 90-day fact is a structured choice, not free text.
@@ -156,18 +156,18 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    'Chase now reuses Amex two-panel application/bonus decision UI');
  assert.ok(walk(get('assessment-result')).some(n=>/Chase 卡适不适合现在申请/.test(n.textContent)),
    'issuer label changes without a second UI');
- const five24=selectValues(['','0','4','5']);
- assert.ok(five24,'Chase 5/24 has only three threshold bands');
- assert.deepEqual(five24.options.slice(1).map(o=>o.textContent),['0–3 张','4 张','5 张或更多']);
+ const five24=selectValues(['','0','5']);
+ assert.ok(five24,'5/24 only needs below/above threshold');
+ assert.deepEqual(five24.options.slice(1).map(o=>o.textContent),['0–4 张','5 张或更多']);
  assert.ok(selectValues(['','0','2']),'Chase 2/30 only needs two choices');
- five24.value='4';five24.fire('change');
- const au=selectValues(['','0','1']);
- assert.ok(au,'4/24 requires a two-choice AU follow-up');
- au.value='1';au.fire('change');
+ five24.value='0';five24.fire('change');
+ const totalSelectors=walk(get('questions')).filter(n=>n.tag==='select'&&JSON.stringify(n.options.map(o=>o.value))===JSON.stringify(['','0','5']));
+ assert.equal(totalSelectors.length,2,'when below threshold, check reported total including AU');
+ totalSelectors[1].value='5';totalSelectors[1].fire('change');
  assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&/CHASE-001/.test(n.textContent)));
- const newFive24=selectValues(['','0','4','5']);
+ const newFive24=selectValues(['','0','5']);
  newFive24.value='5';newFive24.fire('change');
- assert.ok(!selectValues(['','0','1']),'AU question no longer relevant at 5+');
+ assert.equal(walk(get('questions')).filter(n=>n.tag==='select'&&JSON.stringify(n.options.map(o=>o.value))===JSON.stringify(['','0','5'])).length,1,'reported-total follow-up no longer relevant at 5+');
  assert.ok(!walk(get('questions')).some(n=>n.tag==='input'&&n.type==='number'),'modeled count questions require no exact entry');
  assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
    /CHASE-001/.test(n.textContent)),
@@ -268,7 +268,8 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(walk(get('assessment-result')).some(n=>/可能拿不到开卡奖励/.test(n.textContent)));
  assert.ok(!walk(get('assessment-result')).some(n=>/不符合这张卡的申请条件/.test(n.textContent)));
  assert.ok(requestLog.some(x=>x.includes('amex-formal-product-identities.json')));
- assert.ok(!requestLog.some(x=>!x.startsWith('data/')),'only static data requests');
+ assert.ok(requestLog.every(x=>x.startsWith('data/')||x.startsWith('bank-rules/')),'only static data requests');
+ assert.ok(!requestLog.some(x=>/questionnaire-policy|rule-index|eligibility-matrix/.test(x)),'no old rule sources loaded');
  // Exercise the transient failure branch and successful retry on a fresh page.
  const retryContext={...context,window:null};
  // Reuse script/bootstrap module only after changing fetch to test the recovery path.

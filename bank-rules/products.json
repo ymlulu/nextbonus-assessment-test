@@ -1,0 +1,127 @@
+{
+  "overrides": {
+    "chase_sapphire_preferred": {
+      "product_name": "Chase Sapphire Preferred",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_sapphire_reserve": {
+      "product_name": "Chase Sapphire Reserve",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_marriott_bonvoy_boundless": {
+      "product_name": "Marriott Bonvoy Boundless",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_016": {
+      "product_name": "United Explorer",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_017": {
+      "product_name": "United Quest",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_018": {
+      "product_name": "British Airways Visa",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_world_of_hyatt": {
+      "product_name": "World of Hyatt Personal",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_ihg_one_rewards_premier": {
+      "product_name": "IHG One Rewards Premier",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_aeroplan": {
+      "product_name": "Chase Aeroplan Card",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_freedom_flex": {
+      "product_name": "Freedom Flex",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_038": {
+      "product_name": "Freedom Unlimited",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_039": {
+      "product_name": "Freedom Rise",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_040": {
+      "product_name": "United Gateway",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_041": {
+      "product_name": "Southwest Plus",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_042": {
+      "product_name": "Southwest Premier",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_043": {
+      "product_name": "Southwest Priority",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_044": {
+      "product_name": "IHG One Rewards Traveler",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_045": {
+      "product_name": "Marriott Bonvoy Bold",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_046": {
+      "product_name": "Marriott Bonvoy Bountiful",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_047": {
+      "product_name": "Amazon Prime Visa",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_070": {
+      "product_name": "Sapphire Reserve for Business",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_071": {
+      "product_name": "Ink Business Unlimited",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_072": {
+      "product_name": "Ink Business Cash",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_082": {
+      "product_name": "Ink Business Preferred",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_084": {
+      "product_name": "World of Hyatt Business Credit Card",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_086": {
+      "product_name": "United Business",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_087": {
+      "product_name": "United Club Business",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_094": {
+      "product_name": "IHG One Rewards Premier Business",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_chase_095": {
+      "product_name": "Southwest Performance Business",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "chase_ink_business_premier": {
+      "product_name": "Ink Business Premier",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_amex_022": {
+      "card_form": "CHARGE_OR_PAY_OVER_TIME"
+    }
+  }
+}
