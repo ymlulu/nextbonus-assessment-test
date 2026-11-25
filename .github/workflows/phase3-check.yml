@@ -33,6 +33,8 @@ jobs:
         run: node tests/dynamic-questionnaire-v1.cjs
       - name: Verify authoritative rulebook mutations and all executable rules
         run: node tests/bank-rules-runtime.cjs
+      - name: Verify every rule against reviewed independent acceptance cases
+        run: node tests/bank-rules-audit.cjs
       - name: Smoke-test actual questionnaire browser bootstrap and cascading selectors
         run: node tests/dynamic-questionnaire-browser-startup.cjs
       - name: Verify name / link identity and standalone questionnaire safety
