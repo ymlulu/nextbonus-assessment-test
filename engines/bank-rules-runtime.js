@@ -361,13 +361,21 @@ function createRuntime({rulebook,factbook,products,approval}){
     missing_rules:xs.filter(x=>x.status==='MISSING'||x.pending_facts).map(x=>x.rule_id),
     unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.pending_facts?'MISSING':x.status,reason:x.pending_facts?'已发现限制，但还有相关条件需要确认':x.reason}))};
   }
+  const application={...result(app,'application',appStatus,applicationImpact,appAction,messageApp),base_risk:base.rating,activity:base.activity,
+   base_completed:base.rating!=='INSUFFICIENT_DATA',issuer_rules_completed:!gaps(app).length,complete:base.rating!=='INSUFFICIENT_DATA'&&!gaps(app).length,product_blocking_rules:blockIds};
+  const bonusResult={...result(bonus,'bonus',bonusStatus,bonusImpact,bonusAction,messageBonus),product_blocking_rules:blockIds};
+  // Overall advice consumes the two aggregated dimensions, never evaluates bank facts again.
+  const actions=[application.action,bonusResult.action];
+  const decision=actions.includes('BLOCK')?{code:'BLOCK',label:'暂不建议申请',summary:'存在不符合申请或开卡奖励条件的情况。'}:
+   actions.includes('WAIT')?{code:'WAIT',label:'建议等待',summary:'存在需要等待解除的申请或开卡奖励限制。'}:
+   !application.complete||!bonusResult.complete?{code:'REVIEW',label:'还需要确认',summary:'部分信用情况、持卡历史或优惠条款尚未确认。'}:
+   actions.includes('RISK')||application.base_risk==='HIGH_RISK'?{code:'RISK',label:'谨慎考虑申请',summary:'有可能影响获批或开卡奖励的情况。'}:
+   {code:'CLEAR',label:'可以考虑申请',summary:'按已填信息及参考条款，暂未发现明显限制；实际结果以银行为准。'};
   const matrixEvents=events.filter(x=>rules.find(r=>r.id===x.rule_id)?.when?.fact&&defs[rules.find(r=>r.id===x.rule_id).when.fact]?.details_id);
   return {questionnaire:{common:approval.questions.filter(q=>empty(a[q.id])),specific:pending,editable:questions,benefits:null},
    diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved},
    evaluation:{issuer:p.issuer,product_id:p.product_id,offer_variant,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS',
-    application:{...result(app,'application',appStatus,applicationImpact,appAction,messageApp),base_risk:base.rating,activity:base.activity,
-      base_completed:base.rating!=='INSUFFICIENT_DATA',issuer_rules_completed:!gaps(app).length,complete:base.rating!=='INSUFFICIENT_DATA'&&!gaps(app).length,product_blocking_rules:blockIds},
-    bonus:{...result(bonus,'bonus',bonusStatus,bonusImpact,bonusAction,messageBonus),product_blocking_rules:blockIds},
+    application,bonus:bonusResult,decision,
     rule_results:events,answers_transmitted:false,caveat:'确定性规则模型，不代表银行实际审批结果；答案仅在本机计算。'},
    marriott_matrix:matrixEvents.length?{status:triggered(matrixEvents).length?'TRIGGERED':gaps(matrixEvents).length?'MISSING':'CLEAR'}:null,
    offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
