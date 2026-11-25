@@ -1,3 +1,5 @@
+> Historical design record. The v1 dynamic questionnaire described below was retired in favor of [Bank Rules](../bank-rules/README.md). File paths and behavior below are not current implementation guidance.
+
 # AMEX local decision v1
 
 This module lives only in `ymlulu/nextbonus-assessment-test`. It does not modify Discover or the production Web catalog.

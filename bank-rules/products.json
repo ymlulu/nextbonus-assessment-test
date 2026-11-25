@@ -123,5 +123,35 @@
     "history_ot_amex_022": {
       "card_form": "CHARGE_OR_PAY_OVER_TIME"
     }
-  }
+  },
+  "unlisted_targets": [
+    {
+      "issuer": "CHASE",
+      "product_name": "United Club",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "product_lineage": "UNITED_CLUB"
+    },
+    {
+      "issuer": "CHASE",
+      "product_name": "Iberia Visa",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    {
+      "issuer": "CHASE",
+      "product_name": "Aer Lingus Visa",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    {
+      "issuer": "CHASE",
+      "product_name": "Southwest Premier Business",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "product_lineage": "NOT_UNITED_CLUB"
+    }
+  ]
 }
