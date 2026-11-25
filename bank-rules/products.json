@@ -119,6 +119,9 @@
     "chase_ink_business_premier": {
       "product_name": "Ink Business Premier",
       "product_lineage": "NOT_UNITED_CLUB"
+    },
+    "history_ot_amex_022": {
+      "card_form": "CHARGE_OR_PAY_OVER_TIME"
     }
   }
 }

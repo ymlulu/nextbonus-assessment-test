@@ -25,7 +25,7 @@ function targetState(target,p){
  return unknown?null:true;
 }
 function validate({rulebook,factbook,products,approval}){
- if(!rulebook?.version||!Array.isArray(rulebook.rules)||!factbook?.facts||
+ if(!rulebook?.version||!Array.isArray(rulebook.supported_issuers)||!rulebook.supported_issuers.length||!Array.isArray(rulebook.rules)||!factbook?.facts||
     !products?.overrides||!approval?.base_matrix)throw Error('BANK_RULES_DATA_REQUIRED');
  const defs=factbook.facts,ids=new Set();
  function effect(e){
@@ -54,11 +54,11 @@ function validate({rulebook,factbook,products,approval}){
   }else if(node.op!=='eq'||(f.type==='grouped_multi'?!['YES','NO'].includes(node.value):!f.options?.some(o=>o.value===node.value)))throw Error('INVALID_CHOICE '+r.id);
  }
  for(const r of rulebook.rules){
-  if(!r.id||ids.has(r.id)||!r.target?.issuer)throw Error('DUPLICATE_OR_INVALID_RULE '+r.id);
+  if(!r.id||ids.has(r.id)||!r.target?.issuer||![r.target.issuer].flat().every(i=>rulebook.supported_issuers.includes(i)))throw Error('DUPLICATE_OR_INVALID_RULE '+r.id);
   ids.add(r.id);effect(r.effect);condition(r.condition,r);
   if(r.when)condition(r.when,r);
   if(r.review)condition(r.review.condition,r);
-  for(const o of r.overrides||[]){if(!o.target||!Object.keys(o.target).length)throw Error('INVALID_OVERRIDE');effect(o.effect);}
+  for(const o of r.overrides||[]){if(!o.target||!Object.keys(o.target).length)throw Error('INVALID_OVERRIDE');if(o.effect)effect(o.effect);if(o.condition)condition(o.condition,{...r,condition:o.condition});}
   if(r.offer_clause&&r.offer_scenarios&&Object.values(r.offer_scenarios).some(x=>!['PRESENT','ABSENT'].includes(x)))throw Error('INVALID_OFFER_SCENARIO');
  }
  return true;
@@ -71,7 +71,7 @@ function countBands(cuts){
 function createRuntime({rulebook,factbook,products,approval}){
  validate({rulebook,factbook,products,approval});
  const defs=factbook.facts, rules=rulebook.rules;
- const supported=new Set(rules.map(r=>r.target.issuer).flat());
+ const supported=new Set(rulebook.supported_issuers);
  const canonical=p=>({...p,...products.overrides[p.product_id]});
  const key=(id,f)=>f.answer_key||id;
  function factValue(id,node,a){
@@ -162,7 +162,7 @@ function createRuntime({rulebook,factbook,products,approval}){
      state=node.op==='eq'?raw===threshold:node.op==='gte'?raw>=threshold:node.op==='gt'?raw>threshold:node.op==='lt'?raw<threshold:raw<=threshold;
      if(f.type==='number'){
       const comparator={gte:'达到 ',gt:'超过 ',lt:'少于 ',lte:'不超过 ',eq:'等于 '}[node.op];
-      reason=f.title+' '+comparator+threshold+' 张';
+      reason=f.title+' '+(state?comparator:node.op==='gte'?'少于 ':node.op==='gt'?'不超过 ':node.op==='lt'?'达到 ':node.op==='lte'?'超过 ':'不等于 ')+threshold+' 张';
      }else reason=f.title.replace(/[？?]$/,'')+'：'+(f.type==='grouped_multi'?(raw==='YES'?'是':'否'):(f.options.find(o=>o.value===raw)?.label||raw));
     }
    }
@@ -191,7 +191,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   }
   function effectFor(r){
    const o=(r.overrides||[]).find(x=>targetState(x.target,p)===true);
-   return {effect:o?.effect||r.effect,label:o?.label||r.label||r.id};
+   return {...r,...(o?.effect?{effect:o.effect}:{}),...(o?.condition?{condition:o.condition}:{}),label:o?.label||r.label||r.id};
   }
   const actionOf=(e,dimension,actions)=>e[dimension]===3?
     (e[dimension+'_action']||(actions.includes('BLOCK')?'BLOCK':actions.includes('WAIT')?'WAIT':'BLOCK')):e[dimension]>0?'RISK':'CLEAR';
@@ -207,10 +207,10 @@ function createRuntime({rulebook,factbook,products,approval}){
     ...(x.hits?.length?{trigger_sources:x.hits}:{}),
     reason:reason|| (fired?(x.hits.map(h=>h.reason).filter(Boolean).join('；')||label):status==='MISSING'?'还需要补充相关信息':status==='REVIEW'?'相关条款或事实需要核实':'未触发限制')};
   }
-  for(const r of rules){
-   const scope=targetState(r.target,p);
+  for(const sourceRule of rules){
+   const scope=targetState(sourceRule.target,p);
    if(scope===false)continue;
-   const {effect:e,label}=effectFor(r);
+   const r=effectFor(sourceRule),{effect:e,label}=r;
    if(scope===null){unresolved.push({rule_id:r.id,stage:'TARGET'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'卡片资料需要核实'));continue;}
    if(r.offer_clause){
     const explicitState=offer_rule_overrides[r.offer_clause];
@@ -253,7 +253,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   const productBlockers=triggered(app).filter(x=>x.product_eligibility);
   const blockIds=productBlockers.map(x=>x.rule_id);
   const max=(xs,k)=>Math.max(0,...xs.map(x=>x[k]));
-  const applicationImpact=max(app,'application_impact'),bonusImpact=max(bonus,'bonus_impact');
+  const applicationImpact=max(app,'application_impact'),bonusImpact=productBlockers.length?3:max(bonus,'bonus_impact');
   const combine=(xs,dim)=>xs.some(x=>x[dim+'_action']==='BLOCK')?'BLOCK':xs.some(x=>x[dim+'_action']==='WAIT')?'WAIT':
    xs.some(x=>x[dim+'_action']==='RISK')?'RISK':gaps(xs).length?'UNKNOWN':'CLEAR';
   const appAction=combine(app,'application'),bonusAction=productBlockers.length?combine(productBlockers,'application'):combine(bonus,'bonus');
@@ -274,7 +274,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    bonusStatus==='LIKELY_RESTRICTED'?'按参考条款，你这次可能拿不到开卡奖励：'+bonusReasons.join('、'):
    bonusStatus==='NEEDS_REVIEW'?'还有持卡历史或奖励条款需要确认':'目前未发现开卡奖励限制，最终以银行为准';
   function result(xs,dim,status,impact,action,message){
-   return {status,impact,action,message,triggered_rules:triggered(xs).map(x=>x.rule_id),
+   return {status,impact,action,message,complete:gaps(xs).length===0,triggered_rules:triggered(xs).map(x=>x.rule_id),
     missing_rules:xs.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
     unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.status,reason:x.reason}))};
   }
@@ -283,11 +283,11 @@ function createRuntime({rulebook,factbook,products,approval}){
    diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved},
    evaluation:{issuer:p.issuer,product_id:p.product_id,offer_variant,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS',
     application:{...result(app,'application',appStatus,applicationImpact,appAction,messageApp),base_risk:base.rating,activity:base.activity,
-      base_completed:base.rating!=='INSUFFICIENT_DATA',issuer_rules_completed:!gaps(app).length,product_blocking_rules:blockIds},
+      base_completed:base.rating!=='INSUFFICIENT_DATA',issuer_rules_completed:!gaps(app).length,complete:base.rating!=='INSUFFICIENT_DATA'&&!gaps(app).length,product_blocking_rules:blockIds},
     bonus:{...result(bonus,'bonus',bonusStatus,bonusImpact,bonusAction,messageBonus),product_blocking_rules:blockIds},
     rule_results:events,answers_transmitted:false,caveat:'确定性规则模型，不代表银行实际审批结果；答案仅在本机计算。'},
    marriott_matrix:matrixEvents.length?{status:triggered(matrixEvents).length?'TRIGGERED':gaps(matrixEvents).length?'MISSING':'CLEAR'}:null,
-   offer_context:{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}};
+   offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
  }
  function createFacade(lookup){
   function plan({product_id,input,issuer,customer_type,confirm_product_id,known_facts={},offer_variant='STANDARD',offer_facts,offer_rule_overrides={}}={}){

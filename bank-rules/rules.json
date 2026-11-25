@@ -27,7 +27,51 @@
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "ABSENT"
-      }
+      },
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Marriott Bonvoy Business American Express"
+            ]
+          },
+          "condition": {
+            "fact": "F07_MARRIOTT_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "AMEX Marriott Bonvoy Business / Legacy SPG Business"
+            ]
+          }
+        },
+        {
+          "target": {
+            "product_name": [
+              "Marriott Bonvoy Bevy"
+            ]
+          },
+          "condition": {
+            "fact": "F07_MARRIOTT_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "AMEX Marriott Bonvoy Bevy"
+            ]
+          }
+        },
+        {
+          "target": {
+            "product_name": [
+              "Marriott Bonvoy Brilliant"
+            ]
+          },
+          "condition": {
+            "fact": "F07_MARRIOTT_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "AMEX Marriott Bonvoy Brilliant"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "AMEX-006",
@@ -634,15 +678,11 @@
         "bonus_action": "BLOCK"
       },
       "condition": {
-        "fact": "F03_CARD_HISTORY",
+        "fact": "F07_MARRIOTT_HISTORY",
         "op": "includes_any",
         "values": [
-          "Marriott Bonvoy Bevy",
-          "Marriott Bonvoy Brilliant"
-        ],
-        "legacy": [
-          "Marriott Bonvoy Bevy",
-          "Marriott Bonvoy Brilliant"
+          "AMEX Marriott Bonvoy Bevy",
+          "AMEX Marriott Bonvoy Brilliant"
         ]
       },
       "offer_clause": "AMEX-FL-012",
@@ -666,14 +706,10 @@
         "bonus_action": "BLOCK"
       },
       "condition": {
-        "fact": "F03_CARD_HISTORY",
+        "fact": "F07_MARRIOTT_HISTORY",
         "op": "includes_any",
         "values": [
-          "Marriott Bonvoy Brilliant",
-          "以前的 SPG Luxury"
-        ],
-        "legacy": [
-          "Marriott Bonvoy Brilliant"
+          "AMEX Marriott Bonvoy Brilliant"
         ]
       },
       "offer_clause": "AMEX-FL-013",
@@ -918,11 +954,10 @@
         "bonus_action": "BLOCK"
       },
       "condition": {
-        "fact": "F03_CARD_HISTORY",
+        "fact": "F07_MARRIOTT_HISTORY",
         "op": "includes_any",
         "values": [
-          "Marriott Bonvoy Business American Express",
-          "以前的 SPG Business"
+          "AMEX Marriott Bonvoy Business / Legacy SPG Business"
         ]
       },
       "offer_clause": "AMEX-BIZ-005",
@@ -1066,7 +1101,7 @@
             "fact": "F04_BONUS_HISTORY",
             "op": "includes_any",
             "values": [
-              "United Club"
+              "$TARGET"
             ],
             "action": "WAIT"
           }

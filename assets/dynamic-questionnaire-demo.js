@@ -10,9 +10,7 @@
     if(text!=null)n.textContent=text;
     return n;
   }
-  const readableRuleNames={
-    'AMEX-011':'90 天内重复申请同一张 Amex 卡'
-  };
+  const readableRuleNames=Object.create(null);
   function ruleLabel(id){
     return readableRuleNames[id]?id+'（'+readableRuleNames[id]+'）':id;
   }
@@ -28,25 +26,25 @@
   // All grouped time answers are stored under the existing per-card facts.
   // A newly selected historical card has no answer until explicitly confirmed.
   function groupFact(item,priorId){
-    return answers.F07_MARRIOTT_DETAILS?.[priorId]?.[item.fact_field];
+    return answers[item.details_id]?.[priorId]?.[item.fact_field];
   }
   function patchGroupFacts(item,choiceIds,valueFor){
-    const groups={...(answers.F07_MARRIOTT_DETAILS||{})};
+    const groups={...(answers[item.details_id]||{})};
     for(const id of choiceIds){
       const row={...(groups[id]||{})};
       const value=valueFor(id);
       if(value==='YES'||value==='NO')row[item.fact_field]=value;
       else delete row[item.fact_field];
       // A close date only applies while the card is no longer held.
-      if(item.fact_field==='held_now'&&value!=='NO')delete row.closed_within_30d;
+      if(value!=='NO')for(const dependent of item.clear_when_not_no||[])delete row[dependent];
       if(Object.keys(row).length)groups[id]=row;
       else delete groups[id];
     }
     return groups;
   }
-  function setMarriottDetails(groups){
-    if(Object.keys(groups).length)answers.F07_MARRIOTT_DETAILS=groups;
-    else delete answers.F07_MARRIOTT_DETAILS;
+  function setGroupedDetails(item,groups){
+    if(Object.keys(groups).length)answers[item.details_id]=groups;
+    else delete answers[item.details_id];
   }
   function minusAnswer(item,field,choiceValue){
     const previous={...answers};
@@ -59,8 +57,8 @@
       const ids=item.options.map(o=>o.value)
         .filter(id=>choiceValue===undefined||choiceValue==='NONE'||id===choiceValue);
       const previousGroups=patchGroupFacts(item,ids,()=>undefined);
-      if(Object.keys(previousGroups).length)previous.F07_MARRIOTT_DETAILS=previousGroups;
-      else delete previous.F07_MARRIOTT_DETAILS;
+      if(Object.keys(previousGroups).length)previous[item.details_id]=previousGroups;
+      else delete previous[item.details_id];
     }else if(choiceValue!==undefined&&Array.isArray(answers[item.id])){
       const remaining=answers[item.id].filter(value=>value!==choiceValue);
       if(remaining.length)previous[item.id]=remaining;
@@ -98,10 +96,7 @@
     const scoped=item.type==='marriott_multi'&&choiceValue!==undefined&&choiceValue!=='NONE'
       ?(item.options.find(o=>o.value===choiceValue)?.rule_ids||item.rule_ids||[])
       :field?(item.fields?.find(f=>f.id===field)?.rule_ids||item.rule_ids||[]):(item.rule_ids||[]);
-    const matching=id=>!scoped.length?false:scoped.some(rid=>
-      rid==='MARRIOTT-MATRIX'?
-        id==='MARRIOTT-MATRIX'||id.startsWith('MARRIOTT-MATRIX:'):
-        id===rid||id.startsWith(rid+':'));
+    const matching=id=>scoped.includes(id);
     const all=[...new Set([...oldMap.keys(),...newMap.keys()])]
       .filter(matching);
     for(const id of all){
@@ -212,7 +207,7 @@
       const allNo=ids.length>0&&ids.every(id=>groupFact(item,id)==='NO');
       const hasUnknown=ids.some(id=>!['YES','NO'].includes(groupFact(item,id)));
       function commit(yes,clear=false){
-        setMarriottDetails(patchGroupFacts(item,ids,id=>clear?undefined:yes.has(id)?'YES':'NO'));
+        setGroupedDetails(item,patchGroupFacts(item,ids,id=>clear?undefined:yes.has(id)?'YES':'NO'));
         render();
       }
       for(const choice of [...item.options,{value:'NONE',label:'以上都没有'}]){
@@ -435,7 +430,7 @@
     $('identity-note').textContent='身份来源：'+(result.identity.formal_nb_card_id
       ?'NB 正式版信用卡目录（仅卡片身份）':source)+
       '。'+(result.offer_context
-        ?'Amex 按普通 Offer 建模'+(result.offer_context.variant==='NLL'
+        ?'Amex 按选定 Offer 场景建模'+(result.offer_context.variant==='NLL'
           ?'，已启用 NLL 特殊变量。':'。')
         +'这里是问卷假设，并非实时核实的申请条款。'
         :result.identity.issuer==='CHASE'
@@ -450,29 +445,17 @@
     const currentQuestions=plan.questionnaire.editable||plan.questionnaire.specific;
     if(!currentQuestions.length)list.append(el('p','muted','目前没有其他需要回答的问题。'));
     for(const q of currentQuestions)list.append(question(q,false,result,activeIds.has(q.id)));
-    if(plan.questionnaire.pending_terms?.length){
-      const pending=el('details','pending-rules');
-      const label=el('summary','','还有几项开卡奖励条款需要核实（'+
-        plan.questionnaire.pending_terms.length+' 项，暂不需要你回答）');
-      pending.append(label,el('p','small','这些限制可能和这张卡有关，但还没核实你这次申请的具体条款，因此暂时不能判断。'));
-      for(const rule of plan.questionnaire.pending_terms){
-        const p=el('p','small',rule.rule_id+' · '+rule.title+
-          (rule.history_scope.length?' · 相关卡片：'+rule.history_scope.join('、'):''));
-        pending.append(p);
-      }
-      list.append(pending);
-    }
-
     const report=$('assessment-result');
     report.replaceChildren();
     if(result.evaluation){
       const d=result.evaluation;
-      const issuerLabel=d.issuer==='CHASE'?'Chase':'Amex';
+      const issuerLabel=ISSUER_LABELS[d.issuer]||d.issuer;
       report.append(el('h2','','这张 '+issuerLabel+' 卡适不适合现在申请？'));
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
-      app.append(el('p',d.application.status==='PRODUCT_INELIGIBLE'?'rule-delta':'',d.application.message));
+      app.append(el('p',['PRODUCT_INELIGIBLE','APPLICATION_INELIGIBLE','WAIT'].includes(d.application.status)?'rule-delta':'',d.application.message));
+      app.append(el('p','small','申请影响：'+d.application.impact+'/3 · '+({WAIT:'等待',BLOCK:'受限',RISK:'风险提示',UNKNOWN:'待确认',CLEAR:'未触发'}[d.application.action]||d.application.action)));
       app.append(el('p','small','基础信用情况：'+({
         HIGH:'优秀（最高档）',MEDIUM:'一般',HIGH_RISK:'偏高风险',
         INSUFFICIENT_DATA:'还没算出来'
@@ -495,6 +478,8 @@
       const bonus=el('section','assessment-panel');
       bonus.append(el('strong','','能不能拿到开卡奖励'));
       bonus.append(el('p',['PRODUCT_INELIGIBLE','BONUS_INELIGIBLE'].includes(d.bonus.status)?'rule-delta':'',d.bonus.message));
+      bonus.append(el('p','small','奖励影响：'+d.bonus.impact+'/3 · '+({WAIT:'等待',BLOCK:'受限',RISK:'风险提示',UNKNOWN:'待确认',CLEAR:'未触发'}[d.bonus.action]||d.bonus.action)));
+      if(!d.bonus.complete)bonus.append(el('p','small','还有奖励相关事实或条款需要确认。'));
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
@@ -509,7 +494,7 @@
       if(result.marriott_matrix){
         const pending=result.marriott_matrix;
         report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
-          ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'有可能影响奖励的持卡记录',
+          ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'已触发持卡历史限制',
              MISSING:'还需要补充相关持卡时间',
              SKIPPED_AFTER_BONUS_BLOCK:'已经发现其他奖励限制，不再重复追问',
              NOT_APPLICABLE:'不适用'})[pending.status]+'。具体以这次申请的条款为准。'));

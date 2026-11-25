@@ -3,17 +3,29 @@
     "F01_RECENT_NEW_ACCOUNTS": {
       "type": "number",
       "title": "过去 24 个月，你本人作为主卡人新开了几张信用卡？",
-      "description": "不计仅作为副卡人或未上报个人信用报告的账户。"
+      "description": "不计仅作为副卡人或未上报个人信用报告的账户。",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
     },
     "F06_REPORTED_NEW_ACCOUNTS": {
       "type": "number",
-      "title": "包括副卡在内，过去 24 个月信用报告上新增了多少张信用卡账户？"
+      "title": "包括副卡在内，过去 24 个月信用报告上新增了多少张信用卡账户？",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
     },
     "approved_chase_30d": {
       "type": "number",
       "title": "过去 30 天，你获批了几张 Chase 信用卡？",
       "group": "F02_ISSUER_APPLICATION_HISTORY",
-      "group_title": "最近 30 天，你在 Chase 的获批情况"
+      "group_title": "最近 30 天，你在 Chase 的获批情况",
+      "window": {
+        "unit": "day",
+        "value": 30
+      }
     },
     "approved_chase_business_30d": {
       "type": "single",
@@ -29,13 +41,21 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "window": {
+        "unit": "day",
+        "value": 30
+      }
     },
     "approved_revolving_90d": {
       "type": "number",
       "title": "过去 90 天，你获批过几张 Amex 普通信用卡？",
       "group": "F02_ISSUER_APPLICATION_HISTORY",
-      "group_title": "你最近申请 Amex 的情况"
+      "group_title": "你最近申请 Amex 的情况",
+      "window": {
+        "unit": "day",
+        "value": 90
+      }
     },
     "same_product_applied_or_approved_90d": {
       "type": "single",
@@ -51,7 +71,11 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "window": {
+        "unit": "day",
+        "value": 90
+      }
     },
     "amex_revolving_count": {
       "type": "number",
@@ -69,21 +93,6 @@
       "type": "multi",
       "title": "下面这些卡，你现在有或者以前办过哪些？",
       "description": "以前办过、后来关掉的也算；即使当时没拿到开卡奖励，也请选上。",
-      "positive_aliases": {
-        "fact": "F07_MARRIOTT_HISTORY",
-        "map": {
-          "AMEX Marriott Bonvoy Bevy": [
-            "Marriott Bonvoy Bevy"
-          ],
-          "AMEX Marriott Bonvoy Brilliant": [
-            "Marriott Bonvoy Brilliant"
-          ],
-          "AMEX Marriott Bonvoy Business / Legacy SPG Business": [
-            "Marriott Bonvoy Business American Express",
-            "以前的 SPG Business"
-          ]
-        }
-      },
       "evidence_prefix": "以前办过 "
     },
     "F03_CURRENT_CARD_HISTORY": {
@@ -97,7 +106,11 @@
       "title": "过去 24 个月，你拿到过下面哪些卡的新卡开卡奖励？",
       "description": "以实际收到奖励的日期为准。",
       "evidence_prefix": "过去 24 个月拿过 ",
-      "evidence_suffix": " 的开卡奖励"
+      "evidence_suffix": " 的开卡奖励",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
     },
     "F04_EVER_BONUS_HISTORY": {
       "type": "multi",
@@ -162,7 +175,7 @@
         },
         "Chase Marriott Business（历史卡）": {
           "prior_id": "chase_marriott_business_legacy",
-          "label": "Chase Marriott Business (discontinued)",
+          "label": "Chase Marriott Business（历史卡）",
           "labels_by_issuer": {
             "CHASE": "Chase Marriott Business (discontinued)"
           }
@@ -176,21 +189,21 @@
         },
         "AMEX Marriott Bonvoy Business / Legacy SPG Business": {
           "prior_id": "amex_marriott_business",
-          "label": "AMEX Marriott Business",
+          "label": "Amex Marriott Business / 旧版 SPG Business",
           "labels_by_issuer": {
             "CHASE": "Amex Marriott Business / 旧版 SPG Business"
           }
         },
         "AMEX Marriott Bonvoy Bevy": {
           "prior_id": "amex_marriott_bevy",
-          "label": "AMEX Marriott Bevy",
+          "label": "Amex Marriott Bevy",
           "labels_by_issuer": {
             "CHASE": "Amex Marriott Bevy"
           }
         },
         "AMEX Marriott Bonvoy Brilliant": {
           "prior_id": "amex_marriott_brilliant",
-          "label": "AMEX Marriott Brilliant",
+          "label": "Amex Marriott Brilliant / 旧版 SPG Luxury",
           "labels_by_issuer": {
             "CHASE": "Amex Marriott Brilliant / 旧版 SPG Luxury"
           }
@@ -214,28 +227,44 @@
       "title": "下面这些已关卡或转卡的卡，过去 30 天内你还持有过哪些？",
       "details_id": "F07_MARRIOTT_DETAILS",
       "history_id": "F07_MARRIOTT_HISTORY",
-      "group_prefix": "F07_MARRIOTT_GROUP"
+      "group_prefix": "F07_MARRIOTT_GROUP",
+      "window": {
+        "unit": "day",
+        "value": 30
+      }
     },
     "approved_within_90d": {
       "type": "grouped_multi",
       "title": "过去 90 天内，你申请并获批过下面哪些卡？",
       "details_id": "F07_MARRIOTT_DETAILS",
       "history_id": "F07_MARRIOTT_HISTORY",
-      "group_prefix": "F07_MARRIOTT_GROUP"
+      "group_prefix": "F07_MARRIOTT_GROUP",
+      "window": {
+        "unit": "day",
+        "value": 90
+      }
     },
     "new_card_bonus_within_24m": {
       "type": "grouped_multi",
       "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励？（不包括升级奖励）",
       "details_id": "F07_MARRIOTT_DETAILS",
       "history_id": "F07_MARRIOTT_HISTORY",
-      "group_prefix": "F07_MARRIOTT_GROUP"
+      "group_prefix": "F07_MARRIOTT_GROUP",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
     },
     "bonus_or_upgrade_within_24m": {
       "type": "grouped_multi",
       "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励或升级奖励？",
       "details_id": "F07_MARRIOTT_DETAILS",
       "history_id": "F07_MARRIOTT_HISTORY",
-      "group_prefix": "F07_MARRIOTT_GROUP"
+      "group_prefix": "F07_MARRIOTT_GROUP",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
     }
   },
   "labels": {

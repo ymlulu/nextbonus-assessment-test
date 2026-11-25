@@ -124,7 +124,8 @@ assert.ok(facade.listCards().some(card=>card.product_id==='chase_ink_business_pr
 assert.equal(facade.plan({product_id:'amex_marriott_bonvoy_bevy'}).status,'MATCHED_ID');
 assert.equal(facade.plan({product_id:'does_not_exist'}).status,'UNKNOWN_PRODUCT');
 assert.match(html,/adapters\/card-identity-v1\.js/);
-assert.match(html,/adapters\/card-questionnaire-facade-v1\.js/);
+assert.match(html,/engines\/bank-rules-runtime\.js/);
+assert.doesNotMatch(html,/adapters\/card-questionnaire-facade-v1\.js/);
 assert.doesNotMatch(html,/id="product"/);
 console.log(JSON.stringify({kind:'independent-card-to-questionnaire',
   identities:identityIndex.count,reviewed:7,historyOnly:true,unknownFallback:true,
