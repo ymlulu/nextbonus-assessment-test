@@ -244,8 +244,8 @@ for(const [pid,name,id] of marriottTargets){
  }
  v=matrixRun(pid,[name],{[id]:{held_now:'NO',bonus_or_upgrade_within_24m:'YES'}});
  assert.equal(v.evaluation.bonus.status,'NEEDS_REVIEW','upgrade cannot count as Chase new-card bonus');
- const q=v.questionnaire.questionnaire.specific.find(q=>q.prior_id===id);
- assert.deepEqual(q.fields.map(x=>x.id),['new_card_bonus_within_24m']);
+ const q=v.questionnaire.questionnaire.specific.find(q=>q.fact_field==='new_card_bonus_within_24m');
+ assert.deepEqual(q.options.map(x=>x.value),[id]);
  for(const [cross,crossId] of crossHistories){
   const allDates={held_now:'NO',closed_within_30d:'NO',approved_within_90d:'NO',bonus_or_upgrade_within_24m:'NO'};
   const keys=id==='chase_bountiful'?Object.keys(allDates):
@@ -263,13 +263,37 @@ for(const [pid,name,id] of marriottTargets){
  v=matrixRun(pid,[name,cross],{[crossId]:{held_now:'YES'}});
  assert.equal(v.evaluation.bonus.status,'BONUS_INELIGIBLE');
  assert.equal(v.evaluation.application.status,'INSUFFICIENT_DATA');
- assert.ok(v.questionnaire.questionnaire.specific.some(q=>q.prior_id===id),
+ assert.ok(v.questionnaire.questionnaire.specific.some(q=>q.type==='marriott_multi'&&q.options.some(o=>o.value===id)),
   'bonus blocker must not suppress independent Chase product eligibility questions');
  const other=id==='chase_bountiful'?'Chase Marriott Bonvoy Bold / Boundless':'Chase Marriott Bonvoy Bountiful';
  v=matrixRun(pid,[other]);
  assert.equal(v.evaluation.bonus.status,'NO_TRIGGER_FOUND');
  assert.equal(v.evaluation.application.status,'MODEL_ONLY');
 }
+// Three equivalent Amex-history windows become two checkbox groups.
+const three=crossHistories.slice(1).map(([label])=>label);
+const threeIds=crossHistories.slice(1).map(([,id])=>id);
+const combined=matrixRun('chase_marriott_bonvoy_boundless',three);
+const grouped=combined.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi');
+assert.deepEqual(grouped.map(q=>q.fact_field),['approved_within_90d','bonus_or_upgrade_within_24m']);
+assert.ok(grouped.every(q=>JSON.stringify(q.options.map(o=>o.value))===JSON.stringify(threeIds)));
+const partiallyAnswered=matrixRun('chase_marriott_bonvoy_boundless',three,{
+ [threeIds[0]]:{approved_within_90d:'NO'},[threeIds[1]]:{approved_within_90d:'YES'}});
+const ninety=partiallyAnswered.questionnaire.questionnaire.marriott_followups.find(q=>q.fact_field==='approved_within_90d');
+assert.equal(ninety.options.length,3);
+assert.deepEqual(ninety.options.map(o=>o.answered),[true,true,false],
+ 'adding a history cannot silently turn an unanswered option into NO');
+assert.ok(ruleEvent(partiallyAnswered,threeIds[1]).trigger_sources.some(x=>x.question_id===ninety.id&&x.value===threeIds[1]));
+const bountifulGroups=matrixRun('history_ot_chase_046',[
+ 'Chase Marriott Bonvoy Bountiful',...crossHistories.map(([label])=>label)
+]).questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi');
+assert.deepEqual(bountifulGroups.map(q=>[q.fact_field,q.options.length]),[
+ ['held_now',5],['approved_within_90d',4],['new_card_bonus_within_24m',1],['bonus_or_upgrade_within_24m',4]
+],'current holding and separate new-card/upgrade windows must not be conflated');
+const thirty=matrixRun('history_ot_chase_046',crossHistories.map(([label])=>label),
+ Object.fromEntries(crossHistories.map(([,id])=>[id,{held_now:'NO'}])))
+ .questionnaire.questionnaire.specific.find(q=>q.fact_field==='closed_within_30d');
+assert.equal(thirty.options.length,4);
 assert.equal(run('chase_aeroplan').marriott_matrix,null,'matrix stays scoped to Marriott');
 const inkTargets=[
  ['history_ot_chase_071','Ink Business Cash','CHASE-005'],

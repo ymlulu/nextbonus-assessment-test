@@ -196,19 +196,54 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
   checkbox.checked=true;checkbox.fire('change');
  }
  selectHistory('Chase Marriott Bonvoy Bold / Boundless');
+ selectHistory('AMEX Marriott Bonvoy Business / Legacy SPG Business');
+ selectHistory('AMEX Marriott Bonvoy Bevy');
  selectHistory('AMEX Marriott Bonvoy Brilliant');
  const sections=()=>walk(get('questions')).filter(n=>n.tag==='section'&&n.className==='question');
  const sectionByTitle=pattern=>sections().find(n=>walk(n).some(x=>x.tag==='strong'&&pattern.test(x.textContent)));
- function chooseFirst(pattern,value){
-  const q=sectionByTitle(pattern);
-  assert.ok(q,'matrix follow-up '+pattern);
-  const sel=walk(q).find(x=>x.tag==='select'&&x.options.some(o=>o.value===value)&&x.value==='');
-  assert.ok(sel,'unanswered matrix field');sel.value=value;sel.fire('change');
+ const groupCheckbox=(pattern,value)=>{
+  const q=sectionByTitle(pattern);assert.ok(q,'matrix group '+pattern);
+  const box=walk(q).find(x=>x.tag==='input'&&x.type==='checkbox'&&x.value===value);
+  assert.ok(box,'group checkbox '+value);return box;
+ };
+ const toggleGroup=(pattern,value,checked)=>{
+  const box=groupCheckbox(pattern,value);box.checked=checked;box.fire('change');
+ };
+ const ninety=/过去 90 天内，你申请并获批过下面哪些卡/;
+ const upgrades=/过去 24 个月，你拿过下面哪些卡的开卡奖励或升级奖励/;
+ assert.equal(sections().filter(q=>walk(q).some(x=>x.tag==='strong'&&ninety.test(x.textContent))).length,1);
+ assert.equal(sections().filter(q=>walk(q).some(x=>x.tag==='strong'&&upgrades.test(x.textContent))).length,1);
+ for(const id of ['amex_marriott_business','amex_marriott_bevy','amex_marriott_brilliant']){
+  assert.ok(groupCheckbox(ninety,id));assert.ok(groupCheckbox(upgrades,id));
  }
- chooseFirst(/关于 Amex Marriott Brilliant/,'YES');
+ toggleGroup(ninety,'amex_marriott_brilliant',true);
  assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
- assert.ok(sectionByTitle(/关于 Chase Marriott Bold/),'bonus-only gate does not hide product question');
- chooseFirst(/关于 Chase Marriott Bold/,'YES');
+ toggleGroup(ninety,'amex_marriott_bevy',true);
+ assert.ok(groupCheckbox(ninety,'amex_marriott_brilliant').checked);
+ assert.ok(groupCheckbox(ninety,'amex_marriott_bevy').checked);
+ const redRows=walk(sectionByTitle(ninety)).filter(x=>x.className==='rule-delta');
+ assert.ok(redRows.some(x=>/amex_marriott_brilliant.*不符合开卡奖励条件/.test(x.textContent)));
+ assert.ok(redRows.some(x=>/amex_marriott_bevy.*不符合开卡奖励条件/.test(x.textContent)));
+ toggleGroup(ninety,'NONE',true);
+ assert.ok(groupCheckbox(ninety,'NONE').checked);
+ toggleGroup(upgrades,'NONE',true);
+ assert.ok(!walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ // Removing and re-adding a history removes its old answers and requires a
+ // fresh confirmation, instead of retaining stale negative facts.
+ const oldBevy=walk(get('questions')).find(x=>x.tag==='input'&&x.value==='AMEX Marriott Bonvoy Bevy');
+ oldBevy.checked=false;oldBevy.fire('change');
+ assert.ok(!walk(sectionByTitle(ninety)).some(x=>x.tag==='input'&&x.value==='amex_marriott_bevy'));
+ selectHistory('AMEX Marriott Bonvoy Bevy');
+ assert.ok(!groupCheckbox(ninety,'NONE').checked);
+ const confirm=walk(sectionByTitle(ninety)).find(x=>x.tag==='button'&&x.textContent==='确认以上选择');
+ assert.ok(confirm,'new option is unanswered until confirmed');
+ confirm.fire('click');
+ assert.ok(groupCheckbox(ninety,'NONE').checked);
+ toggleGroup(ninety,'amex_marriott_brilliant',true);
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ const held=/下面这些卡，你现在还持有哪些/;
+ assert.ok(groupCheckbox(held,'chase_bold_boundless'),'bonus-only gate does not hide product question');
+ toggleGroup(held,'chase_bold_boundless',true);
  assert.ok(walk(get('assessment-result')).some(n=>/不符合这张卡的申请条件/.test(n.textContent)));
  get('customer-type').value='BUSINESS';get('customer-type').fire('change');
  const premier=get('card-select').options.find(x=>/Ink Business Premier/i.test(x.textContent));

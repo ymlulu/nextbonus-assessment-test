@@ -102,7 +102,8 @@
       const plan=marriottResult?.applicable
         ?{...enriched,questionnaire:{...enriched.questionnaire,
           specific:[...enriched.questionnaire.specific.filter(q=>q.id!=='F07_MARRIOTT_HISTORY'),
-            ...marriottResult.questions]}}
+            ...marriottResult.questions],
+          marriott_followups:marriottResult.editable_questions||[]}}
         :enriched;
       const evaluation=amexDecision&&metadata.issuer==='AMEX'
         ?amexDecision.evaluate({plan,product:metadata,answers:known_facts,
@@ -121,7 +122,13 @@
         ?{...plan,questionnaire:{...plan.questionnaire,
           specific:plan.questionnaire.specific.filter(q=>
             q.id!=='F03_CARD_HISTORY'&&q.id!=='F07_MARRIOTT_HISTORY'&&
-            q.type!=='structured_marriott')}}
+            q.type!=='marriott_multi'),
+          // Retain only previously answered time choices after Amex's
+          // short-circuit. A bonus block must not ask for new facts.
+          marriott_followups:(plan.questionnaire.marriott_followups||[]).map(q=>{
+            const options=q.options.filter(o=>o.answered);
+            return {...q,options,rule_ids:options.map(o=>'MARRIOTT-MATRIX:'+o.value)};
+          }).filter(q=>q.options.length)}}
         :plan;
       const matrixStatus=skipMatrix&&marriottResult?.status==='MISSING'
         ?'SKIPPED_AFTER_BONUS_BLOCK':marriottResult?.status;

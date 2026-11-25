@@ -60,41 +60,49 @@ const ritz='Chase Ritz-Carlton',bold='Chase Marriott Bonvoy Bold / Boundless',
    bountiful='Chase Marriott Bonvoy Bountiful';
 let r=qa('Marriott Bonvoy Business Card',{F07_MARRIOTT_HISTORY:[ritz]});
 assert.equal(r.marriott_matrix.status,'CLEAR','Ritz cannot block Marriott Business');
-assert.equal(r.questionnaire.questionnaire.specific.some(q=>q.type==='structured_marriott'),false);
+assert.equal(r.questionnaire.questionnaire.specific.some(q=>q.type==='marriott_multi'),false);
 assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND');
 r=qa('Marriott Bonvoy Bevy Card',{F07_MARRIOTT_HISTORY:[ritz]});
 assert.equal(r.marriott_matrix.status,'MISSING');
-let questions=r.questionnaire.questionnaire.specific.filter(q=>q.type==='structured_marriott');
+let questions=r.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi');
 assert.equal(questions.length,1);
-assert.deepEqual(questions[0].fields.map(x=>x.id),['held_now']);
+assert.equal(questions[0].fact_field,'held_now');
+assert.deepEqual(questions[0].options.map(x=>x.value),['chase_ritz_carlton']);
 r=qa('Marriott Bonvoy Bevy Card',{F07_MARRIOTT_HISTORY:[ritz],
  F07_MARRIOTT_DETAILS:{chase_ritz_carlton:{held_now:'YES'}}});
 assert.equal(r.marriott_matrix.status,'TRIGGERED');
 assert.equal(r.evaluation.bonus.status,'LIKELY_RESTRICTED');
 assert.ok(r.evaluation.bonus.triggered_rules.includes('MARRIOTT-MATRIX:chase_ritz_carlton'));
-assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='structured_marriott').length,0,
+assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi').length,0,
  'no more user questions once decisive block found');
 r=qa('Marriott Bonvoy Bevy Card',{F07_MARRIOTT_HISTORY:[ritz],
  F07_MARRIOTT_DETAILS:{chase_ritz_carlton:{held_now:'NO'}}});
-assert.deepEqual(r.questionnaire.questionnaire.specific.filter(q=>q.type==='structured_marriott')[0]
- .fields.map(x=>x.id),['closed_within_30d'],'ask 30d date only after not currently held');
+assert.equal(r.questionnaire.questionnaire.specific.find(q=>q.type==='marriott_multi')
+ .fact_field,'closed_within_30d','ask 30d date only after not currently held');
 r=qa('Marriott Bonvoy Bevy Card',{F07_MARRIOTT_HISTORY:[ritz],
  F07_MARRIOTT_DETAILS:{chase_ritz_carlton:{held_now:'NO',closed_within_30d:'NO'}}});
 assert.equal(r.marriott_matrix.status,'CLEAR');
 assert.equal(r.evaluation.bonus.status,'NO_TRIGGER_FOUND');
 r=qa('Marriott Bonvoy Brilliant Card',{F07_MARRIOTT_HISTORY:[bold]});
 assert.equal(r.marriott_matrix.status,'MISSING');
-const details=r.questionnaire.questionnaire.specific.find(q=>q.type==='structured_marriott');
-assert.deepEqual(details.fields.map(x=>x.id),['approved_within_90d','bonus_or_upgrade_within_24m']);
+const details=r.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi');
+assert.deepEqual(details.map(q=>q.fact_field),['approved_within_90d','bonus_or_upgrade_within_24m']);
+assert.ok(details.every(q=>q.options.length===1&&q.options[0].value==='chase_bold_boundless'));
+const combined=qa('Marriott Bonvoy Brilliant Card',{F07_MARRIOTT_HISTORY:[bold,bountiful]});
+const combinedQuestions=combined.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi');
+assert.deepEqual(combinedQuestions.map(q=>q.fact_field),['approved_within_90d','bonus_or_upgrade_within_24m']);
+assert.ok(combinedQuestions.every(q=>q.options.length===2),'same Amex time window asked once across histories');
 r=qa('Marriott Bonvoy Brilliant Card',{F07_MARRIOTT_HISTORY:[bold],
  F07_MARRIOTT_DETAILS:{chase_bold_boundless:{approved_within_90d:'YES'}}});
 assert.equal(r.marriott_matrix.status,'TRIGGERED');
-assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='structured_marriott').length,0,
+assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi').length,0,
  'one confirmed matrix trigger suppresses unrelated questions');
+assert.deepEqual(r.questionnaire.questionnaire.marriott_followups.map(q=>q.fact_field),['approved_within_90d'],
+ 'the answered triggering group remains editable after the Amex short-circuit');
 r=qa('Marriott Bonvoy Brilliant Card',{F07_MARRIOTT_HISTORY:[bold],
  F07_MARRIOTT_DETAILS:{chase_bold_boundless:{approved_within_90d:'NO'}}});
-assert.deepEqual(r.questionnaire.questionnaire.specific.find(q=>q.type==='structured_marriott')
- .fields.map(x=>x.id),['bonus_or_upgrade_within_24m']);
+assert.equal(r.questionnaire.questionnaire.specific.find(q=>q.type==='marriott_multi')
+ .fact_field,'bonus_or_upgrade_within_24m');
 r=qa('Marriott Bonvoy Brilliant Card',{F07_MARRIOTT_HISTORY:[bold],
  F07_MARRIOTT_DETAILS:{chase_bold_boundless:{
  approved_within_90d:'NO',bonus_or_upgrade_within_24m:'NO'}}});
@@ -116,7 +124,7 @@ assert.ok(r.evaluation.bonus.triggered_rules.includes('AMEX-FL-012'),
 r=qa('Marriott Bonvoy Bevy Card',{F07_MARRIOTT_HISTORY:[ritz,bountiful],
  F07_MARRIOTT_DETAILS:{chase_ritz_carlton:{held_now:'YES'}}});
 assert.equal(r.marriott_matrix.status,'TRIGGERED');
-assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='structured_marriott').length,0,
+assert.equal(r.questionnaire.questionnaire.specific.filter(q=>q.type==='marriott_multi').length,0,
  'do not ask Bountiful dates after Ritz is an established blocker');
 r=qa('Marriott Bonvoy Bevy Card',{});
 assert.equal(r.marriott_matrix.status,'MISSING');
@@ -151,7 +159,7 @@ let previouslyBlocked=qa('Marriott Bonvoy Bevy Card',{
 assert.equal(previouslyBlocked.evaluation.bonus.status,'LIKELY_RESTRICTED');
 assert.equal(previouslyBlocked.marriott_matrix.status,'SKIPPED_AFTER_BONUS_BLOCK');
 assert.ok(!previouslyBlocked.questionnaire.questionnaire.specific.some(q=>
- q.id==='F07_MARRIOTT_HISTORY'||q.type==='structured_marriott'),
+ q.id==='F07_MARRIOTT_HISTORY'||q.type==='marriott_multi'),
  'confirmed family blocker means Marriott date questions cannot change outcome');
 let legacyBiz=qa('Marriott Bonvoy Business Card',{
  F03_CARD_HISTORY:['NONE'],
@@ -160,7 +168,7 @@ let legacyBiz=qa('Marriott Bonvoy Business Card',{
 assert.equal(legacyBiz.evaluation.bonus.status,'LIKELY_RESTRICTED',
  'Business/legacy SPG group is itself enough to trigger current target family rule');
 assert.ok(legacyBiz.evaluation.bonus.triggered_rules.includes('AMEX-BIZ-005'));
-assert.equal(legacyBiz.questionnaire.questionnaire.specific.some(q=>q.type==='structured_marriott'),false);
+assert.equal(legacyBiz.questionnaire.questionnaire.specific.some(q=>q.type==='marriott_multi'),false);
 const dummy=matrix.evaluate({product:product(bevy),
  known_facts:{F07_MARRIOTT_HISTORY:['some arbitrary historic card']}});
 assert.equal(dummy.status,'MISSING','unknown holdings are not auto-cleared');

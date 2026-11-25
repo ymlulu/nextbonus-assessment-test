@@ -41,6 +41,29 @@
     approved_chase_30d:['CHASE-002'],
     approved_chase_business_30d:['CHASE-012']
   };
+  // All grouped time answers are stored under the existing per-card facts.
+  // A newly selected historical card has no answer until explicitly confirmed.
+  function groupFact(item,priorId){
+    return answers.F07_MARRIOTT_DETAILS?.[priorId]?.[item.fact_field];
+  }
+  function patchGroupFacts(item,choiceIds,valueFor){
+    const groups={...(answers.F07_MARRIOTT_DETAILS||{})};
+    for(const id of choiceIds){
+      const row={...(groups[id]||{})};
+      const value=valueFor(id);
+      if(value==='YES'||value==='NO')row[item.fact_field]=value;
+      else delete row[item.fact_field];
+      // A close date only applies while the card is no longer held.
+      if(item.fact_field==='held_now'&&value!=='NO')delete row.closed_within_30d;
+      if(Object.keys(row).length)groups[id]=row;
+      else delete groups[id];
+    }
+    return groups;
+  }
+  function setMarriottDetails(groups){
+    if(Object.keys(groups).length)answers.F07_MARRIOTT_DETAILS=groups;
+    else delete answers.F07_MARRIOTT_DETAILS;
+  }
   function minusAnswer(item,field,choiceValue){
     const previous={...answers};
     if(item.type==='structured'&&field){
@@ -48,14 +71,11 @@
       delete previousFields[field];
       if(Object.keys(previousFields).length)previous[item.id]=previousFields;
       else delete previous[item.id];
-    }else if(item.type==='structured_marriott'&&field){
-      const previousGroups={...(answers.F07_MARRIOTT_DETAILS||{})};
-      const previousFields={...(previousGroups[item.prior_id]||{})};
-      delete previousFields[field];
-      if(Object.keys(previousFields).length)previousGroups[item.prior_id]=previousFields;
-      else delete previousGroups[item.prior_id];
-      if(Object.keys(previousGroups).length)
-        previous.F07_MARRIOTT_DETAILS=previousGroups;
+    }else if(item.type==='marriott_multi'){
+      const ids=item.options.map(o=>o.value)
+        .filter(id=>choiceValue===undefined||choiceValue==='NONE'||id===choiceValue);
+      const previousGroups=patchGroupFacts(item,ids,()=>undefined);
+      if(Object.keys(previousGroups).length)previous.F07_MARRIOTT_DETAILS=previousGroups;
       else delete previous.F07_MARRIOTT_DETAILS;
     }else if(choiceValue!==undefined&&Array.isArray(answers[item.id])){
       const remaining=answers[item.id].filter(value=>value!==choiceValue);
@@ -67,8 +87,8 @@
   function hasAnswer(item,field){
     if(item.type==='structured')return answers[item.id]?.[field]!==undefined &&
       answers[item.id]?.[field]!=='';
-    if(item.type==='structured_marriott')
-      return !!answers.F07_MARRIOTT_DETAILS?.[item.prior_id]?.[field];
+    if(item.type==='marriott_multi')
+      return item.options.some(o=>['YES','NO'].includes(groupFact(item,o.value)));
     const value=answers[item.id];
     return value!==undefined&&value!==''&&value!==null&&
       (!Array.isArray(value)||value.length>0);
@@ -91,8 +111,9 @@
     }
     const oldMap=new Map((a.rule_results||[]).map(x=>[x.rule_id,x]));
     const newMap=new Map((b.rule_results||[]).map(x=>[x.rule_id,x]));
-    const scoped=field&&structuredRuleIds[field]?
-      structuredRuleIds[field]:(item.rule_ids||[]);
+    const scoped=item.type==='marriott_multi'&&choiceValue!==undefined&&choiceValue!=='NONE'
+      ?['MARRIOTT-MATRIX:'+choiceValue]
+      :field&&structuredRuleIds[field]?structuredRuleIds[field]:(item.rule_ids||[]);
     const matching=id=>!scoped.length?false:scoped.some(rid=>
       rid==='MARRIOTT-MATRIX'?
         id==='MARRIOTT-MATRIX'||id.startsWith('MARRIOTT-MATRIX:'):
@@ -104,7 +125,7 @@
       const rule=newMap.get(id);
       const after=rule?.status||'MISSING';
       const sources=(rule?.trigger_sources||[]).filter(x=>x.question_id===item.id&&
-        (choiceValue!==undefined?x.value===choiceValue:item.type==='structured_marriott'&&field&&x.field===field));
+        choiceValue!==undefined&&x.value===choiceValue);
       if(after==='TRIGGERED'&&sources.length){
         const consequence=rule.product_eligibility?'不符合申请及开卡奖励条件':
           rule.hard_bonus_eligibility?'不符合开卡奖励条件':
@@ -204,25 +225,41 @@
       common?'信用情况':'与这张卡有关'));
     card.append(head);
     if(item.description)card.append(el('p','small',item.description));
-    if(item.type==='structured_marriott'&&Array.isArray(item.fields)){
-      const stored=answers.F07_MARRIOTT_DETAILS||{};
-      const prior=stored[item.prior_id]||{};
-      for(const def of item.fields){
-        const line=el('div','field-line');
-        const label=el('label','structured-field',def.label);
-        const select=yesNoOptions({options:def.options,value:prior[def.id],
-          commit:value=>{
-            const next={...(answers.F07_MARRIOTT_DETAILS?.[item.prior_id]||{})};
-            if(value)next[def.id]=value;
-            else delete next[def.id];
-            answers.F07_MARRIOTT_DETAILS={
-              ...(answers.F07_MARRIOTT_DETAILS||{}),[item.prior_id]:next};
-            render();
-          }});
-        label.append(select);line.append(label);
-        const note=feedback(item,result,def.id);
-        if(note)line.append(note);
-        card.append(line);
+    if(item.type==='marriott_multi'){
+      const options=el('div','choice-list');
+      const ids=item.options.map(o=>o.value);
+      const selected=new Set(ids.filter(id=>groupFact(item,id)==='YES'));
+      const allNo=ids.length>0&&ids.every(id=>groupFact(item,id)==='NO');
+      const hasUnknown=ids.some(id=>!['YES','NO'].includes(groupFact(item,id)));
+      function commit(yes,clear=false){
+        setMarriottDetails(patchGroupFacts(item,ids,id=>clear?undefined:yes.has(id)?'YES':'NO'));
+        render();
+      }
+      for(const choice of [...item.options,{value:'NONE',label:'以上都没有'}]){
+        const label=el('label','check-option');
+        const box=el('input');box.type='checkbox';box.value=choice.value;
+        box.checked=choice.value==='NONE'?allNo:selected.has(choice.value);
+        box.addEventListener('change',()=>{
+          const next=new Set(selected);
+          if(choice.value==='NONE'){commit(new Set(),!box.checked);return;}
+          if(box.checked)next.add(choice.value);
+          else next.delete(choice.value);
+          commit(next,!next.size);
+        });
+        label.append(box,document.createTextNode(choice.label));
+        if(box.checked){
+          const note=feedback(item,result,undefined,choice.value);
+          if(note)label.append(note);
+        }
+        options.append(label);
+      }
+      card.append(options);
+      // If history was expanded after an earlier answer, an unchanged
+      // selection needs an explicit confirmation for the new option(s).
+      if(hasUnknown&&ids.some(id=>['YES','NO'].includes(groupFact(item,id)))){
+        const confirm=el('button','secondary','确认以上选择');confirm.type='button';
+        confirm.addEventListener('click',()=>commit(selected));
+        card.append(confirm);
       }
     }else if(item.type==='structured'&&Array.isArray(item.fields)){
       const entry=answers[item.id]&&typeof answers[item.id]==='object'?answers[item.id]:{};
@@ -265,6 +302,12 @@
           }else selected.delete(choice.value);
           if(selected.size)answers[item.id]=[...selected];
           else delete answers[item.id];
+          if(item.id==='F07_MARRIOTT_HISTORY'){
+            const activePriors=new Set(item.options.filter(o=>selected.has(o.value)).map(o=>o.prior_id));
+            const groups={...(answers.F07_MARRIOTT_DETAILS||{})};
+            for(const id of Object.keys(groups))if(!activePriors.has(id))delete groups[id];
+            setMarriottDetails(groups);
+          }
           render();
         });
         label.append(box,document.createTextNode(choice.label));
@@ -420,14 +463,18 @@
     // The rule planner intentionally returns only unanswered facts, but this
     // QA page keeps all previously displayed questions editable and visible.
     const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
-    for(const q of plan.questionnaire.specific)rememberQuestion(q);
+    for(const q of plan.questionnaire.specific)if(q.type!=='marriott_multi')rememberQuestion(q);
     list.replaceChildren(el('h2','','先了解一下你的信用情况'));
     for(const q of baseQuestionLibrary)list.append(question(q,true,result,true));
     list.append(el('h2','','关于这张卡，还想了解这些情况'));
-    if(!seenQuestions.size)
+    const grouped=plan.questionnaire.marriott_followups||[];
+    if(!seenQuestions.size&&!grouped.length)
       list.append(el('p','muted','目前没有其他需要回答的问题。'));
     for(const q of seenQuestions.values())
       list.append(question(q,false,result,activeIds.has(q.id)));
+    // Group options depend on the CURRENT history, not the accumulated
+    // question cache. Removed historical cards must not leave stale options.
+    for(const q of grouped)list.append(question(q,false,result,activeIds.has(q.id)));
     if(plan.questionnaire.pending_terms?.length){
       const pending=el('details','pending-rules');
       const label=el('summary','','还有几项开卡奖励条款需要核实（'+
