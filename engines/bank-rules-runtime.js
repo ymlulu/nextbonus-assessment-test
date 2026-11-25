@@ -73,6 +73,9 @@ function validate({rulebook,factbook,products,approval}){
   }
   if(s.issuer&&![s.issuer].flat().every(i=>rulebook.supported_issuers.includes(i)))fail('UNKNOWN_TARGET_ISSUER',id);
  }
+ function scenarios(s,r){
+  if(!r.offer_clause||!isObject(s)||!Object.keys(s).length||Object.values(s).some(x=>!['PRESENT','ABSENT'].includes(x)))fail('INVALID_OFFER_SCENARIO',r.id);
+ }
  function effect(e,id){
   if(!allowedKeys(e,['application','bonus','application_action','bonus_action','product_gate'])||!validImpact(e.application)||!validImpact(e.bonus)||!(e.application||e.bonus))
    fail('RULE_REQUIRES_NONZERO_IMPACT',id);
@@ -124,14 +127,14 @@ function validate({rulebook,factbook,products,approval}){
   }
   if(own(r,'overrides')&&!Array.isArray(r.overrides))fail('INVALID_OVERRIDE',r.id);
   for(const o of r.overrides||[]){
-   if(!allowedKeys(o,['target','effect','condition','label'])||!o.effect&&!o.condition)fail('INVALID_OVERRIDE',r.id);
+   if(!allowedKeys(o,['target','effect','condition','label','offer_scenarios'])||!o.effect&&!o.condition&&!o.offer_scenarios)fail('INVALID_OVERRIDE',r.id);
    scope(o.target,r.id);
    if(o.effect)effect(o.effect,r.id);
    if(o.condition)condition(o.condition,{...r,condition:o.condition});
+   if(own(o,'offer_scenarios'))scenarios(o.offer_scenarios,r);
   }
   if(own(r,'offer_clause')&&!nonempty(r.offer_clause))fail('INVALID_OFFER_CLAUSE',r.id);
-  if(own(r,'offer_scenarios')&&(!r.offer_clause||!isObject(r.offer_scenarios)||!Object.keys(r.offer_scenarios).length||Object.values(r.offer_scenarios).some(x=>!['PRESENT','ABSENT'].includes(x))))
-   fail('INVALID_OFFER_SCENARIO',r.id);
+  if(own(r,'offer_scenarios'))scenarios(r.offer_scenarios,r);
  }
  for(const [id,p] of Object.entries(products.overrides)){
   if(!nonempty(id))fail('INVALID_PRODUCT_MAPPING',id);
@@ -268,7 +271,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   }
   function effectFor(r){
    const o=(r.overrides||[]).find(x=>targetState(x.target,p)===true);
-   return {...r,...(o?.effect?{effect:o.effect}:{}),...(o?.condition?{condition:o.condition}:{}),label:o?.label||r.label||r.id};
+   return {...r,...(o?.effect?{effect:o.effect}:{}),...(o?.condition?{condition:o.condition}:{}),...(o?.offer_scenarios?{offer_scenarios:o.offer_scenarios}:{}),label:o?.label||r.label||r.id};
   }
   const actionOf=(e,dimension,actions)=>e[dimension]===3?
     (e[dimension+'_action']||(actions.includes('BLOCK')?'BLOCK':actions.includes('WAIT')?'WAIT':'BLOCK')):e[dimension]>0?'RISK':'CLEAR';
@@ -304,7 +307,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    const x=evaluate(r.condition,r);
    const review=r.review&&(x.state===false||r.review.show_with_primary)?evaluate(r.review.condition,r):null;
    if(x.state===true){
-    events.push(makeEvent(r,'TRIGGERED',e,label,{hits:[...gate.hits,...x.hits],actions:x.actions,pending:!!(gate.pending||x.pending||review?.pending)},r.overrides?.some(o=>targetState(o.target,p)===true)?label:undefined));
+    events.push(makeEvent(r,'TRIGGERED',e,label,{hits:[...gate.hits,...x.hits],actions:x.actions,pending:!!(gate.pending||x.pending||review?.pending)},r.overrides?.some(o=>o.label&&targetState(o.target,p)===true)?label:undefined));
    }else if(x.state===null)events.push(makeEvent(r,'MISSING',e,label));
    else if(review?.state===true)events.push(makeEvent(r,'REVIEW',e,label,undefined,r.review.label));
    else if(review?.state===null)events.push(makeEvent(r,'MISSING',e,label));

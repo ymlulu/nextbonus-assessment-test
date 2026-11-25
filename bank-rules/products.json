@@ -122,6 +122,27 @@
     },
     "history_ot_amex_022": {
       "card_form": "CHARGE_OR_PAY_OVER_TIME"
+    },
+    "citi_aadvantage_executive": {
+      "product_name": "Citi / AAdvantage Executive"
+    },
+    "history_ot_citi_008": {
+      "product_name": "Citi / AAdvantage Platinum Select"
+    },
+    "citi_strata_elite": {
+      "product_name": "Citi Strata Elite"
+    },
+    "citi_strata_premier": {
+      "product_name": "Citi Strata Premier"
+    },
+    "history_ot_citi_034": {
+      "product_name": "Citi / AAdvantage Globe"
+    },
+    "history_ot_citi_048": {
+      "product_name": "Citi Double Cash"
+    },
+    "history_ot_citi_078": {
+      "product_name": "Citi / AAdvantage Business"
     }
   },
   "unlisted_targets": [
@@ -152,6 +173,24 @@
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",
       "product_lineage": "NOT_UNITED_CLUB"
+    },
+    {
+      "issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "product_name": "Citi Premier",
+      "customer_type": "PERSONAL"
+    },
+    {
+      "issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "product_name": "Citi Rewards+",
+      "customer_type": "PERSONAL"
+    },
+    {
+      "issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "product_name": "Citi Rewards+ Student",
+      "customer_type": "PERSONAL"
     }
   ]
 }

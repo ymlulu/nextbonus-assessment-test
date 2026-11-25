@@ -265,10 +265,111 @@
         "unit": "month",
         "value": 24
       }
+    },
+    "citi_personal_application_lt_8d": {
+      "type": "single",
+      "title": "距离上一次申请 Citi 个人信用卡，不到 8 天吗？（无论是否获批）",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Citi 的情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "day",
+        "value": 8
+      }
+    },
+    "citi_applications_65d": {
+      "type": "number",
+      "title": "过去 65 天，你一共提交了几次 Citi 信用卡申请？",
+      "description": "个人卡和商业卡都算，包括被拒的申请。",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Citi 的情况",
+      "window": {
+        "unit": "day",
+        "value": 65
+      }
+    },
+    "citi_business_application_lt_90d": {
+      "type": "single",
+      "title": "距离上一次申请 Citi 商业信用卡，不到 90 天吗？（无论是否获批）",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Citi 的情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "day",
+        "value": 90
+      }
+    },
+    "F04_CITI_BONUS_48M": {
+      "type": "multi",
+      "title": "过去 48 个月，你拿到过下面哪些卡的开卡奖励？",
+      "description": "只算新卡开卡奖励，以奖励实际到账日为准。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "过去 48 个月拿过 ",
+      "evidence_suffix": " 的开卡奖励"
+    },
+    "F05_CITI_CONVERSION_48M": {
+      "type": "multi",
+      "title": "有没有 Citi 信用卡在拿到开卡奖励后，被你转成下面这些卡？",
+      "description": "仅勾选原账户的开卡奖励在过去 48 个月内到账的情况。看奖励到账日，不看转卡日期。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "近 48 个月获奖的 Citi 账户后来转为 "
+    },
+    "costco_active_membership": {
+      "type": "single",
+      "title": "你现在有以本人名义登记的有效 Costco 会员资格吗？",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "F12_CITI_OPENING_OFFER_48M": {
+      "type": "multi",
+      "title": "过去 48 个月，你是否获得过下面这张新卡的开户优惠？",
+      "description": "这里按条款中的开户优惠（offer）计算，不是开卡奖励到账时间。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "过去 48 个月获得过 ",
+      "evidence_suffix": " 的开户优惠"
     }
   },
   "labels": {
     "OTHER_CHASE_NO_FEE_BUSINESS": "其他无年费 Chase 商业信用卡（具体产品待核实）",
-    "Chase Aeroplan Card": "Chase Aeroplan Card（包括旧版本）"
+    "Chase Aeroplan Card": "Chase Aeroplan Card（包括旧版本）",
+    "Citi / AAdvantage Platinum Select": "Citi AAdvantage Platinum Select",
+    "Citi / AAdvantage Executive": "Citi AAdvantage Executive",
+    "Citi / AAdvantage Globe": "Citi AAdvantage Globe",
+    "Citi / AAdvantage Business": "Citi AAdvantage Business"
   }
 }
