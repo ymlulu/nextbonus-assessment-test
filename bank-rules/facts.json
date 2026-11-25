@@ -268,7 +268,7 @@
     },
     "citi_personal_application_lt_8d": {
       "type": "single",
-      "title": "距离上一次申请 Citi 个人信用卡，不到 8 天吗？（无论是否获批）",
+      "title": "过去不足 8 天内，你申请过 Citi 个人卡吗？（无论是否获批）",
       "group": "F02_ISSUER_APPLICATION_HISTORY",
       "group_title": "你最近申请 Citi 的情况",
       "options": [
@@ -288,18 +288,19 @@
     },
     "citi_applications_65d": {
       "type": "number",
-      "title": "过去 65 天，你一共提交了几次 Citi 信用卡申请？",
+      "title": "过去 65 天，你一共提交了几次 Citi 信用卡申请？（个人卡、商业卡及被拒的申请都算）",
       "description": "个人卡和商业卡都算，包括被拒的申请。",
       "group": "F02_ISSUER_APPLICATION_HISTORY",
       "group_title": "你最近申请 Citi 的情况",
       "window": {
         "unit": "day",
         "value": 65
-      }
+      },
+      "count_unit": "次"
     },
     "citi_business_application_lt_90d": {
       "type": "single",
-      "title": "距离上一次申请 Citi 商业信用卡，不到 90 天吗？（无论是否获批）",
+      "title": "过去不足 90 天内，你申请过 Citi 商业卡吗？（无论是否获批）",
       "group": "F02_ISSUER_APPLICATION_HISTORY",
       "group_title": "你最近申请 Citi 的情况",
       "options": [
@@ -330,7 +331,7 @@
     },
     "F05_CITI_CONVERSION_48M": {
       "type": "multi",
-      "title": "有没有 Citi 信用卡在拿到开卡奖励后，被你转成下面这些卡？",
+      "title": "过去 48 个月拿到开卡奖励的 Citi 账户，有没有被你转成下面这些卡？",
       "description": "仅勾选原账户的开卡奖励在过去 48 个月内到账的情况。看奖励到账日，不看转卡日期。",
       "window": {
         "unit": "month",

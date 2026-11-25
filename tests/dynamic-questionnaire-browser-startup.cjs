@@ -280,6 +280,31 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  historyButton.fire('click');await settle();
  assert.ok(requestLog.includes('data/offer-history.json'));
  assert.ok(walk(get('assessment-result')).some(n=>/参考记录日期：2026-09-/.test(n.textContent)));
+
+ // Citi shares the same selector, controls, feedback and report.
+ get('issuer').value='CITI';get('issuer').fire('change');
+ get('customer-type').value='PERSONAL';get('customer-type').fire('change');
+ const elite=get('card-select').options.find(x=>/Strata Elite/i.test(x.textContent));
+ assert.ok(elite);get('card-select').value=elite.value;get('card-select').fire('change');
+ assert.match(get('identity-note').textContent,/Citi/);
+ assert.equal(get('amex-offer-settings').hidden,true);
+ const citiCount=selectValues(['','0','2']);
+ assert.ok(citiCount);
+ assert.deepEqual(citiCount.options.slice(1).map(o=>o.textContent),['0–1 次','2 次或更多']);
+ citiCount.value='2';citiCount.fire('change');
+ assert.ok(walk(get('assessment-result')).some(n=>/建议等待申请限制解除/.test(n.textContent)));
+ const conversion=walk(get('questions')).find(n=>n.tag==='section'&&walk(n).some(x=>/看奖励到账日，不看转卡日期/.test(x.textContent)));
+ assert.ok(conversion,'conversion anchor explained');
+ const conversionBox=walk(conversion).find(n=>n.tag==='input'&&n.value==='Citi Strata Elite');
+ assert.ok(conversionBox);conversionBox.checked=true;conversionBox.fire('change');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ get('customer-type').value='BUSINESS';get('customer-type').fire('change');
+ assert.equal(get('assessment-result').children.length,0);
+ const aaBusiness=get('card-select').options.find(x=>/AAdvantage Business/i.test(x.textContent));
+ assert.ok(aaBusiness);get('card-select').value=aaBusiness.value;get('card-select').fire('change');
+ assert.ok(walk(get('questions')).some(n=>/不足 90 天内/.test(n.textContent)));
+ assert.ok(!walk(get('questions')).some(n=>/不足 8 天内/.test(n.textContent)));
+ assert.ok(get('card-select').options.some(x=>/Costco Anywhere Visa Business/.test(x.textContent)));
  // Exercise the transient failure branch and successful retry on a fresh page.
  const retryContext={...context,window:null};
  // Reuse script/bootstrap module only after changing fetch to test the recovery path.
@@ -313,5 +338,5 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.equal(get2('card-select').value,'');
  console.log(JSON.stringify({suite:'browser-startup-smoke',
   controls:'bank/type/card',identity:'exact id',onBoot:'no stale report',
-  failureRetry:'works',amexAndChase:'verified',answersUploaded:false,status:'PASS'}));
+  failureRetry:'works',amexChaseCiti:'verified',answersUploaded:false,status:'PASS'}));
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -41,6 +41,7 @@ function validate({rulebook,factbook,products,approval}){
    fail('INVALID_FACT_DEFINITION',id);
   if(f.window&&(!allowedKeys(f.window,['unit','value'])||!['day','month','year'].includes(f.window.unit)||!Number.isSafeInteger(f.window.value)||f.window.value<1))
    fail('INVALID_FACT_WINDOW',id);
+  if(own(f,'count_unit')&&(f.type!=='number'||!nonempty(f.count_unit)))fail('INVALID_COUNT_UNIT',id);
   if(f.type==='single'){
    if(!Array.isArray(f.options)||!f.options.length||f.options.some(o=>!nonempty(o.value)||!nonempty(o.label))||new Set(f.options.map(o=>o.value)).size!==f.options.length)
     fail('INVALID_FACT_OPTIONS',id);
@@ -144,10 +145,10 @@ function validate({rulebook,factbook,products,approval}){
  for(const p of products.unlisted_targets||[])scope(p,'unlisted_targets',{requireIssuer:true,allowArrays:false});
  return true;
 }
-function countBands(cuts){
+function countBands(cuts,unit='张'){
  const starts=uniq([0,...cuts]).filter(validCount).sort((a,b)=>a-b);
- return starts.map((v,i)=>({value:v,label:i===starts.length-1?v+' 张或更多':
-   starts[i+1]===v+1?v+' 张':v+'–'+(starts[i+1]-1)+' 张'}));
+ return starts.map((v,i)=>({value:v,label:i===starts.length-1?v+' '+unit+'或更多':
+   starts[i+1]===v+1?v+' '+unit:v+'–'+(starts[i+1]-1)+' '+unit}));
 }
 function createRuntime({rulebook,factbook,products,approval}){
  validate({rulebook,factbook,products,approval});
@@ -189,7 +190,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    let entry=groups.get(qid);
    if(!entry){
     entry={id:qid,type:f.group?'structured':f.type==='grouped_multi'?'marriott_multi':f.type,title:f.group?f.group_title:f.title,
-      ...(f.description?{description:f.description}:{}),rules:new Set(),fields:new Map(),options:new Map(),cuts:new Set(),pending:false,
+      ...(f.description?{description:f.description}:{}),rules:new Set(),fields:new Map(),options:new Map(),cuts:new Set(),pending:false,count_unit:f.count_unit,
       ...(f.type==='grouped_multi'?{fact_field:id,details_id:f.details_id,history_id:f.history_id,clear_when_not_no:f.clear_when_not_no||[]}:{}) ,
       ...(f.type==='multi'&&f.details_id?{details_id:f.details_id}:{})};
     groups.set(qid,entry);
@@ -197,7 +198,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    entry.rules.add(r.id);
    let e=entry;
    if(f.group){
-    if(!entry.fields.has(id))entry.fields.set(id,{id,type:f.type,label:f.title,rules:new Set(),cuts:new Set(),options:new Map(),pending:false});
+    if(!entry.fields.has(id))entry.fields.set(id,{id,type:f.type,label:f.title,rules:new Set(),cuts:new Set(),options:new Map(),pending:false,count_unit:f.count_unit});
     e=entry.fields.get(id);e.rules.add(r.id);
    }
    const missing=f.type==='multi'?!knownList(raw):f.type==='number'?!validCount(raw):f.type==='grouped_multi'?!['YES','NO'].includes(raw):empty(raw)||!f.options?.some(o=>o.value===raw);
@@ -242,7 +243,7 @@ function createRuntime({rulebook,factbook,products,approval}){
      state=node.op==='eq'?raw===threshold:node.op==='gte'?raw>=threshold:node.op==='gt'?raw>threshold:node.op==='lt'?raw<threshold:raw<=threshold;
      if(f.type==='number'){
       const comparator={gte:'达到 ',gt:'超过 ',lt:'少于 ',lte:'不超过 ',eq:'等于 '}[node.op];
-      reason=f.title+' '+(state?comparator:node.op==='gte'?'少于 ':node.op==='gt'?'不超过 ':node.op==='lt'?'达到 ':node.op==='lte'?'超过 ':'不等于 ')+threshold+' 张';
+      reason=f.title+' '+(state?comparator:node.op==='gte'?'少于 ':node.op==='gt'?'不超过 ':node.op==='lt'?'达到 ':node.op==='lte'?'超过 ':'不等于 ')+threshold+' '+(f.count_unit||'张');
      }else reason=f.title.replace(/[？?]$/,'')+'：'+(f.type==='grouped_multi'?(raw==='YES'?'是':'否'):(f.options.find(o=>o.value===raw)?.label||raw));
     }
    }
@@ -316,8 +317,8 @@ function createRuntime({rulebook,factbook,products,approval}){
   function form(e){
    const out={id:e.id,type:e.type,title:e.title,rule_ids:[...e.rules],...(e.description?{description:e.description}:{})};
    if(e.type==='structured')out.fields=[...e.fields.values()].map(f=>({id:f.id,type:f.type,label:f.label,rule_ids:[...f.rules],
-    ...(f.type==='number'?{count_bands:countBands([...f.cuts])}:{options:[...f.options.values()]})}));
-   else if(e.type==='number')out.count_bands=countBands([...e.cuts]);
+    ...(f.type==='number'?{count_bands:countBands([...f.cuts],f.count_unit)}:{options:[...f.options.values()]})}));
+   else if(e.type==='number')out.count_bands=countBands([...e.cuts],e.count_unit);
    else {
     out.options=[...e.options.values()];
     if(e.type==='multi'||e.type==='marriott_multi')out.allow_none=true;
