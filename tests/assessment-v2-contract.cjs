@@ -4,8 +4,8 @@ const root=path.resolve(__dirname,'..'),source=p=>fs.readFileSync(path.join(root
 const data={rulebook:read('bank-rules/rules.json'),factbook:read('bank-rules/facts.json'),products:read('bank-rules/products.json'),approval:read('bank-rules/approval.json'),identityIndex:read('data/card-identity-index.json')};
 const client=createClient(data);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,
- F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
- F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES'};
+ F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',bofa_approved_2m:0,bofa_approved_12m:0,bofa_approved_24m:0,cap1_application_or_approval_lt_6m:'NO',cap1_applications_30d:0,wf_consumer_opened_lt_4m:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
+ F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES',F03_HELD_WITHIN_24M:['NONE'],bofa_business_held_24m:'NO',F04_BONUS_RECEIVED_48M:['NONE'],cap1_business_ever_held:'NO',cap1_open_accounts:0,F03_HELD_OR_OPENED_48M:['NONE'],F03_OPENED_AND_RECEIVED_BONUS_15M:['NONE'],F03_OPENED_WITHIN_48M:['NONE'],discover_current_cards:0,recent_new_accounts_6m:0,recent_new_accounts_12m:0,F04_BONUS_RECEIVED_60M:['NONE'],usb_cashplus_upgrade:'NO',bilt_decline_lt_45d:'NO'};
 const csp='chase_sapphire_preferred',gold='amex_gold';
 const request=(product_id,known_facts=base,extra={})=>({product_id,known_facts,...extra});
 function equalReport(r){
@@ -16,9 +16,10 @@ function equalReport(r){
  assert.equal(r.report.answers_transmitted,false);
  assert.equal(r.report.benefits.status,'NOT_IN_SCOPE');
 }
+const reviewIds=new Set(["capital_one_venture","history_ot_bankofamerica_029","history_ot_bankofamerica_030","history_ot_capitalone_049","history_ot_capitalone_050","history_ot_capitalone_051","history_ot_bankofamerica_052","history_ot_bankofamerica_053","history_ot_bankofamerica_054","history_ot_wellsfargo_061","history_ot_wellsfargo_062","history_ot_capitalone_076","history_ot_capitalone_077","history_ot_capitalone_083","history_ot_bankofamerica_085","history_ot_capitalone_090","history_ot_capitalone_091","wf_choice","wf_choice_select","citi_costco_anywhere_visa","citi_costco_anywhere_business","bofa_atmos_rewards_summit","history_ot_u_s_bank_058","history_ot_discovercapitalone_063","history_ot_barclays_066","history_ot_barclays_067","history_ot_barclays_068","history_ot_barclays_069","history_ot_u_s_bank_088","history_ot_u_s_bank_089","history_ot_u_s_bank_096","history_ot_barclays_098"]);
 for(const p of client.listCards()){
  const r=client.evaluate(request(p.product_id));equalReport(r);
- assert.equal(r.report.decision.code,p.product_id.startsWith('citi_costco_')?'REVIEW':'CLEAR',p.product_id);
+ assert.equal(r.report.decision.code,reviewIds.has(p.product_id)?'REVIEW':'CLEAR',p.product_id);
  assert.deepEqual(r,client.evaluate(request(p.product_id)));
  const blank=client.evaluate(request(p.product_id,{}));equalReport(blank);
  assert.equal(blank.report.decision.code,'REVIEW',p.product_id);

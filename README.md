@@ -1,14 +1,14 @@
 # NextBonus Assessment Test
 
-## Current assessment (AMEX + Chase + Citi)
+## Current assessment (all 10 issuer / brand families)
 
 [Open the dynamic questionnaire](https://ymlulu.github.io/nextbonus-assessment-test/dynamic-questionnaire.html).
 
 All current eligibility rules, questions derived from them, thresholds and impacts use the single [bank-rules library](bank-rules/README.md). The one generic engine is `engines/bank-rules-runtime.js`. The UI renders its question schema, collects facts and displays the returned decision. No answers are uploaded.
 
-- 76 selectable AMEX, Chase and Citi identities and 80 executable rules at this release.
+- 118 selectable identities and 108 executable rules (88 source bank rules plus 20 active Marriott matrix cells) at this release.
 - Card identities come from `data/card-identity-index.json`. Explicit canonical mappings and currently unlisted target scopes live in `bank-rules/products.json`.
-- Other issuers are not supported yet. Unlisted targets are not selectable products.
+- AMEX, Chase, Citi, Capital One, BofA, Wells Fargo, U.S. Bank, Barclays, Discover and Bilt / Column are supported. Unlisted targets are not selectable products. Current offer gaps are intentionally unresolved.
 - Standard / NLL are modeled offer scenarios, not verification of live terms. Frozen clauses can be supplied explicitly; unknown terms remain unresolved.
 - [Audit and open business questions](bank-rules/AUDIT.md).
 - The earlier dynamic questionnaire prototype, issuer-specific engines and duplicate policy/index/matrix files are retired. Git history preserves them.

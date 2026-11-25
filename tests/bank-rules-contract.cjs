@@ -87,10 +87,13 @@ expanded.rulebook.rules.push({id:'TEST-NEW-BANK',target:{issuer:'TEST_BANK'},con
 const generic=createRuntime(expanded),p={product_id:'test_citi',product_name:'Fixture only',issuer:'TEST_BANK'};
 assert.deepEqual(generic.assess({product:p}).questionnaire.editable.find(q=>q.id==='F01_RECENT_NEW_ACCOUNTS').count_bands.map(x=>x.value),[0,3]);
 assert.equal(generic.assess({product:p,answers:{F01_RECENT_NEW_ACCOUNTS:3}}).evaluation.application.impact,2);
+rejects(d=>{d.rulebook.coverage_checks[0].dimension='UNKNOWN';},/INVALID_COVERAGE_CHECK/);
+rejects(d=>{d.rulebook.coverage_checks[0].id='BOFA-001';},/INVALID_COVERAGE_CHECK/);
+rejects(d=>{find(d,'CAP1-007').offer_clause=undefined;},/INVALID_OFFER_THRESHOLD/);
 const html=source('dynamic-questionnaire.html'),ui=source('assets/dynamic-questionnaire-demo.js'),engine=source('engines/bank-rules-runtime.js');
 assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]),['adapters/card-identity-v1.js','engines/bank-rules-runtime.js','adapters/assessment-api-v2.js','assets/assessment-loader-v2.js','assets/dynamic-questionnaire-demo.js']);
-for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE)-(?:PROD-|FL-|REL-|BIZ-)?\d{3}\b/);
+for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE|CITI|BOFA|CAP1|WF|DISC|BARC|USB|BILT)-(?:PROD-|FL-|REL-|BIZ-)?\d{3}\b/);
 for(const s of [engine,source('adapters/card-identity-v1.js')])assert.doesNotMatch(s,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
 const retired=["adapters/amex-offer-context-v1.js","adapters/amex-questionnaire-v1.js","adapters/card-questionnaire-facade-v1.js","adapters/chase-questionnaire-v1.js","adapters/dynamic-questionnaire-v1.js","engines/amex-decision-v1.js","engines/chase-decision-v1.js","engines/marriott-matrix-v1.js","data/amex-questionnaire-policy.json","data/chase-questionnaire-policy.json","data/dynamic-questionnaire-rule-index.json","data/marriott-eligibility-matrix.json"];
 for(const p of retired){assert.ok(!fs.existsSync(path.join(root,p)),'retired duplicate still exists: '+p);assert.ok(!ui.includes(p),'old source loaded: '+p);}
-console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:18,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));
+console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:21,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));

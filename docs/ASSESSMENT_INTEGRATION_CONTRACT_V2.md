@@ -11,7 +11,7 @@ Create the client with `NextBonusAssessmentV2.createClient({rulebook,factbook,pr
 - `reportFromPlan(planResult)`: consumes a matching-version result without evaluating facts again.
 - `getOfferHistory({product_id,offerHistory,evaluation_date})`, `getOfferTiming({product_id,offerTiming})`: optional reviewed historical snapshots; missing source => null.
 
-Question values/IDs come from the fact definitions, not from labels. `known_facts` stays on the device. The UI renders the result, never evaluates bank terms. Standard and NLL are modeled scenarios unless explicit frozen clauses are provided. Unsupported identities yield no questionnaire/report, not an assumed approval.
+Question values/IDs come from the fact definitions, not from labels. `known_facts` stays on the device. The UI renders the result, never evaluates bank terms. Standard and NLL are modeled scenarios unless explicit frozen clauses are provided. Unsupported identities yield no questionnaire/report, not an assumed approval. An exact offer with a numeric cap supplies offer_facts.rule_clause_state and offer_facts.rule_limits keyed by the clause ID. Missing or invalid threshold => REVIEW, no question. A reviewed absence of additional product terms may resolve a coverage check via offer_facts.coverage_state[id] = CONFIRMED_NO_ADDITIONAL_RULES; these checks have no impact and never ask user facts.
 
 Overall decision priority: BLOCK, WAIT, REVIEW if facts/clauses incomplete, RISK (soft restriction or high base risk), CLEAR. CLEAR means no modeled limitation found, not approval or guaranteed bonus. No live offer/timing or long-term benefit decision is invented.
 

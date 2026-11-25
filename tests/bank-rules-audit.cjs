@@ -8,9 +8,9 @@ const runtime=createRuntime({rulebook,factbook,products,approval});
 const assert=(v,label)=>{if(!v)throw Error(label);};
 const eq=(a,b,label)=>assert(JSON.stringify(a)===JSON.stringify(b),label+': '+JSON.stringify(a)+' != '+JSON.stringify(b));
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
- F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO'},
+ F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',bofa_approved_2m:0,bofa_approved_12m:0,bofa_approved_24m:0,cap1_application_or_approval_lt_6m:'NO',cap1_applications_30d:0,wf_consumer_opened_lt_4m:'NO'},
  F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],
- F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES'};
+ F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES',F03_HELD_WITHIN_24M:['NONE'],bofa_business_held_24m:'NO',F04_BONUS_RECEIVED_48M:['NONE'],cap1_business_ever_held:'NO',cap1_open_accounts:0,F03_HELD_OR_OPENED_48M:['NONE'],F03_OPENED_AND_RECEIVED_BONUS_15M:['NONE'],F03_OPENED_WITHIN_48M:['NONE'],discover_current_cards:0,recent_new_accounts_6m:0,recent_new_accounts_12m:0,F04_BONUS_RECEIVED_60M:['NONE'],usb_cashplus_upgrade:'NO',bilt_decline_lt_45d:'NO'};
 const catalog=ids.products.map(p=>({...p,...products.overrides[p.product_id]}));
 const virtual=(name,business=false,lineage='NOT_UNITED_CLUB')=>({product_id:'fixture_'+name,product_name:name,issuer:'CHASE',product_type:'CREDIT_CARD',customer_type:business?'BUSINESS':'PERSONAL',product_lineage:lineage,card_form:'REVOLVING_CREDIT'});
 const fixtures=[virtual('United Club',false,'UNITED_CLUB'),virtual('Iberia Visa'),virtual('Aer Lingus Visa'),virtual('Southwest Premier Business',true)];
@@ -250,6 +250,118 @@ for(const p of catalog.filter(p=>p.issuer==='CITI')){
  eq(q.fields.some(f=>f.id==='citi_personal_application_lt_8d'),p.customer_type==='PERSONAL','personal scope');
  eq(q.fields.some(f=>f.id==='citi_business_application_lt_90d'),p.customer_type==='BUSINESS','business scope');
 }
+
+
+// Remaining seven issuer/brand families, independently reviewed against the source rows.
+// Known exact offer clauses are passed in tests rather than inferred from a user profile.
+const clause=(id,state='PRESENT',limits={})=>({offer_facts:{rule_clause_state:{[id]:state},rule_limits:limits}});
+const gatedBinary=(id,p,patch,positive,negative,impacts,actions)=>{
+ check(id,p,patch(negative),'CLEAR',[0,0],['CLEAR','CLEAR'],clause(id));
+ check(id,p,patch(positive),'TRIGGERED',impacts,actions,clause(id));
+ check(id,p,patch(undefined),'MISSING',[0,0],['CLEAR','CLEAR'],clause(id));
+ check(id,p,patch(positive),'ABSENT',[0,0],['CLEAR','CLEAR'],clause(id,'ABSENT'));
+ check(id,p,patch(positive),'REVIEW',[0,0],['CLEAR','CLEAR'],{offer_facts:{}});
+};
+const gatedHistory=(id,p,fact,value,impacts,actions)=>{
+ gatedBinary(id,p,x=>({[fact]:x}),[value],['NONE'],impacts,actions);
+ check(id,p,{[fact]:['UNRELATED_HISTORY']},'CLEAR',[0,0],['CLEAR','CLEAR'],clause(id));
+};
+const ascent=card('Atmos Rewards Ascent'),summit=card('Atmos Rewards Summit'),bofaBiz=card('Atmos Rewards Business'),bofaPremium=card('Premium Rewards');
+for(const p of [ascent,bofaBiz]){
+ for(const [field,n] of [['bofa_approved_2m',2],['bofa_approved_12m',3],['bofa_approved_24m',4]])
+  numeric('BOFA-001',p,x=>structured(field,x),n,3,'WAIT');
+}
+gatedHistory('BOFA-002',bofaPremium,'F03_HELD_WITHIN_24M','Premium Rewards',...app(2));
+check('BOFA-002',bofaBiz,{},'ABSENT');
+gatedBinary('BOFA-003',bofaBiz,x=>({bofa_business_held_24m:x}),'YES','NO',...app(2));
+check('BOFA-003',ascent,{},'ABSENT');
+history('BOFA-PROD-002',ascent,'F03_HELD_WITHIN_24M',['Atmos Rewards Ascent'],...app(2));
+check('BOFA-PROD-002',ascent,{F03_HELD_WITHIN_24M:['Atmos Rewards Summit']},'CLEAR');
+check('BOFA-PROD-002',summit,{F03_HELD_WITHIN_24M:['Atmos Rewards Ascent']},'ABSENT');
+check('BOFA-PROD-001',summit,{},'REVIEW');
+eq(assess(summit,{}, {offer_facts:{rule_clause_state:{'BOFA-002':'ABSENT'},coverage_state:{'BOFA-PROD-001':'CONFIRMED_NO_ADDITIONAL_RULES'}}}).evaluation.bonus.action,'CLEAR','reviewed Summit coverage');
+const vx=card('Capital One Venture X'),venture=card('Capital One Venture'),ventureOne=card('Capital One VentureOne'),spark=card('Spark Cash Plus'),capSavor=card('Savor');
+for(const p of [vx,spark])binary('CAP1-001',p,x=>structured('cap1_application_or_approval_lt_6m',x),'YES','NO',...app(1));
+numeric('CAP1-002',vx,x=>structured('cap1_applications_30d',x),2,3,'WAIT');
+check('CAP1-002',spark,structured('cap1_applications_30d',2),'REVIEW');
+gatedBinary('CAP1-002',spark,x=>structured('cap1_applications_30d',x),2,1,...app(3,'WAIT'));
+gatedHistory('CAP1-003',capSavor,'F04_BONUS_RECEIVED_48M','Savor',...bonus(3,'WAIT'));
+check('CAP1-003',spark,{},'ABSENT');
+const vc=['Capital One VentureOne','Capital One Venture','Capital One Venture X'];
+for(let i=0;i<vc.length;i++){
+ const p=[ventureOne,venture,vx][i];
+ history('CAP1-004',p,'F04_BONUS_RECEIVED_48M',vc.slice(i),...bonus(3,'WAIT'));
+ for(const other of vc.slice(0,i))check('CAP1-004',p,{F04_BONUS_RECEIVED_48M:[other]},'CLEAR');
+ eq(assess(p).questionnaire.editable.find(q=>q.id==='F04_BONUS_RECEIVED_48M').options.map(o=>o.value).sort(),vc.slice(i).sort(),'directional questionnaire scope');
+}
+gatedBinary('CAP1-005',spark,x=>({cap1_business_ever_held:x}),'YES','NO',...bonus(2,'RISK'));
+check('CAP1-005',vx,{},'ABSENT');
+check('CAP1-007',vx,{cap1_open_accounts:99},'ABSENT');
+check('CAP1-007',spark,{cap1_open_accounts:99},'REVIEW');
+for(const n of [5,6]){
+ const opts=clause('CAP1-007','PRESENT',{'CAP1-007':n});
+ const q=assess(spark,{},opts).questionnaire.editable.find(q=>q.id==='cap1_open_accounts');
+ eq(q.count_bands.map(b=>b.value),[0,n],'exact offer account cap bands');
+ check('CAP1-007',spark,{cap1_open_accounts:n-1},'CLEAR',[0,0],['CLEAR','CLEAR'],opts);
+ check('CAP1-007',spark,{cap1_open_accounts:n},'TRIGGERED',...app(3,'BLOCK'),opts);
+ check('CAP1-007',spark,{cap1_open_accounts:n+1},'TRIGGERED',...app(3,'BLOCK'),opts);
+ check('CAP1-007',spark,{cap1_open_accounts:undefined},'MISSING',[0,0],['CLEAR','CLEAR'],opts);
+}
+for(const invalid of [undefined,0,-1,1.5,'5']){
+ const r=check('CAP1-007',spark,{cap1_open_accounts:99},'REVIEW',[0,0],['CLEAR','CLEAR'],clause('CAP1-007','PRESENT',{'CAP1-007':invalid}));
+ assert(!r.questionnaire.editable.some(q=>q.id==='cap1_open_accounts'),'unverified cap must not generate user question');
+}
+const wfActive=card('Wells Fargo Active Cash'),wfAuto=card('Wells Fargo Autograph'),wfJourney=card('Wells Fargo Autograph Journey'),wfBiz=card('Signify Business Cash');
+for(const p of [wfActive,wfAuto,wfJourney])binary('WF-001',p,x=>structured('wf_consumer_opened_lt_4m',x),'YES','NO',...app(2));
+check('WF-001',wfBiz,{},'ABSENT');
+for(const [id,p] of [['WF-PROD-001',wfActive],['WF-PROD-002',wfAuto],['WF-PROD-003',wfJourney]]){
+ history(id,p,'F03_HELD_OR_OPENED_48M',[p.product_name],...bonus(2,'RISK'));
+ check(id,p,{F04_BONUS_RECEIVED_48M:[p.product_name]},'CLEAR');
+}
+const choiceNames=['Choice Privileges Mastercard','Choice Privileges Select Mastercard'],oneNames=['One Key Card','One Key+ Card','Hotels.com Card'];
+for(const name of choiceNames){
+ const p=card(name);
+ history('WF-PROD-004',p,'F03_CURRENT_CARD_HISTORY',choiceNames,...app(2));
+ history('WF-PROD-005',p,'F03_OPENED_AND_RECEIVED_BONUS_15M',choiceNames,...bonus(2,'RISK'));
+ check('WF-PROD-005',p,{F03_OPENED_WITHIN_48M:[name],F04_BONUS_RECEIVED_48M:[name]},'CLEAR');
+}
+const one=card(oneNames[0]),onePlus=card(oneNames[1]);
+history('WF-PROD-006',one,'F03_CURRENT_CARD_HISTORY',oneNames,...app(3,'BLOCK'));
+history('WF-PROD-007',onePlus,'F03_CURRENT_CARD_HISTORY',oneNames,...app(2));
+check('WF-PROD-006',onePlus,{},'ABSENT');check('WF-PROD-007',one,{},'ABSENT');
+for(const p of [one,onePlus]){
+ history('WF-PROD-008',p,'F03_OPENED_WITHIN_48M',oneNames,...bonus(2,'RISK'));
+ check('WF-PROD-008',p,{F04_BONUS_RECEIVED_48M:[p.product_name]},'CLEAR');
+}
+const discover=card('Discover it Cash Back');
+numeric('DISC-001',discover,x=>({discover_current_cards:x}),2,3,'BLOCK');
+gatedHistory('DISC-003',discover,'F04_BONUS_RECEIVED_48M',discover.product_name,...bonus(2,'RISK'));
+for(const id of ['CAP1-001','CAP1-002','CAP1-003','CAP1-007'])check(id,discover,{},'ABSENT');
+check('DISC-001',vx,{},'ABSENT');
+const barc=card('Wyndham Earner');
+numeric('BARC-001',barc,x=>({F01_RECENT_NEW_ACCOUNTS:x}),6,2,'RISK');
+check('BARC-002',barc,{},'REVIEW');
+eq(assess(barc,{F03_CARD_HISTORY:['Wyndham Earner Plus']}).evaluation.bonus.action,'UNKNOWN','unverified cross-product history must not create a hard block');
+eq(assess(barc,{}, {offer_facts:{coverage_state:{'BARC-002':'CONFIRMED_NO_ADDITIONAL_RULES'}}}).evaluation.bonus.action,'CLEAR','explicit coverage state');
+const usbGo=card('U.S. Bank Altitude Go Visa Signature'),usbConnect=card('U.S. Bank Altitude Connect Visa Signature'),usbCash=card('U.S. Bank Cash+ Visa Signature'),usbSmart=card('Smartly');
+for(const [field,n] of [['recent_new_accounts_6m',1],['recent_new_accounts_12m',2]])numeric('USB-001',usbGo,x=>({[field]:x}),n,1,'RISK');
+history('USB-PROD-002',usbGo,'F04_BONUS_RECEIVED_60M',[usbGo.product_name],...bonus(3,'WAIT'));
+history('USB-PROD-003',usbConnect,'F04_BONUS_RECEIVED_60M',[usbConnect.product_name],...bonus(3,'WAIT'));
+check('USB-PROD-002',usbGo,{F04_BONUS_RECEIVED_48M:[usbGo.product_name]},'CLEAR');
+history('USB-PROD-004',usbCash,'F03_CARD_HISTORY',['U.S. Bank Cash Rewards Visa'],...bonus(3,'BLOCK'));
+binary('USB-PROD-004',usbCash,x=>({usb_cashplus_upgrade:x}),'YES','NO',...bonus(3,'BLOCK'));
+check('USB-PROD-004',usbCash,{F03_CARD_HISTORY:['Smartly']},'CLEAR');
+check('USB-002',usbSmart,{},'REVIEW');check('USB-002',usbGo,{},'ABSENT');
+const biltNames=['Bilt Blue','Bilt Obsidian','Bilt Palladium'];
+for(const name of biltNames){
+ const p=card(name);
+ history('BILT-001',p,'F03_CARD_HISTORY',biltNames,...bonus(3,'BLOCK'));
+ history('BILT-001',p,'F04_EVER_BONUS_HISTORY',biltNames,...bonus(3,'BLOCK'));
+ check('BILT-001',p,{F03_CARD_HISTORY:['Legacy Wells Fargo Bilt'],F04_EVER_BONUS_HISTORY:['Legacy Wells Fargo Bilt']},'CLEAR');
+ binary('BILT-003',p,x=>({bilt_decline_lt_45d:x}),'YES','NO',...app(3,'WAIT'));
+}
+check('BILT-001',wfActive,{},'ABSENT');
+check('BILT-003',wfActive,{},'ABSENT');
 
 eq([...coverage].sort(),rulebook.rules.map(r=>r.id).sort(),'every executable rule must have independent positive coverage');
 console.log(JSON.stringify({suite:'bank-rules-audit',covered:coverage.size,matrix_cells:cells,fixture_only_products:fixtures.length,...counter,status:'PASS'}));
