@@ -92,7 +92,11 @@ rejects(d=>{d.rulebook.coverage_checks[0].id='BOFA-001';},/INVALID_COVERAGE_CHEC
 rejects(d=>{find(d,'CAP1-007').offer_clause=undefined;},/INVALID_OFFER_THRESHOLD/);
 rejects(d=>{d.approval.activity_facts.push('unknown_fact');},/INVALID_APPROVAL_FACTS/);
 rejects(d=>{d.approval.activity_bands[1].min=0;},/INVALID_APPROVAL_BANDS/);
-rejects(d=>{d.factbook.count_relations[0].shorter='recent_applications_6m';},/INVALID_COUNT_RELATION/);
+rejects(d=>{
+ d.factbook.count_relations[0].shorter='recent_applications_6m';
+ d.messages.count_relation_messages['recent_applications_6m|recent_new_accounts_12m']='test relation label';
+},/INVALID_COUNT_RELATION/);
+rejects(d=>{delete d.messages.count_relation_messages['recent_new_accounts_6m|recent_new_accounts_12m'];},/MISSING_LANGUAGE_KEY/);
 rejects(d=>{d.messages.facts.recent_new_accounts_12m.result_reason='no threshold placeholder';},/INVALID_RESULT_REASON/);
 rejects(d=>{delete d.messages;},/LANGUAGE_PACK_REQUIRED/);
 rejects(d=>{delete d.messages.facts.recent_new_accounts_12m;},/MISSING_FACT_LANGUAGE/);
@@ -116,4 +120,4 @@ for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE|CITI|BOFA|CAP1
 for(const s of [engine,source('adapters/card-identity-v1.js')])assert.doesNotMatch(s,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
 const retired=["adapters/amex-offer-context-v1.js","adapters/amex-questionnaire-v1.js","adapters/card-questionnaire-facade-v1.js","adapters/chase-questionnaire-v1.js","adapters/dynamic-questionnaire-v1.js","engines/amex-decision-v1.js","engines/chase-decision-v1.js","engines/marriott-matrix-v1.js","data/amex-questionnaire-policy.json","data/chase-questionnaire-policy.json","data/dynamic-questionnaire-rule-index.json","data/marriott-eligibility-matrix.json"];
 for(const p of retired){assert.ok(!fs.existsSync(path.join(root,p)),'retired duplicate still exists: '+p);assert.ok(!ui.includes(p),'old source loaded: '+p);}
-console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:28,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));
+console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:29,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));
