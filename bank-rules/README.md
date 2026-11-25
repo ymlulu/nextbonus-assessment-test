@@ -3,7 +3,7 @@
 The active dynamic questionnaire (`dynamic-questionnaire.html`) uses this directory for all ten supported bank / brand families. The old Bank Rules.xlsx (snapshot 2026-09-12) is historical/reference material. Retired 129-row runtime index and issuer-specific policy files have been removed; git history preserves them.
 
 - rules.json: each row has a unique id, exact target, optional offer_clause, executable condition and nonzero effect. Matrix restrictions are ordinary rules, not separate imperative code.
-- facts.json: user-visible fact definitions, answer identity, groups and labels. Bank predicates and base-credit thresholds jointly determine numeric option boundaries; history choices come from relevant predicates.
+- facts.json: typed fact definitions, answer identity and groups. Bank predicates and base-credit thresholds jointly determine numeric option boundaries; history choices come from relevant predicates.
 - products.json: explicit identity-to-canonical-scope overrides and deliberately unlisted target scopes (not selectable products).
 - approval.json: base credit risk model, references to shared fact IDs, and numeric activity bands (no duplicated question definitions).
 
@@ -15,4 +15,6 @@ Source: Bank Rules.xlsx, Rule Database / Rule Applicability / Special Matrix, sn
 
 The current questionnaire editable list includes both common and issuer-specific facts, with a section and base_credit flag; a shared fact is displayed exactly once. Numeric API inputs may be exact nonnegative integers or explicit {min,max} intervals (max:null is unbounded). The UI submits intervals, so a changed threshold splitting a prior interval requires clarification, not a guessed count. Comparable cumulative windows are checked using data-defined count_relations; impossible ranges are flagged and excluded from evaluation, without discarding unrelated restrictions. The base activity input formerly measuring approvals now measures actual new accounts, with the same score bands; six-month application attempts remain distinct. The old a3/a4 category values are not migrated as new-account counts.
 
-Result presentation: the runtime returns one human-readable recommendation and reason list based on evaluated rule evidence. `facts.json` supplies optional `result_reason` wording, not new rule logic. The UI renders the recommendation and reasons; full scores and rule IDs remain in diagnostics.
+Result presentation: the runtime returns one human-readable recommendation and reason list based on evaluated rule evidence. `messages.zh-CN.json` supplies all question/option wording, result_reason templates and other display text, not new rule logic. The UI renders the recommendation and reasons; full scores and rule IDs remain in diagnostics.
+
+- `messages.zh-CN.json`: sole editable Chinese language pack for dynamic questionnaire and results; rule labels and fact text are keyed by stable IDs. Initial HTML/bootstrap fallback strings only cover pre-load/error states. The client requires this asset; language edits cannot override executable predicates or impacts.

@@ -43,41 +43,41 @@ select{min-width:170px;max-width:100%}#amex-offer-settings[hidden],#retry[hidden
 </head>
 <body>
 <main class="wrap">
-  <div class="header"><div><div class="small"><a href="./">Assessment 独立测试站</a> / 动态问卷</div><h1>信用卡申请评估</h1>
-    <p>选好信用卡，回答几个问题，看看哪些申请规则和开卡奖励限制需要注意。已回答的问题可随时修改，红字显示结果变化。</p></div><span class="badge">答案只在本机计算</span></div>
+  <div class="header"><div><div class="small"><a href="./" data-copy="home">Assessment 独立测试站</a><span data-copy="dynamic_suffix"> / 动态问卷</span></div><h1 data-copy="heading">信用卡申请评估</h1>
+    <p data-copy="intro">选好信用卡，回答几个问题，看看哪些申请规则和开卡奖励限制需要注意。已回答的问题可随时修改，红字显示结果变化。</p></div><span class="badge" data-copy="local">答案只在本机计算</span></div>
   <div class="selection-panel">
     <div class="selection-grid">
-      <label for="issuer"><span>银行</span>
-        <select id="issuer" aria-label="选择发行银行" disabled><option value="">正在加载银行…</option></select>
+      <label for="issuer"><span data-copy="bank">银行</span>
+        <select id="issuer" aria-label="选择发行银行" data-copy-aria="bank_aria" disabled><option value="">正在加载银行…</option></select>
       </label>
-      <label for="customer-type"><span>个人卡还是商业卡</span>
-        <select id="customer-type" aria-label="选择个人卡或商业卡" disabled><option value="">请先选择银行</option></select>
+      <label for="customer-type"><span data-copy="customer_type">个人卡还是商业卡</span>
+        <select id="customer-type" aria-label="选择个人卡或商业卡" data-copy-aria="type_aria" disabled><option value="">请先选择银行</option></select>
       </label>
-      <label for="card-select"><span>想申请哪张卡</span>
-        <select id="card-select" aria-label="选择信用卡" disabled><option value="">请先选择卡片类型</option></select>
+      <label for="card-select"><span data-copy="card">想申请哪张卡</span>
+        <select id="card-select" aria-label="选择信用卡" data-copy-aria="card_aria" disabled><option value="">请先选择卡片类型</option></select>
       </label>
     </div>
     <div class="controls selector-actions">
-      <button id="generate" type="button" disabled>重新开始这张卡</button>
-      <button id="reset" class="secondary" type="button">清空答案</button>
-      <button id="retry" class="secondary" type="button" hidden>重新加载</button>
+      <button id="generate" type="button" disabled data-copy="restart">重新开始这张卡</button>
+      <button id="reset" class="secondary" type="button" data-copy="reset">清空答案</button>
+      <button id="retry" class="secondary" type="button" hidden data-copy="retry">重新加载</button>
     </div>
   </div>
   <div id="amex-offer-settings" class="controls" hidden>
-    <label for="offer-variant">申请优惠类型：</label>
-    <select id="offer-variant" aria-label="Amex Offer 类型">
-      <option value="STANDARD">普通公开开卡奖励（默认）</option>
-      <option value="NLL">NLL 特殊开卡奖励</option>
+    <label for="offer-variant" data-copy="offer_type">申请优惠类型：</label>
+    <select id="offer-variant" aria-label="Amex Offer 类型" data-copy-aria="offer_aria">
+      <option value="STANDARD" data-copy="standard">普通公开开卡奖励（默认）</option>
+      <option value="NLL" data-copy="nll">NLL 特殊开卡奖励</option>
     </select>
-    <span class="small">普通优惠按常见开卡奖励条款判断；如果是 NLL，只取消同一张卡的终身奖励限制，其他同系列限制仍可能存在。</span>
+    <span class="small" data-copy="offer_explainer">普通优惠按常见开卡奖励条款判断；如果是 NLL，只取消同一张卡的终身奖励限制，其他同系列限制仍可能存在。</span>
   </div>
   <div class="summary"><strong id="summary">正在读取独立评估数据…</strong>
     <p class="small" id="version"></p><p class="small" id="identity-note"></p></div>
   <div id="questions"></div>
   <div id="assessment-result" aria-live="polite"></div>
-  <div class="notes"><strong>关于这份评估</strong>
-    <p class="muted">这是一份申请前的初步评估。我们会结合你填的信用记录、银行申请记录和持卡历史，提示可能影响获批或开卡奖励的规则。普通优惠的条款目前采用标准假设，NLL 等特殊优惠需要以实际申请链接为准；历史卡片也不一定还开放申请。问卷不计算真实获批概率，也不保证一定拿到奖励。你的回答和评估结果都只在当前设备处理，不会上传。这个独立测试页不会修改 Discover。</p>
-    <details><summary>查看规则编号和匹配详情</summary><p class="small" id="scope"></p><p class="small" id="gaps"></p></details>
+  <div class="notes"><strong data-copy="about">关于这份评估</strong>
+    <p class="muted" data-copy="about_text">这是一份申请前的初步评估。我们会结合你填的信用记录、银行申请记录和持卡历史，提示可能影响获批或开卡奖励的规则。普通优惠的条款目前采用标准假设，NLL 等特殊优惠需要以实际申请链接为准；历史卡片也不一定还开放申请。问卷不计算真实获批概率，也不保证一定拿到奖励。你的回答和评估结果都只在当前设备处理，不会上传。这个独立测试页不会修改 Discover。</p>
+    <details><summary data-copy="debug">查看规则编号和匹配详情</summary><p class="small" id="scope"></p><p class="small" id="gaps"></p></details>
   </div>
 </main>
 <script src="adapters/card-identity-v1.js"></script>

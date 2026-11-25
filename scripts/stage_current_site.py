@@ -12,7 +12,7 @@ FILES = [
     "data/card-identity-index.json", "data/amex-formal-product-identities.json",
     "data/offer-history.json", "data/offer-timing.json",
     "bank-rules/rules.json", "bank-rules/facts.json", "bank-rules/products.json",
-    "bank-rules/approval.json",
+    "bank-rules/approval.json", "bank-rules/messages.zh-CN.json",
 ]
 def main():
     parser = argparse.ArgumentParser()

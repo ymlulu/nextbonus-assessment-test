@@ -44,7 +44,39 @@ const nonempty=x=>typeof x==='string'&&x.trim().length>0;
 const uniqueStrings=x=>Array.isArray(x)&&x.length>0&&x.every(nonempty)&&new Set(x).size===x.length;
 const allowedKeys=(obj,keys)=>isObject(obj)&&Object.keys(obj).every(k=>keys.includes(k));
 const TARGET_FIELDS=['issuer','approval_issuer','product_type','customer_type','card_form','product_name','product_lineage','product_id','brand','generation'];
-function validate({rulebook,factbook,products,approval}){
+const format=(s,vars={})=>s.replace(/\{([a-zA-Z_]+)\}/g,(m,k)=>own(vars,k)?String(vars[k]):m);
+const scopeKey=t=>JSON.stringify(Object.fromEntries(Object.keys(t).sort().map(k=>[k,Array.isArray(t[k])?[...t[k]].sort():t[k]])));
+function localizedData({rulebook,factbook,products,approval,messages}){
+ if(!isObject(messages)||messages.schema_version!==1||!nonempty(messages.locale)||!isObject(messages.facts)||
+ !isObject(messages.engine)||!isObject(messages.decision)||!isObject(messages.ui)||!isObject(messages.units))
+  throw Error('LANGUAGE_PACK_REQUIRED');
+ const copy=messages.engine;
+ const requireText=(s,key)=>{if(!nonempty(s))throw Error('MISSING_LANGUAGE_KEY '+key);return s;};
+ const defs=Object.fromEntries(Object.entries(factbook.facts).map(([id,f])=>{
+  const c=messages.facts[id];
+  if(!isObject(c))throw Error('MISSING_FACT_LANGUAGE '+id);
+  const allowed=['title','description','group_title','evidence_prefix','evidence_suffix','result_reason'];
+  const display=Object.fromEntries(allowed.filter(k=>own(c,k)).map(k=>[k,c[k]]));
+  requireText(display.title,id+'.title');
+  if(f.group)requireText(display.group_title,id+'.group_title');
+  const def={...f,...display};
+  if(f.count_unit)def.count_unit=requireText(messages.units[f.count_unit],f.count_unit);
+  if(f.options)def.options=f.options.map(o=>({...o,label:requireText(c.options?.[o.value],id+'.'+o.value)}));
+  if(f.options_by_value)def.options_by_value=Object.fromEntries(Object.entries(f.options_by_value).map(([v,o])=>{
+   const l=c.options_by_value?.[v];
+   return [v,{...o,label:requireText(l?.label,id+'.'+v),...(l?.labels_by_issuer?{labels_by_issuer:l.labels_by_issuer}:{})}];
+  }));
+  return [id,def];
+ }));
+ const rules=rulebook.rules.map(r=>({...r,label:messages.rule_labels?.[r.id]||r.id,
+  ...(r.review?{review:{...r.review,label:messages.review_labels?.[r.id]||copy.event_review}}:{}),
+  ...(r.overrides?{overrides:r.overrides.map(o=>({...o,...(messages.override_labels?.[r.id]?.[scopeKey(o.target)]?
+    {label:messages.override_labels[r.id][scopeKey(o.target)]}:{})}))}:{})}));
+ const checks=(rulebook.coverage_checks||[]).map(c=>({...c,label:messages.coverage_labels?.[c.id]||copy.event_review}));
+ const relations=(factbook.count_relations||[]).map(r=>({...r,message:requireText(messages.count_relation_messages?.[r.shorter+'|'+r.longer],r.shorter+'|'+r.longer)}));
+ return {rulebook:{...rulebook,rules,coverage_checks:checks},factbook:{...factbook,facts:defs,labels:messages.history_labels||{},count_relations:relations},products,approval,messages};
+}
+function validateResolved({rulebook,factbook,products,approval}){
  if(!nonempty(rulebook?.version)||!uniqueStrings(rulebook.supported_issuers)||!Array.isArray(rulebook.rules)||!isObject(factbook?.facts)||
     !isObject(products?.overrides)||!isObject(approval?.base_matrix)||!Array.isArray(approval.activity_facts)||!Array.isArray(approval.activity_bands))
   throw Error('BANK_RULES_DATA_REQUIRED');
@@ -204,13 +236,18 @@ function validate({rulebook,factbook,products,approval}){
  for(const p of products.unlisted_targets||[])scope(p,'unlisted_targets',{requireIssuer:true,allowArrays:false});
  return true;
 }
-function countBands(cuts,unit='张'){
+function countBands(cuts,unit,messages){
+ if(!messages?.units||!messages?.engine)throw Error('LANGUAGE_PACK_REQUIRED');
+ unit=unit||messages.units.CARD;
+ const copy=messages.engine;
  const starts=uniq([0,...cuts]).filter(validCount).sort((a,b)=>a-b);
- return starts.map((v,i)=>({value:v,label:i===starts.length-1?v+' '+unit+'或更多':
-   starts[i+1]===v+1?v+' '+unit:v+'–'+(starts[i+1]-1)+' '+unit}));
+ return starts.map((v,i)=>({value:v,label:format(i===starts.length-1?copy.count_open:starts[i+1]===v+1?copy.count_exact:copy.count_range,{min:v,max:starts[i+1]-1,unit})}));
 }
-function createRuntime({rulebook,factbook,products,approval}){
- validate({rulebook,factbook,products,approval});
+function validate(data){return validateResolved(localizedData(data));}
+function createRuntime(data){
+ const {rulebook,factbook,products,approval,messages}=localizedData(data);
+ validateResolved({rulebook,factbook,products,approval});
+ const copy=messages.engine;
  const defs=factbook.facts, rules=rulebook.rules;
  const baseIds=[approval.age_fact,approval.score_fact,...approval.activity_facts],baseSet=new Set(baseIds);
  const supported=new Set(rulebook.supported_issuers);
@@ -224,7 +261,8 @@ function createRuntime({rulebook,factbook,products,approval}){
  function option(id,f,v,p,legacy=[]){
   const extra=f.options_by_value?.[v]||{};
   const label=extra.labels_by_issuer?.[p.issuer]||extra.label||factbook.labels?.[v]||v;
-  return {value:v,label:legacy.includes(v)&&!label.includes('旧版本')&&!label.includes('以前的版本')?label+'（包括以前的版本）':label,
+  const legacyLabel=legacy.includes(v)&&!messages.legacy_label_keys?.includes(v)?label+copy.legacy_suffix:label;
+  return {value:v,label:legacyLabel,
    ...(extra.prior_id?{prior_id:extra.prior_id}:{})};
  }
  function baseRisk(a,issuer){
@@ -275,10 +313,12 @@ function createRuntime({rulebook,factbook,products,approval}){
     if(['gt','lte','eq'].includes(node.op))e.cuts.add(t+1);
    }else if(f.type==='multi'){
     const legacy=resolved(node.legacy||[],p);
+    const legacySeen=e.legacySeen||(e.legacySeen=new Set());
     for(const value of values){
      const o=option(id,f,value,p,legacy);
      const old=e.options.get(value);
-     e.options.set(value,{...o,label:old?.label?.includes('以前的版本')||old?.label?.includes('旧版本')?old.label:o.label,rule_ids:uniq([...(old?.rule_ids||[]),r.id])});
+     e.options.set(value,{...o,label:old&&legacySeen.has(value)?old.label:o.label,rule_ids:uniq([...(old?.rule_ids||[]),r.id])});
+     if(legacy.includes(value)||messages.legacy_label_keys?.includes(value))legacySeen.add(value);
     }
    }else if(f.type==='grouped_multi'){
     const history=defs[f.history_id];
@@ -298,19 +338,19 @@ function createRuntime({rulebook,factbook,products,approval}){
   }
   function readableEvidence(node,f,threshold,raw,value){
    if(f.type==='number'){
-    const count=({gte:'至少',gt:'超过',lt:'不到',lte:'不超过',eq:'正好'}[node.op]||'')+threshold;
+    const count=({gte:copy.at_least,gt:copy.greater_than,lt:copy.less_than,lte:copy.at_most,eq:copy.exactly}[node.op]||'')+threshold;
     return typeof f.result_reason==='string'?f.result_reason.replace('{count}',count):
-      f.title.replace(/[？?]/g,'')+'：'+count+(f.count_unit||'张');
+      f.title.replace(/[？?]/g,'')+'：'+count+(f.count_unit||messages.units.CARD);
    }
    if(f.type==='multi'){
     const name=option(node.fact,f,value,p).label;
     return typeof f.result_reason==='string'?f.result_reason.replace('{card}',name):
-      '你'+(f.evidence_prefix||'选择了')+name+(f.evidence_suffix||'');
+      copy.you+(f.evidence_prefix||copy.selected)+name+(f.evidence_suffix||'');
    }
    if(f.type==='grouped_multi'){
     const h=defs[f.history_id],v=Object.keys(h.options_by_value).find(k=>h.options_by_value[k].prior_id===node.prior);
     const name=option(f.history_id,h,v,p).label;
-    return f.result_reason?.[raw]?.replace('{card}',name)||name+'：'+f.title.replace(/[？?]/g,'')+'（'+(raw==='YES'?'是':'否')+'）';
+    return f.result_reason?.[raw]?.replace('{card}',name)||name+'：'+f.title.replace(/[？?]/g,'')+'（'+(raw==='YES'?copy.yes:copy.no)+'）';
    }
    return f.result_reason?.[raw]||f.title.replace(/[？?]/g,'')+'：'+(f.options.find(o=>o.value===raw)?.label||raw);
   }
@@ -327,19 +367,19 @@ function createRuntime({rulebook,factbook,products,approval}){
     hits=values.filter(v=>chosen.includes(v)||aliasValues.includes(v));
     state=hits.length?true:knownList(raw)?false:null;
     qid=record(node,r,values,threshold,raw);
-    reason=hits.map(v=>(f.evidence_prefix||'已选择 ')+v+(f.evidence_suffix||'')).join('、');
+    reason=hits.map(v=>(f.evidence_prefix||copy.evidence_selected)+v+(f.evidence_suffix||'')).join('、');
    }else{
     qid=record(node,r,values,threshold,raw);
     const valid=f.type==='number'?countPredicate(raw,node.op,threshold)!==null:f.type==='grouped_multi'?['YES','NO'].includes(raw):f.options?.some(o=>o.value===raw)&&!empty(raw);
     if(valid){
      state=f.type==='number'?countPredicate(raw,node.op,threshold):raw===threshold;
      if(f.type==='number'){
-      const comparator={gte:'达到 ',gt:'超过 ',lt:'少于 ',lte:'不超过 ',eq:'等于 '}[node.op];
-      reason=f.title+' '+(state?comparator:node.op==='gte'?'少于 ':node.op==='gt'?'不超过 ':node.op==='lt'?'达到 ':node.op==='lte'?'超过 ':'不等于 ')+threshold+' '+(f.count_unit||'张');
-     }else reason=f.title.replace(/[？?]$/,'')+'：'+(f.type==='grouped_multi'?(raw==='YES'?'是':'否'):(f.options.find(o=>o.value===raw)?.label||raw));
+      const comparator={gte:copy.debug_at_least,gt:copy.debug_greater_than,lt:copy.debug_less_than,lte:copy.debug_at_most,eq:copy.debug_equals}[node.op];
+      reason=f.title+' '+(state?comparator:node.op==='gte'?copy.debug_less_than:node.op==='gt'?copy.debug_at_most:node.op==='lt'?copy.debug_at_least:node.op==='lte'?copy.debug_greater_than:copy.debug_not_equals)+threshold+' '+(f.count_unit||messages.units.CARD);
+     }else reason=f.title.replace(/[？?]$/,'')+'：'+(f.type==='grouped_multi'?(raw==='YES'?copy.yes:copy.no):(f.options.find(o=>o.value===raw)?.label||raw));
     }
    }
-   const evidence=state===true?(node.op==='includes_any'?hits.map(value=>({question_id:qid,value,reason:(f.evidence_prefix||'已选择 ')+value+(f.evidence_suffix||''),display_reason:readableEvidence(node,f,threshold,raw,value)})):
+   const evidence=state===true?(node.op==='includes_any'?hits.map(value=>({question_id:qid,value,reason:(f.evidence_prefix||copy.evidence_selected)+value+(f.evidence_suffix||''),display_reason:readableEvidence(node,f,threshold,raw,value)})):
     [{question_id:qid,...(f.type==='grouped_multi'?{value:node.prior}:f.group?{field:node.fact}:{}),reason,display_reason:readableEvidence(node,f,threshold,raw)}]):[];
    return {state,hits:evidence,actions:state===true&&node.action?[node.action]:[],reason,pending:state===null};
   }
@@ -379,23 +419,23 @@ function createRuntime({rulebook,factbook,products,approval}){
     ...(e.product_gate?{product_eligibility:true}:{}),...(bonus===3?{hard_bonus_eligibility:true}:{}),
     ...(x.hits?.length?{trigger_sources:x.hits}:{}),
     ...(fired&&x.pending?{pending_facts:true}:{}),
-    reason:reason|| (fired?(x.hits.map(h=>h.reason).filter(Boolean).join('；')||label):status==='MISSING'?'还需要补充相关信息':status==='REVIEW'?'相关条款或事实需要核实':'未触发限制')};
+    reason:reason|| (fired?(x.hits.map(h=>h.reason).filter(Boolean).join('；')||label):status==='MISSING'?copy.event_missing:status==='REVIEW'?copy.event_review:copy.event_clear)};
   }
   const needsOfferLimit=node=>node?.value_from==='offer_limit'||(node?.any||node?.all||[]).some(needsOfferLimit);
   for(const sourceRule of rules){
    const scope=targetState(sourceRule.target,p);
    if(scope===false)continue;
    const r=effectFor(sourceRule),{effect:e,label}=r;
-   if(scope===null){unresolved.push({rule_id:r.id,stage:'TARGET'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'卡片资料需要核实'));continue;}
+   if(scope===null){unresolved.push({rule_id:r.id,stage:'TARGET'});events.push(makeEvent(r,'REVIEW',e,label,undefined,copy.target_unknown));continue;}
    if(r.offer_clause){
     const explicitState=offer_rule_overrides[r.offer_clause];
     const state=explicitState??(offer_facts===undefined?r.offer_scenarios?.[offer_variant]:offer_facts?.rule_clause_state?.[r.offer_clause]);
     if(explicitState!==undefined)explicit.push(r.offer_clause);
     else if(offer_facts===undefined&&state)assumed.push(r.offer_clause);
     if(state==='ABSENT')continue;
-    if(state!=='PRESENT'){gated.push({rule_id:r.id,stage:'SYSTEM_GATE'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'本次 Offer 条款需要核实'));continue;}
+    if(state!=='PRESENT'){gated.push({rule_id:r.id,stage:'SYSTEM_GATE'});events.push(makeEvent(r,'REVIEW',e,label,undefined,copy.offer_unknown));continue;}
     if([r.condition,r.when,r.review?.condition].some(needsOfferLimit)&&(!validCount(offer_facts?.rule_limits?.[r.offer_clause])||offer_facts.rule_limits[r.offer_clause]<1||offer_facts.rule_limits[r.offer_clause]>=Number.MAX_SAFE_INTEGER)){
-     gated.push({rule_id:r.id,stage:'OFFER_LIMIT'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'具体申请条款的账户数门槛尚未核实'));continue;
+     gated.push({rule_id:r.id,stage:'OFFER_LIMIT'});events.push(makeEvent(r,'REVIEW',e,label,undefined,copy.offer_cap_unknown));continue;
     }
    }
    active.push(r.id);
@@ -423,8 +463,8 @@ function createRuntime({rulebook,factbook,products,approval}){
   function form(e){
    const out={id:e.id,type:e.type,title:e.title,section:e.base_credit?'common':'specific',base_credit:!!e.base_credit,rule_ids:[...e.rules],...(e.description?{description:e.description}:{})};
    if(e.type==='structured')out.fields=[...e.fields.values()].map(f=>({id:f.id,type:f.type,label:f.label,rule_ids:[...f.rules],
-    ...(f.type==='number'?{count_bands:countBands([...f.cuts],f.count_unit)}:{options:[...f.options.values()]})}));
-   else if(e.type==='number')out.count_bands=countBands([...e.cuts],e.count_unit);
+    ...(f.type==='number'?{count_bands:countBands([...f.cuts],f.count_unit,messages)}:{options:[...f.options.values()]})}));
+   else if(e.type==='number')out.count_bands=countBands([...e.cuts],e.count_unit,messages);
    else {
     out.options=[...e.options.values()];
     if(e.type==='multi'||e.type==='marriott_multi')out.allow_none=true;
@@ -457,30 +497,30 @@ function createRuntime({rulebook,factbook,products,approval}){
    bonusAction==='UNKNOWN'?'NEEDS_REVIEW':'NO_TRIGGER_FOUND';
   const appReasons=triggered(app).filter(x=>x.application_impact===applicationImpact).map(x=>x.label);
   const bonusReasons=triggered(bonus).filter(x=>x.bonus_impact===bonusImpact||x.product_eligibility).map(x=>x.label);
-  const messageApp=appStatus==='PRODUCT_INELIGIBLE'?'按参考条款，你不符合这张卡的申请条件'+(appAction==='WAIT'?'，需等待限制解除':'')+'：'+appReasons.join('、'):
-   appStatus==='APPLICATION_INELIGIBLE'?'不符合申请条件：'+appReasons.join('、'):
-   appStatus==='WAIT'?'建议等待申请限制解除：'+appReasons.join('、'):
-   appStatus==='ELEVATED_RISK'?'发现可能影响申请的情况：'+appReasons.join('、'):
-   appStatus==='INSUFFICIENT_DATA'?'还有信用情况或申请信息需要确认':'目前未发现申请限制；实际获批以银行为准';
-  const messageBonus=bonusStatus==='PRODUCT_INELIGIBLE'?'按参考条款，你不符合这次开卡奖励条件'+(bonusAction==='WAIT'?'，需等待限制解除':'')+'：'+bonusReasons.join('、'):
-   bonusStatus==='BONUS_INELIGIBLE'?'按参考条款，你不符合这次开卡奖励条件'+(bonusAction==='WAIT'?'，需等待限制解除':'')+'：'+bonusReasons.join('、'):
-   bonusStatus==='LIKELY_RESTRICTED'?'按参考条款，你这次可能拿不到开卡奖励：'+bonusReasons.join('、'):
-   bonusStatus==='NEEDS_REVIEW'?'还有持卡历史或奖励条款需要确认':'目前未发现开卡奖励限制，最终以银行为准';
+  const messageApp=appStatus==='PRODUCT_INELIGIBLE'?copy.app_product_ineligible+(appAction==='WAIT'?copy.wait_suffix:'')+'：'+appReasons.join('、'):
+   appStatus==='APPLICATION_INELIGIBLE'?copy.app_block+appReasons.join('、'):
+   appStatus==='WAIT'?copy.app_wait+appReasons.join('、'):
+   appStatus==='ELEVATED_RISK'?copy.app_risk+appReasons.join('、'):
+   appStatus==='INSUFFICIENT_DATA'?copy.app_incomplete:copy.app_clear;
+  const messageBonus=bonusStatus==='PRODUCT_INELIGIBLE'?copy.bonus_block+(bonusAction==='WAIT'?copy.wait_suffix:'')+'：'+bonusReasons.join('、'):
+   bonusStatus==='BONUS_INELIGIBLE'?copy.bonus_block+(bonusAction==='WAIT'?copy.wait_suffix:'')+'：'+bonusReasons.join('、'):
+   bonusStatus==='LIKELY_RESTRICTED'?copy.bonus_risk+bonusReasons.join('、'):
+   bonusStatus==='NEEDS_REVIEW'?copy.bonus_incomplete:copy.bonus_clear;
   function result(xs,dim,status,impact,action,message){
    return {status,impact,action,message,complete:gaps(xs).length===0,triggered_rules:triggered(xs).map(x=>x.rule_id),
     missing_rules:xs.filter(x=>x.status==='MISSING'||x.pending_facts).map(x=>x.rule_id),
-    unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.pending_facts?'MISSING':x.status,reason:x.pending_facts?'已发现限制，但还有相关条件需要确认':x.reason}))};
+    unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.pending_facts?'MISSING':x.status,reason:x.pending_facts?copy.trigger_with_pending:x.reason}))};
   }
   const application={...result(app,'application',appStatus,applicationImpact,appAction,messageApp),base_risk:base.rating,activity:base.activity,
    base_completed:base.rating!=='INSUFFICIENT_DATA',issuer_rules_completed:!gaps(app).length,complete:base.rating!=='INSUFFICIENT_DATA'&&!gaps(app).length,product_blocking_rules:blockIds};
   const bonusResult={...result(bonus,'bonus',bonusStatus,bonusImpact,bonusAction,messageBonus),product_blocking_rules:blockIds};
   // Overall advice consumes the two aggregated dimensions, never evaluates bank facts again.
   const actions=[application.action,bonusResult.action];
-  const decision=actions.includes('BLOCK')?{code:'BLOCK',label:'现在不建议申请',summary:'先解决下面的问题，再考虑这张卡。'}:
-   actions.includes('WAIT')?{code:'WAIT',label:'建议等一等再申请',summary:'等相关限制解除后再申请。'}:
-   !application.complete||!bonusResult.complete?{code:'REVIEW',label:'建议先确认，再申请',summary:'目前还不能确定是否适合申请。'}:
-   actions.includes('RISK')||application.base_risk==='HIGH_RISK'?{code:'RISK',label:'可以考虑申请，但有风险',summary:'申请前请留意下面的情况。'}:
-   {code:'CLEAR',label:'现在可以考虑申请',summary:'根据你填写的信息，暂未发现明显的申请或开卡奖励限制。'};
+  const code=actions.includes('BLOCK')?'BLOCK':
+   actions.includes('WAIT')?'WAIT':
+   !application.complete||!bonusResult.complete?'REVIEW':
+   actions.includes('RISK')||application.base_risk==='HIGH_RISK'?'RISK':'CLEAR';
+  const decision={code,label:messages.decision[code].label,summary:messages.decision[code].summary};
   // Explanations consume already-evaluated rule events, not another set of bank rules.
   // Preserve rule IDs for audit, deduplicate overlapping facts in the user-facing summary.
   const reasons=[];
@@ -497,13 +537,12 @@ function createRuntime({rulebook,factbook,products,approval}){
    if(!causes.length)causes.push(event.label);
    if(event.product_eligibility){
     const action=event.application_action;
-    addReason(action,causes,action==='WAIT'?'目前不符合这张卡的申请条件，需要等限制解除':'目前不符合这张卡的申请条件，因而也无法通过新卡申请拿到奖励',[event.rule_id]);
+    addReason(action,causes,action==='WAIT'?copy.product_wait:copy.product_block,[event.rule_id]);
    }else{
     for(const [dim,action] of [['application',event.application_action],['bonus',event.bonus_action]]){
      if(action==='CLEAR')continue;
      const consequence=dim==='application'?
-      ({BLOCK:'目前不符合申请条件',WAIT:'触发了申请限制，建议等限制解除',RISK:'可能影响获批'})[action]:
-      ({BLOCK:'按参考条款，这次拿不到开卡奖励',WAIT:'目前不符合开卡奖励条件，需要等限制期结束',RISK:'这次可能拿不到开卡奖励'})[action];
+      messages.consequences.application[action]:messages.consequences.bonus[action];
      if(consequence)addReason(action,causes,consequence,[event.rule_id]);
     }
    }
@@ -511,12 +550,12 @@ function createRuntime({rulebook,factbook,products,approval}){
   if(base.rating==='HIGH_RISK'){
    const age=defs[approval.age_fact].options.find(o=>o.value===factValue(approval.age_fact,{},a))?.label;
    const score=defs[approval.score_fact].options.find(o=>o.value===factValue(approval.score_fact,{},a))?.label;
-   if(base.original_rating==='HIGH_RISK')addReason('RISK',['你的美国信用卡历史：'+age+'；信用分：'+score],'按当前信用评估模型，获批把握偏低');
-   else if(base.adjustment)addReason('RISK',['你近期申请或新开的信用卡较多'],'按当前信用评估模型，获批把握偏低');
+   if(base.original_rating==='HIGH_RISK')addReason('RISK',[copy.base_age_prefix+age+copy.base_score_prefix+score],copy.base_risk_consequence);
+   else if(base.adjustment)addReason('RISK',[copy.base_activity_risk],copy.base_risk_consequence);
   }
   if(decision.code==='REVIEW'){
-   if(!application.base_completed||pending.length)addReason('REVIEW',['还有信用情况或持卡记录的问题需要回答'],'请先补齐这些答案');
-   if(gated.length||unresolved.length||events.some(x=>x.status==='REVIEW'))addReason('REVIEW',['这张卡的部分申请条件或开卡奖励条款还需要核实'],'请以当前申请页面的条款为准');
+   if(!application.base_completed||pending.length)addReason('REVIEW',[copy.missing_user_facts],copy.complete_answers);
+   if(gated.length||unresolved.length||events.some(x=>x.status==='REVIEW'))addReason('REVIEW',[copy.missing_offer_terms],copy.check_offer_terms);
   }
   // If a broader overlapping rule already explains the same facts, suppress
   // the duplicate subset, but keep its source IDs in the broader explanation.
@@ -525,13 +564,13 @@ function createRuntime({rulebook,factbook,products,approval}){
    if(broader){broader.rule_ids=uniq([...broader.rule_ids,...x.rule_ids]);reasons.splice(i,1);}
   }
   decision.reasons=reasons.sort((a,b)=>(severity[a.kind]??9)-(severity[b.kind]??9)).map(({kind,text,rule_ids})=>({kind,text,rule_ids}));
-  decision.note='按参考规则和你填写的信息判断，不保证银行获批或发放奖励。';
+  decision.note=copy.decision_note;
   const matrixEvents=events.filter(x=>rules.find(r=>r.id===x.rule_id)?.when?.fact&&defs[rules.find(r=>r.id===x.rule_id).when.fact]?.details_id);
   return {questionnaire:{common:pending.filter(q=>q.section==='common'),specific:pending.filter(q=>q.section==='specific'),editable:questions,benefits:null},
    diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved,answer_conflicts:[]},
    evaluation:{issuer:p.issuer,product_id:p.product_id,offer_variant,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS',
     application,bonus:bonusResult,decision,
-    rule_results:events,answers_transmitted:false,caveat:'确定性规则模型，不代表银行实际审批结果；答案仅在本机计算。'},
+    rule_results:events,answers_transmitted:false,caveat:copy.caveat},
    marriott_matrix:matrixEvents.length?{status:triggered(matrixEvents).length?'TRIGGERED':gaps(matrixEvents).length?'MISSING':'CLEAR'}:null,
    offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
  }

@@ -3,7 +3,8 @@ const {createRuntime,countBands}=require('../engines/bank-rules-runtime.js');
 const root=path.resolve(__dirname,'..');
 const read=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
 const rulebook=read('bank-rules/rules.json'),factbook=read('bank-rules/facts.json'),products=read('bank-rules/products.json'),approval=read('bank-rules/approval.json'),ids=read('data/card-identity-index.json');
-const runtime=(book=rulebook)=>createRuntime({rulebook:book,factbook,products,approval});
+const messages=read('bank-rules/messages.zh-CN.json');
+const runtime=(book=rulebook)=>createRuntime({rulebook:book,factbook,products,approval,messages});
 const byId=id=>ids.products.find(p=>p.product_id===id);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,
  F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
@@ -114,7 +115,7 @@ assert.equal(ask(altered,csp,answers).evaluation.application.impact,2);
 assert.equal(ask(altered,csp,answers).evaluation.bonus.impact,2);
 book.rules.at(-1).effect={application:0,bonus:0};assert.throws(()=>runtime(book),/NONZERO/);
 book=structuredClone(rulebook);book.rules.push({...book.rules[0]});assert.throws(()=>runtime(book),/DUPLICATE/);
-assert.deepEqual(countBands([2,5]).map(x=>x.value),[0,2,5]);
+assert.deepEqual(countBands([2,5],undefined,messages).map(x=>x.value),[0,2,5]);
 
 const smart='history_ot_u_s_bank_058',bofa='history_ot_bankofamerica_024';
 const shared=ask(rt,smart,{});

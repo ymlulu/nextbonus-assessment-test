@@ -1,0 +1,821 @@
+{
+  "locale": "zh-CN",
+  "schema_version": 1,
+  "facts": {
+    "F01_RECENT_NEW_ACCOUNTS": {
+      "title": "过去 24 个月，你本人作为主卡人新开了几张信用卡？",
+      "description": "不计仅作为副卡人或未上报个人信用报告的账户。",
+      "result_reason": "过去24个月，你本人新开并上报个人信用报告的信用卡账户有{count}张"
+    },
+    "F06_REPORTED_NEW_ACCOUNTS": {
+      "title": "包括副卡在内，过去 24 个月信用报告上新增了多少张信用卡账户？",
+      "result_reason": "过去24个月，你的信用报告上新增了{count}张信用卡账户（含副卡）"
+    },
+    "approved_chase_30d": {
+      "title": "过去 30 天，你获批了几张 Chase 信用卡？",
+      "group_title": "最近 30 天，你在 Chase 的获批情况",
+      "result_reason": "过去30天，你已获批{count}张 Chase 信用卡"
+    },
+    "approved_chase_business_30d": {
+      "title": "过去 30 天，你有 Chase 商业信用卡获批吗？",
+      "group_title": "最近 30 天，你在 Chase 的获批情况",
+      "result_reason": {
+        "YES": "过去30天，你已经获批过 Chase 商业信用卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "approved_revolving_90d": {
+      "title": "过去 90 天，你获批过几张 Amex 普通信用卡？",
+      "group_title": "你最近申请 Amex 的情况",
+      "result_reason": "过去90天，你已获批{count}张 Amex 普通信用卡"
+    },
+    "same_product_applied_or_approved_90d": {
+      "title": "过去 90 天，你申请过现在选中的这张卡吗？（无论是否获批）",
+      "group_title": "你最近申请 Amex 的情况",
+      "result_reason": {
+        "YES": "过去90天，你已经申请过这张 Amex 卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "amex_revolving_count": {
+      "title": "你现在有几张 Amex 普通信用卡？（个人卡、商业卡都算）",
+      "description": "只算主卡，不算副卡。",
+      "result_reason": "你目前持有{count}张 Amex 普通信用卡"
+    },
+    "amex_charge_count": {
+      "title": "你现在有几张 Amex Platinum、Gold 这类签账卡？",
+      "description": "只算主卡，不算副卡。",
+      "result_reason": "你目前持有{count}张 Amex 签账卡"
+    },
+    "F03_CARD_HISTORY": {
+      "title": "下面这些卡，你现在有或者以前办过哪些？",
+      "description": "以前办过、后来关掉的也算；即使当时没拿到开卡奖励，也请选上。",
+      "evidence_prefix": "以前办过 ",
+      "result_reason": "你以前办过{card}"
+    },
+    "F03_CURRENT_CARD_HISTORY": {
+      "title": "下面这些卡，你现在还持有哪些？",
+      "description": "只选现在还没有关掉的卡。",
+      "evidence_prefix": "目前持有 ",
+      "result_reason": "你目前还持有{card}"
+    },
+    "F04_BONUS_HISTORY": {
+      "title": "过去 24 个月，你拿到过下面哪些卡的新卡开卡奖励？",
+      "description": "以实际收到奖励的日期为准。",
+      "evidence_prefix": "过去 24 个月拿过 ",
+      "evidence_suffix": " 的开卡奖励",
+      "result_reason": "过去24个月，你拿过{card}的开卡奖励"
+    },
+    "F04_EVER_BONUS_HISTORY": {
+      "title": "你以前拿过下面哪些卡的新卡开卡奖励？",
+      "description": "不管是几年前拿到的，都请选上。",
+      "evidence_prefix": "以前拿过 ",
+      "evidence_suffix": " 的开卡奖励",
+      "result_reason": "你以前拿过{card}的开卡奖励"
+    },
+    "schwab_relationship": {
+      "title": "你有符合要求的 Schwab 账户吗？",
+      "result_reason": {
+        "NO": "你没有符合要求的 Schwab 账户"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "morgan_stanley_relationship": {
+      "title": "你有符合要求的 Morgan Stanley 或 E*TRADE 账户吗？",
+      "result_reason": {
+        "NO": "你没有符合要求的 Morgan Stanley 或 E*TRADE 账户"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "F07_MARRIOTT_HISTORY": {
+      "title": "下面这些 Marriott / Ritz-Carlton 卡，你办过哪些？",
+      "description": "包括已经关掉的卡。",
+      "evidence_prefix": "办过 ",
+      "result_reason": "你以前办过{card}",
+      "options_by_value": {
+        "Chase Marriott Bonvoy Bold / Boundless": {
+          "label": "Chase Marriott Bold / Boundless",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Bold / Boundless / Marriott Premier / Rewards Premier / Premier Plus"
+          }
+        },
+        "Chase Marriott Bonvoy Bountiful": {
+          "label": "Chase Marriott Bountiful",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Bountiful"
+          }
+        },
+        "Chase Ritz-Carlton": {
+          "label": "Chase Ritz-Carlton",
+          "labels_by_issuer": {
+            "CHASE": "Chase Ritz-Carlton"
+          }
+        },
+        "Chase Marriott Business（历史卡）": {
+          "label": "Chase Marriott Business（历史卡）",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Business (discontinued)"
+          }
+        },
+        "AMEX Marriott / Legacy SPG Personal": {
+          "label": "AMEX Marriott Bonvoy / legacy SPG personal",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Bonvoy / 旧版 SPG Personal"
+          }
+        },
+        "AMEX Marriott Bonvoy Business / Legacy SPG Business": {
+          "label": "Amex Marriott Business / 旧版 SPG Business",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Business / 旧版 SPG Business"
+          }
+        },
+        "AMEX Marriott Bonvoy Bevy": {
+          "label": "Amex Marriott Bevy",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Bevy"
+          }
+        },
+        "AMEX Marriott Bonvoy Brilliant": {
+          "label": "Amex Marriott Brilliant / 旧版 SPG Luxury",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Brilliant / 旧版 SPG Luxury"
+          }
+        }
+      }
+    },
+    "held_now": {
+      "title": "下面这些卡，你现在还持有哪些？",
+      "result_reason": {
+        "YES": "你目前还持有{card}",
+        "NO": "你已不再持有{card}"
+      }
+    },
+    "closed_within_30d": {
+      "title": "下面这些已关卡或转卡的卡，过去 30 天内你还持有过哪些？",
+      "result_reason": {
+        "YES": "你在过去30天内仍持有过{card}"
+      }
+    },
+    "approved_within_90d": {
+      "title": "过去 90 天内，你申请并获批过下面哪些卡？",
+      "result_reason": {
+        "YES": "过去90天，你申请并获批过{card}"
+      }
+    },
+    "new_card_bonus_within_24m": {
+      "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励？（不包括升级奖励）",
+      "result_reason": {
+        "YES": "过去24个月，你拿过{card}的开卡奖励"
+      }
+    },
+    "bonus_or_upgrade_within_24m": {
+      "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励或升级奖励？",
+      "result_reason": {
+        "YES": "过去24个月，你拿过{card}的开卡奖励或升级奖励"
+      }
+    },
+    "citi_personal_application_lt_8d": {
+      "title": "过去不足 8 天内，你申请过 Citi 个人卡吗？（无论是否获批）",
+      "group_title": "你最近申请 Citi 的情况",
+      "result_reason": {
+        "YES": "距离你上次申请 Citi 个人信用卡还不到8天"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "citi_applications_65d": {
+      "title": "过去 65 天，你一共提交了几次 Citi 信用卡申请？（个人卡、商业卡及被拒的申请都算）",
+      "description": "个人卡和商业卡都算，包括被拒的申请。",
+      "group_title": "你最近申请 Citi 的情况",
+      "result_reason": "过去65天，你已提交{count}次 Citi 信用卡申请"
+    },
+    "citi_business_application_lt_90d": {
+      "title": "过去不足 90 天内，你申请过 Citi 商业卡吗？（无论是否获批）",
+      "group_title": "你最近申请 Citi 的情况",
+      "result_reason": {
+        "YES": "距离你上次申请 Citi 商业信用卡还不到90天"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "F04_CITI_BONUS_48M": {
+      "title": "过去 48 个月，你拿到过下面哪些卡的开卡奖励？",
+      "description": "只算新卡开卡奖励，以奖励实际到账日为准。",
+      "evidence_prefix": "过去 48 个月拿过 ",
+      "evidence_suffix": " 的开卡奖励",
+      "result_reason": "过去48个月，你拿过{card}的开卡奖励"
+    },
+    "F05_CITI_CONVERSION_48M": {
+      "title": "过去 48 个月拿到开卡奖励的 Citi 账户，有没有被你转成下面这些卡？",
+      "description": "仅勾选原账户的开卡奖励在过去 48 个月内到账的情况。看奖励到账日，不看转卡日期。",
+      "evidence_prefix": "近 48 个月获奖的 Citi 账户后来转为 ",
+      "result_reason": "你曾将一个在过去48个月拿到开卡奖励的 Citi 账户转为{card}"
+    },
+    "costco_active_membership": {
+      "title": "你现在有以本人名义登记的有效 Costco 会员资格吗？",
+      "result_reason": {
+        "NO": "你没有本人名下的有效 Costco 会员资格"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "F12_CITI_OPENING_OFFER_48M": {
+      "title": "过去 48 个月，你是否获得过下面这张新卡的开户优惠？",
+      "description": "这里按条款中的开户优惠（offer）计算，不是开卡奖励到账时间。",
+      "evidence_prefix": "过去 48 个月获得过 ",
+      "evidence_suffix": " 的开户优惠",
+      "result_reason": "过去48个月，你已经获得过{card}的开户优惠"
+    },
+    "bofa_approved_2m": {
+      "title": "过去 2 个月，你获批了几张 BofA 信用卡？",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "result_reason": "过去2个月，你已获批{count}张 BofA 信用卡"
+    },
+    "bofa_approved_12m": {
+      "title": "过去 12 个月，你获批了几张 BofA 信用卡？",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "result_reason": "过去12个月，你已获批{count}张 BofA 信用卡"
+    },
+    "bofa_approved_24m": {
+      "title": "过去 24 个月，你获批了几张 BofA 信用卡？",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "result_reason": "过去24个月，你已获批{count}张 BofA 信用卡"
+    },
+    "F03_HELD_WITHIN_24M": {
+      "title": "下面这些卡，你现在持有，或者过去 24 个月曾经持有过哪些？",
+      "description": "即使已经关卡，也要计算过去 24 个月内持有过的账户。Atmos Ascent 只计已确认是同一产品沿革的账户。",
+      "evidence_prefix": "现在或过去 24 个月持有过 ",
+      "result_reason": "你目前持有或过去24个月持有过{card}"
+    },
+    "bofa_business_held_24m": {
+      "title": "你现在有，或过去 24 个月曾经持有过 BofA 商业信用卡吗？",
+      "description": "任意一张 BofA 商业信用卡都算。",
+      "result_reason": {
+        "YES": "你现在持有或过去24个月持有过 BofA 商业信用卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "cap1_application_or_approval_lt_6m": {
+      "title": "过去不足 6 个月，你申请过或获批过 Capital One 信用卡吗？",
+      "group_title": "你最近申请 Capital One 的情况",
+      "result_reason": {
+        "YES": "过去6个月，你申请过或获批过 Capital One 信用卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "cap1_applications_30d": {
+      "title": "过去 30 天，你提交了几次 Capital One 信用卡申请？（包括被拒）",
+      "group_title": "你最近申请 Capital One 的情况",
+      "result_reason": "过去30天，你已提交{count}次 Capital One 信用卡申请"
+    },
+    "F04_BONUS_RECEIVED_48M": {
+      "title": "过去 48 个月，你拿到过下面哪些卡的新卡开卡奖励？",
+      "description": "以奖励实际到账日期为准。",
+      "evidence_prefix": "过去 48 个月拿过 ",
+      "result_reason": "过去48个月，你拿过{card}的开卡奖励"
+    },
+    "cap1_business_ever_held": {
+      "title": "你现在持有或以前持有过任何 Capital One 商业信用卡吗？",
+      "description": "即使已经关闭账户也算。",
+      "result_reason": {
+        "YES": "你现在持有或以前持有过 Capital One 商业信用卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "cap1_open_accounts": {
+      "title": "你现在有多少个 Capital One 信用卡账户？",
+      "result_reason": "你目前持有{count}个 Capital One 信用卡账户"
+    },
+    "wf_consumer_opened_lt_4m": {
+      "title": "过去不足 4 个月，你新开过 Wells Fargo 品牌的个人信用卡吗？",
+      "group_title": "你最近在 Wells Fargo 的开户情况",
+      "result_reason": {
+        "YES": "过去4个月，你已经开过 Wells Fargo 品牌个人信用卡"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "F03_HELD_OR_OPENED_48M": {
+      "title": "下面这些卡，你现在持有，或者过去 48 个月新开过哪些？",
+      "description": "已关卡或余额为零也算过去 48 个月内的新开户。",
+      "evidence_prefix": "现在持有或过去 48 个月开过 ",
+      "result_reason": "你目前持有或过去48个月新开过{card}"
+    },
+    "F03_OPENED_AND_RECEIVED_BONUS_15M": {
+      "title": "过去 15 个月，你开过下面哪些卡，并且拿到该账户的开卡奖励？",
+      "description": "必须是同一个账户：在过去 15 个月开户，且已经收到开卡奖励。",
+      "evidence_prefix": "过去 15 个月开户并获得过奖励 ",
+      "result_reason": "过去15个月，你开过{card}并拿到了该账户的开卡奖励"
+    },
+    "F03_OPENED_WITHIN_48M": {
+      "title": "过去 48 个月，你新开过下面哪些卡？",
+      "description": "看账户开立日期，不看奖励到账或关卡日期。",
+      "evidence_prefix": "过去 48 个月开过 ",
+      "result_reason": "过去48个月，你新开过{card}"
+    },
+    "discover_current_cards": {
+      "title": "你现在还持有几张 Discover 信用卡？",
+      "result_reason": "你目前持有{count}张 Discover 信用卡"
+    },
+    "recent_new_accounts_6m": {
+      "title": "过去 6 个月，你新开了几张美国信用卡？",
+      "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
+      "result_reason": "过去6个月，你新开了{count}张美国信用卡"
+    },
+    "recent_new_accounts_12m": {
+      "title": "过去 12 个月，你新开了几张美国信用卡？",
+      "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
+      "result_reason": "过去12个月，你新开了{count}张美国信用卡"
+    },
+    "F04_BONUS_RECEIVED_60M": {
+      "title": "过去 5 年，你拿到过下面哪些卡的新户开卡奖励？",
+      "description": "以该卡开卡奖励实际到账日期为准。",
+      "evidence_prefix": "过去 5 年拿过 ",
+      "result_reason": "过去5年，你拿过{card}的新户开卡奖励"
+    },
+    "usb_cashplus_upgrade": {
+      "title": "你是通过现有 U.S. Bank 账户升级获得 Cash+ 吗？",
+      "description": "如果是直接申请新卡，请选没有。",
+      "result_reason": {
+        "YES": "你是通过已有 U.S. Bank 账户升级获得 Cash+ 的"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "bilt_decline_lt_45d": {
+      "title": "你最近一次 Bilt 申请是否在不足 45 天前被拒？",
+      "description": "仍在人工审核的申请不算被拒。",
+      "result_reason": {
+        "YES": "距离你上次 Bilt 信用卡申请被拒还不到45天"
+      },
+      "options": {
+        "NO": "没有",
+        "YES": "有"
+      }
+    },
+    "a1": {
+      "title": "你的第一张美国信用卡开了多久？",
+      "options": {
+        "NO_US_CARD": "还没有美国信用卡",
+        "LT_6M": "不到 6 个月",
+        "M6_11": "6–11 个月",
+        "Y1_2": "1–2 年",
+        "Y2_PLUS": "2年以上",
+        "UNKNOWN": "不确定"
+      }
+    },
+    "a2": {
+      "title": "你目前的信用分大约是多少？",
+      "options": {
+        "SCORE_740_PLUS": "740+",
+        "SCORE_700_739": "700–739",
+        "SCORE_670_699": "670–699",
+        "SCORE_LT_670": "670 以下",
+        "UNKNOWN": "不知道"
+      }
+    },
+    "recent_applications_6m": {
+      "title": "过去 6 个月，你提交过几次美国信用卡申请？",
+      "description": "包括获批、被拒以及仍在审核的申请。",
+      "result_reason": "过去6个月，你提交了{count}次美国信用卡申请"
+    }
+  },
+  "rule_labels": {
+    "AMEX-001": "同卡历史持卡限制",
+    "AMEX-006": "90天获批数量",
+    "AMEX-007": "普通信用卡持卡数量",
+    "AMEX-008": "签账卡持卡数量",
+    "CHASE-001": "5/24：过去 24 个月的新账户数量",
+    "CHASE-002": "30 天内 Chase 信用卡获批记录",
+    "CHASE-003": "同一张 Sapphire 卡的历史开卡奖励",
+    "CHASE-005": "以前办过的无年费 Chase 商业卡",
+    "CHASE-006": "以前办过 Ink Business Preferred",
+    "CHASE-007": "以前办过 Ink Business Premier",
+    "CHASE-008": "以前办过 Sapphire Reserve Business",
+    "AMEX-FL-001": "历史持卡限制",
+    "AMEX-FL-002": "历史持卡限制",
+    "AMEX-FL-003": "历史持卡限制",
+    "AMEX-REL-001": "Schwab账户要求",
+    "AMEX-REL-002": "Morgan Stanley账户要求",
+    "AMEX-FL-004": "历史持卡限制",
+    "AMEX-FL-005": "历史持卡限制",
+    "AMEX-FL-006": "历史持卡限制",
+    "AMEX-FL-007": "历史持卡限制",
+    "AMEX-FL-008": "历史持卡限制",
+    "AMEX-FL-009": "历史持卡限制",
+    "AMEX-FL-010": "历史持卡限制",
+    "AMEX-FL-012": "历史持卡限制",
+    "AMEX-FL-013": "历史持卡限制",
+    "CHASE-PROD-001": "目前是否持有个人 IHG 联名卡",
+    "CHASE-PROD-002": "个人 IHG 卡过去 24 个月的开卡奖励",
+    "CHASE-PROD-005": "Southwest 个人卡持卡及 24 个月奖励记录",
+    "CHASE-PROD-006": "World of Hyatt 个人卡持卡及 24 个月奖励",
+    "CHASE-PROD-007": "Aeroplan 持卡及 24 个月奖励",
+    "AMEX-BIZ-001": "历史持卡限制",
+    "AMEX-BIZ-002": "历史持卡限制",
+    "AMEX-BIZ-005": "历史持卡限制",
+    "AMEX-011": "90 天内重复申请同一张 Amex 卡",
+    "CHASE-012": "30 天内 Chase 商业卡获批记录",
+    "CHASE-PROD-011": "Freedom 同一产品持卡及 24 个月奖励",
+    "CHASE-PROD-012": "United 同一产品持卡及 24 个月奖励",
+    "CHASE-PROD-013": "United Club 系列持卡历史",
+    "CHASE-PROD-014": "Avios 同一产品持卡及 24 个月奖励",
+    "CHASE-PROD-015": "World of Hyatt 商业卡持卡及奖励",
+    "CHASE-PROD-016": "Southwest 商业卡同一产品持卡及奖励",
+    "CHASE-PROD-017": "目前是否持有 Chase Sapphire Preferred",
+    "CHASE-PROD-018": "目前是否持有 Chase Sapphire Reserve",
+    "MARRIOTT-MATRIX:chase_bold_boundless:chase_bold_boundless": "Marriott Now or 24",
+    "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bold_boundless": "Marriott Now/30",
+    "MARRIOTT-MATRIX:amex_marriott_business:chase_bold_boundless": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bold_boundless": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bold_boundless": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:chase_bountiful:chase_bountiful": "Marriott Now or 24",
+    "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bountiful": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:amex_marriott_business:chase_bountiful": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bountiful": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bountiful": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Business_American_Express": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Business_American_Express": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Business_American_Express": "Marriott Now/30",
+    "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Bevy": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Bevy": "Marriott Now/30 or 90 or 24",
+    "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Bevy": "Marriott Now/30",
+    "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Bevy": "Marriott Now/30",
+    "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Brilliant": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Brilliant": "Marriott 90 or 24",
+    "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Brilliant": "Marriott Now/30",
+    "CITI-001": "8 天内 Citi 个人卡申请记录",
+    "CITI-002": "65 天内 Citi 申请数量",
+    "CITI-003": "90 天内 Citi 商业卡申请记录",
+    "CITI-004": "同产品 48 个月开卡奖励限制",
+    "CITI-005": "转卡至目标产品的 48 个月奖励限制",
+    "CITI-PROD-001": "Strata / Rewards+ 系列 48 个月奖励及转卡限制",
+    "CITI-PROD-003": "AAdvantage Platinum Select 48 个月奖励及转卡限制",
+    "CITI-PROD-004": "AAdvantage Executive 48 个月奖励及转卡限制",
+    "CITI-PROD-005": "AAdvantage Globe 48 个月奖励及转卡限制",
+    "CITI-PROD-006": "AAdvantage MileUp 48 个月奖励及转卡限制",
+    "CITI-PROD-007": "AAdvantage Business 48 个月奖励及转卡限制",
+    "CITI-PROD-008": "Premier / Strata Premier 48 个月奖励及转卡限制",
+    "CITI-PROD-009": "Strata Elite 48 个月奖励及转卡限制",
+    "CITI-PROD-010": "Double Cash 48 个月奖励及转卡限制",
+    "CITI-REL-001": "Costco 本人有效会员资格",
+    "CITI-PROD-014": "AT&T Points Plus 仅能持有一个账户",
+    "CITI-PROD-015": "AT&T Points Plus 48 个月开户优惠限制",
+    "BOFA-001": "2/3/4：近期 BofA 信用卡获批数量",
+    "BOFA-002": "个人卡同产品 24 个月持卡限制",
+    "BOFA-003": "商业卡 24 个月持卡限制",
+    "BOFA-PROD-002": "Atmos Ascent 同产品 24 个月持卡限制",
+    "CAP1-001": "6 个月内 Capital One 申请或获批记录",
+    "CAP1-002": "30 天内 Capital One 申请次数限制",
+    "CAP1-003": "同卡 48 个月开卡奖励限制",
+    "CAP1-004": "Venture 系列 48 个月奖励限制（按目标卡方向）",
+    "CAP1-005": "Capital One 商业卡历史可能影响奖励",
+    "CAP1-007": "具体申请条款中的当前账户数上限",
+    "WF-001": "4 个月内新开 Wells Fargo 品牌个人卡",
+    "WF-PROD-001": "Wells Fargo Active Cash 当前持有或 48 个月内开户奖励限制",
+    "WF-PROD-002": "Wells Fargo Autograph 当前持有或 48 个月内开户奖励限制",
+    "WF-PROD-003": "Wells Fargo Autograph Journey 当前持有或 48 个月内开户奖励限制",
+    "WF-PROD-004": "Choice 个人卡系列当前持卡限制",
+    "WF-PROD-005": "Choice 系列 15 个月内开户且取得奖励",
+    "WF-PROD-006": "One Key 系列当前持卡限制",
+    "WF-PROD-007": "One Key+ 系列当前持卡风险",
+    "WF-PROD-008": "One Key 系列 48 个月开户奖励限制",
+    "DISC-001": "Discover 同时持有最多 2 张卡",
+    "DISC-003": "指定限时一次性奖励的 48 个月历史限制",
+    "BARC-001": "6/24：24 个月新开账户数量",
+    "USB-001": "0/6、1/12：近期新账户敏感度",
+    "USB-PROD-002": "Altitude Go 5 年同卡新户奖励限制",
+    "USB-PROD-003": "Altitude Connect 5 年同卡新户奖励限制",
+    "USB-PROD-004": "Cash+ 原 Cash Rewards 账户或升级奖励限制",
+    "BILT-001": "Bilt Card 2.0 系列终身奖励限制",
+    "BILT-003": "最近一次 Bilt 申请被拒不足 45 天"
+  },
+  "review_labels": {
+    "CHASE-001": "含副卡的信用报告账户达到门槛，但本人主卡未达到；需核实银行是否排除副卡",
+    "CHASE-005": "其他无年费商业卡的具体产品需核实"
+  },
+  "override_labels": {
+    "CHASE-001": {
+      "{\"product_name\":[\"Amazon Prime Visa\"]}": "Amazon Prime Visa 有5/24例外报告，不能保证获批"
+    }
+  },
+  "coverage_labels": {
+    "BOFA-PROD-001": "Summit 的具体开户奖励条款仍需核实",
+    "USB-002": "U.S. Bank 目标产品的具体奖励条款仍需核实",
+    "BARC-002": "Barclays 目标产品的具体开卡奖励条款仍需核实",
+    "COVERAGE-WF-BUSINESS-APPLICATION": "Wells Fargo 商业卡的具体申请限制尚待核实",
+    "COVERAGE-WF-BUSINESS-BONUS": "Wells Fargo 商业卡的具体奖励条款尚待核实"
+  },
+  "history_labels": {
+    "OTHER_CHASE_NO_FEE_BUSINESS": "其他无年费 Chase 商业信用卡（具体产品待核实）",
+    "Chase Aeroplan Card": "Chase Aeroplan Card（包括旧版本）",
+    "Citi / AAdvantage Platinum Select": "Citi AAdvantage Platinum Select",
+    "Citi / AAdvantage Executive": "Citi AAdvantage Executive",
+    "Citi / AAdvantage Globe": "Citi AAdvantage Globe",
+    "Citi / AAdvantage Business": "Citi AAdvantage Business"
+  },
+  "count_relation_messages": {
+    "recent_new_accounts_6m|recent_new_accounts_12m": "过去 6 个月新开的信用卡数量不能超过过去 12 个月。请检查这两项答案。",
+    "bofa_approved_2m|bofa_approved_12m": "过去 2 个月获批的 BofA 信用卡数量不能超过过去 12 个月。请检查这两项答案。",
+    "bofa_approved_12m|bofa_approved_24m": "过去 12 个月获批的 BofA 信用卡数量不能超过过去 24 个月。请检查这两项答案。",
+    "bofa_approved_2m|bofa_approved_24m": "过去 2 个月获批的 BofA 信用卡数量不能超过过去 24 个月。请检查这两项答案。"
+  },
+  "units": {
+    "CARD": "张",
+    "ATTEMPT": "次",
+    "ACCOUNT": "个"
+  },
+  "engine": {
+    "count_open": "{min} {unit}或更多",
+    "count_exact": "{min} {unit}",
+    "count_range": "{min}–{max} {unit}",
+    "legacy_suffix": "（包括以前的版本）",
+    "at_least": "至少",
+    "greater_than": "超过",
+    "less_than": "不到",
+    "at_most": "不超过",
+    "exactly": "正好",
+    "card_unit": "张",
+    "you": "你",
+    "selected": "选择了",
+    "yes": "是",
+    "no": "否",
+    "evidence_selected": "已选择 ",
+    "debug_at_least": "达到 ",
+    "debug_greater_than": "超过 ",
+    "debug_less_than": "少于 ",
+    "debug_at_most": "不超过 ",
+    "debug_equals": "等于 ",
+    "debug_not_equals": "不等于 ",
+    "event_missing": "还需要补充相关信息",
+    "event_review": "相关条款或事实需要核实",
+    "event_clear": "未触发限制",
+    "target_unknown": "卡片资料需要核实",
+    "offer_unknown": "本次 Offer 条款需要核实",
+    "offer_cap_unknown": "具体申请条款的账户数门槛尚未核实",
+    "app_product_ineligible": "按参考条款，你不符合这张卡的申请条件",
+    "wait_suffix": "，需等待限制解除",
+    "app_block": "不符合申请条件：",
+    "app_wait": "建议等待申请限制解除：",
+    "app_risk": "发现可能影响申请的情况：",
+    "app_incomplete": "还有信用情况或申请信息需要确认",
+    "app_clear": "目前未发现申请限制；实际获批以银行为准",
+    "bonus_block": "按参考条款，你不符合这次开卡奖励条件",
+    "bonus_risk": "按参考条款，你这次可能拿不到开卡奖励：",
+    "bonus_incomplete": "还有持卡历史或奖励条款需要确认",
+    "bonus_clear": "目前未发现开卡奖励限制，最终以银行为准",
+    "trigger_with_pending": "已发现限制，但还有相关条件需要确认",
+    "product_wait": "目前不符合这张卡的申请条件，需要等限制解除",
+    "product_block": "目前不符合这张卡的申请条件，因而也无法通过新卡申请拿到奖励",
+    "base_age_prefix": "你的美国信用卡历史：",
+    "base_score_prefix": "；信用分：",
+    "base_risk_consequence": "按当前信用评估模型，获批把握偏低",
+    "base_activity_risk": "你近期申请或新开的信用卡较多",
+    "missing_user_facts": "还有信用情况或持卡记录的问题需要回答",
+    "complete_answers": "请先补齐这些答案",
+    "missing_offer_terms": "这张卡的部分申请条件或开卡奖励条款还需要核实",
+    "check_offer_terms": "请以当前申请页面的条款为准",
+    "decision_note": "按参考规则和你填写的信息判断，不保证银行获批或发放奖励。",
+    "caveat": "确定性规则模型，不代表银行实际审批结果；答案仅在本机计算。"
+  },
+  "decision": {
+    "BLOCK": {
+      "label": "现在不建议申请",
+      "summary": "目前不适合申请这张卡。"
+    },
+    "WAIT": {
+      "label": "建议等一等再申请",
+      "summary": "等相关限制解除后再申请。"
+    },
+    "REVIEW": {
+      "label": "建议先确认，再申请",
+      "summary": "目前还不能确定是否适合申请。"
+    },
+    "RISK": {
+      "label": "可以考虑申请，但有风险",
+      "summary": "申请前请留意下面的情况。"
+    },
+    "CLEAR": {
+      "label": "现在可以考虑申请",
+      "summary": "根据你填写的信息，暂未发现明显的申请或开卡奖励限制。"
+    }
+  },
+  "consequences": {
+    "application": {
+      "BLOCK": "目前不符合申请条件",
+      "WAIT": "触发了申请限制，建议等限制解除",
+      "RISK": "可能影响获批"
+    },
+    "bonus": {
+      "BLOCK": "按参考条款，这次拿不到开卡奖励",
+      "WAIT": "目前不符合开卡奖励条件，需要等限制期结束",
+      "RISK": "这次可能拿不到开卡奖励"
+    }
+  },
+  "ui": {
+    "credit_change": "基础信用档位：",
+    "pending_calculation": "待计算",
+    "both_block": "不符合申请及开卡奖励条件",
+    "outcome_bonus_block": "不符合开卡奖励条件",
+    "bonus_may_impact": "可能影响开卡奖励",
+    "application_may_impact": "可能影响申请",
+    "not_applicable": "未适用",
+    "product_block": "不符合产品申请条件",
+    "application_change": "申请风险：",
+    "bonus_change": "开卡奖励：",
+    "other_changes_prefix": "；另有 ",
+    "other_changes_suffix": " 项变化",
+    "answer_no_change": "这项回答暂时不会改变评估结果",
+    "answer_no_comparison": "这张卡暂时只能查看问题，还不能比较评估结果",
+    "choose": "请选择",
+    "count_placeholder": "请输入张数",
+    "answered": "已回答 · 可以修改",
+    "credit_question": "信用情况",
+    "specific_question": "与这张卡有关",
+    "none": "以上都没有",
+    "confirm_choices": "确认以上选择",
+    "free_text_placeholder": "请填写你知道的情况（仅保存在本机）",
+    "save_answer": "保存答案",
+    "rule_ids": "对应规则：",
+    "select_first": "先选择一张信用卡，我们会根据这张卡生成问题",
+    "choose_bank": "请选择银行",
+    "choose_customer_type": "请选择个人卡或商业卡",
+    "personal": "个人卡",
+    "business": "商业卡",
+    "choose_type_first": "请先选择卡片类型",
+    "choose_type": "请选择卡片类型",
+    "choose_card": "请选择要申请的卡",
+    "choose_credit_card": "请选择信用卡",
+    "no_cards": "这里暂时没有可选的卡",
+    "card_error": "无法读取选定信用卡：",
+    "choose_again": "请重新选择",
+    "applicable_prefix": " · 适用规则 ",
+    "unverified_prefix": " 条 · 待核实系统条件 ",
+    "missing_prefix": " 条 · 需补充事实 ",
+    "groups_suffix": " 组",
+    "source_reviewed": "已审核 Assessment 产品",
+    "source_candidate": "扩展候选资料",
+    "source_history": "历史奖励记录",
+    "source_catalog": "NB 正式版信用卡目录",
+    "source_partial": "用户提供的部分信息",
+    "identity_source": "身份来源：",
+    "source_catalog_identity": "NB 正式版信用卡目录（仅卡片身份）",
+    "offer_scenario": " 按选定 Offer 场景建模",
+    "nll_on": "，已启用 NLL 特殊变量。",
+    "offer_assumption": "这里是问卷假设，并非实时核实的申请条款。",
+    "offer_default_assumption": " 按现有规则库模拟；卡片历史身份和当前申请条款尚需分别核实。",
+    "common_heading": "先了解一下你的信用情况",
+    "specific_heading": "关于这张卡，还想了解这些情况",
+    "no_specific": "目前没有其他需要回答的问题。",
+    "result_heading_prefix": "这张 ",
+    "result_heading_suffix": " 卡适不适合现在申请？",
+    "review_heading": "需要确认的情况",
+    "reasons_heading": "原因",
+    "application_heading": "申请风险",
+    "application_impact": "申请影响：",
+    "action_wait": "等待",
+    "action_block": "受限",
+    "action_risk": "风险提示",
+    "action_unknown": "待确认",
+    "action_clear": "未触发",
+    "base_heading": "基础信用情况：",
+    "credit_high": "优秀（最高档）",
+    "credit_medium": "一般",
+    "credit_high_risk": "偏高风险",
+    "credit_unknown": "还没算出来",
+    "base_not_probability": "。这不是银行的获批概率。",
+    "issuer_rules": " 申请规则：",
+    "unanswered_suffix": " 项还没回答，",
+    "review_suffix": " 项需要再确认。",
+    "unconfirmed_prefix": "看看还有哪些信息没确认（",
+    "items_suffix": " 项）",
+    "not_answered": "还没回答",
+    "needs_verification": "需要核实",
+    "rules_complete_prefix": "这张卡适用的 ",
+    "rules_complete_suffix": " 申请规则已检查完。",
+    "bonus_heading": "能不能拿到开卡奖励",
+    "bonus_impact": "奖励影响：",
+    "bonus_pending": "还有奖励相关事实或条款需要确认。",
+    "offer_type_prefix": "当前按以下条款估算：",
+    "nll_offer": "NLL（不含普通同卡终身限制）",
+    "standard_offer": "普通公开 Offer",
+    "full_report_prefix": "查看完整报告（",
+    "rules_suffix": " 条规则）",
+    "state_triggered": "可能受限",
+    "not_triggered": "没有触发",
+    "history_heading": "历史开卡奖励",
+    "history_note": "只展示已审核的历史快照，不代表现在的奖励。",
+    "history_button": "查看历史奖励",
+    "history_loading": "正在读取历史奖励…",
+    "history_empty": "暂无可用的已审核历史奖励。",
+    "history_date": "参考记录日期：",
+    "history_limit": "此处展示最近 10 条已审核记录。",
+    "history_error": "暂时无法读取历史奖励，请重试。",
+    "benefits_note": "本评估不包含长期持卡福利价值。",
+    "marriott_application": "Marriott 申请及开卡奖励限制：",
+    "marriott_bonus": "Marriott 跨银行开卡奖励限制：",
+    "matrix_clear": "根据已填记录，这条限制不适用",
+    "matrix_triggered": "已触发持卡历史限制",
+    "matrix_missing": "还需要补充相关持卡时间",
+    "matrix_skipped": "已经发现其他奖励限制，不再重复追问",
+    "matrix_na": "不适用",
+    "matrix_note": "。具体以这次申请的条款为准。",
+    "scope_prefix": "对应的规则编号：",
+    "gaps_prefix": "待核实的申请条款：",
+    "none_debug": "无",
+    "identity_gaps": "；卡片信息缺失：",
+    "conflicts_prefix": "；答案需要检查：",
+    "version_prefix": "规则库 ",
+    "version_separator": " 条 · ",
+    "version_cards": " 张卡",
+    "loading": "正在加载卡片和申请规则…",
+    "boot_error": "初始化失败：",
+    "unknown_error": "未知错误",
+    "boot_failed": "未完成加载；不会显示旧卡片或旧评估结果"
+  },
+  "states": {
+    "ruleStates": {
+      "MISSING": "待补充",
+      "REVIEW": "待核实",
+      "TRIGGERED": "可能受限",
+      "CLEAR": "未发现限制"
+    },
+    "riskStates": {
+      "HIGH": "优秀（最高档）",
+      "MEDIUM": "一般",
+      "HIGH_RISK": "偏高风险",
+      "INSUFFICIENT_DATA": "还没算出来"
+    },
+    "outcomeStates": {
+      "MODEL_ONLY": "已检查",
+      "INSUFFICIENT_DATA": "尚未完成",
+      "WAIT": "需等待限制解除",
+      "APPLICATION_INELIGIBLE": "不符合申请条件",
+      "ELEVATED_RISK": "有需要注意的申请风险",
+      "PRODUCT_INELIGIBLE": "不符合当前产品条件",
+      "BONUS_INELIGIBLE": "不符合开卡奖励条件",
+      "NO_TRIGGER_FOUND": "未发现开卡奖励限制",
+      "NEEDS_REVIEW": "开卡奖励还要确认",
+      "LIKELY_RESTRICTED": "可能拿不到奖励"
+    }
+  },
+  "shell": {
+    "document_title": "NextBonus · 信用卡申请评估测试",
+    "home": "Assessment 独立测试站",
+    "heading": "信用卡申请评估",
+    "intro": "选好信用卡，回答几个问题，看看哪些申请规则和开卡奖励限制需要注意。已回答的问题可随时修改，红字显示结果变化。",
+    "local": "答案只在本机计算",
+    "bank": "银行",
+    "customer_type": "个人卡还是商业卡",
+    "card": "想申请哪张卡",
+    "restart": "重新开始这张卡",
+    "reset": "清空答案",
+    "retry": "重新加载",
+    "offer_type": "申请优惠类型：",
+    "standard": "普通公开开卡奖励（默认）",
+    "nll": "NLL 特殊开卡奖励",
+    "offer_explainer": "普通优惠按常见开卡奖励条款判断；如果是 NLL，只取消同一张卡的终身奖励限制，其他同系列限制仍可能存在。",
+    "about": "关于这份评估",
+    "about_text": "这是一份申请前的初步评估。我们会结合你填的信用记录、银行申请记录和持卡历史，提示可能影响获批或开卡奖励的规则。普通优惠的条款目前采用标准假设，NLL 等特殊优惠需要以实际申请链接为准；历史卡片也不一定还开放申请。问卷不计算真实获批概率，也不保证一定拿到奖励。你的回答和评估结果都只在当前设备处理，不会上传。这个独立测试页不会修改 Discover。",
+    "debug": "查看规则编号和匹配详情",
+    "bank_aria": "选择发行银行",
+    "type_aria": "选择个人卡或商业卡",
+    "card_aria": "选择信用卡",
+    "offer_aria": "Amex Offer 类型",
+    "dynamic_suffix": " / 动态问卷"
+  },
+  "legacy_label_keys": [
+    "Chase Aeroplan Card"
+  ]
+}

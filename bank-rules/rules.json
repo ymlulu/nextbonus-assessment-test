@@ -31,7 +31,6 @@
         ]
       },
       "offer_clause": "AMEX-001",
-      "label": "同卡历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "ABSENT"
@@ -96,8 +95,7 @@
         "fact": "approved_revolving_90d",
         "op": "gte",
         "value": 2
-      },
-      "label": "90天获批数量"
+      }
     },
     {
       "id": "AMEX-007",
@@ -113,8 +111,7 @@
         "fact": "amex_revolving_count",
         "op": "gte",
         "value": 5
-      },
-      "label": "普通信用卡持卡数量"
+      }
     },
     {
       "id": "AMEX-008",
@@ -130,8 +127,7 @@
         "fact": "amex_charge_count",
         "op": "gte",
         "value": 10
-      },
-      "label": "签账卡持卡数量"
+      }
     },
     {
       "id": "CHASE-001",
@@ -149,14 +145,12 @@
         "op": "gte",
         "value": 5
       },
-      "label": "5/24：过去 24 个月的新账户数量",
       "review": {
         "condition": {
           "fact": "F06_REPORTED_NEW_ACCOUNTS",
           "op": "gte",
           "value_from": "condition.value"
-        },
-        "label": "含副卡的信用报告账户达到门槛，但本人主卡未达到；需核实银行是否排除副卡"
+        }
       },
       "overrides": [
         {
@@ -168,8 +162,7 @@
           "effect": {
             "application": 2,
             "bonus": 0
-          },
-          "label": "Amazon Prime Visa 有5/24例外报告，不能保证获批"
+          }
         }
       ]
     },
@@ -188,8 +181,7 @@
         "fact": "approved_chase_30d",
         "op": "gte",
         "value": 2
-      },
-      "label": "30 天内 Chase 信用卡获批记录"
+      }
     },
     {
       "id": "CHASE-003",
@@ -211,8 +203,7 @@
           "$TARGET"
         ],
         "action": "BLOCK"
-      },
-      "label": "同一张 Sapphire 卡的历史开卡奖励"
+      }
     },
     {
       "id": "CHASE-005",
@@ -235,7 +226,6 @@
           "Ink Business Unlimited"
         ]
       },
-      "label": "以前办过的无年费 Chase 商业卡",
       "review": {
         "condition": {
           "fact": "F03_CARD_HISTORY",
@@ -244,7 +234,6 @@
             "OTHER_CHASE_NO_FEE_BUSINESS"
           ]
         },
-        "label": "其他无年费商业卡的具体产品需核实",
         "show_with_primary": true
       }
     },
@@ -266,8 +255,7 @@
         "values": [
           "$TARGET"
         ]
-      },
-      "label": "以前办过 Ink Business Preferred"
+      }
     },
     {
       "id": "CHASE-007",
@@ -287,8 +275,7 @@
         "values": [
           "$TARGET"
         ]
-      },
-      "label": "以前办过 Ink Business Premier"
+      }
     },
     {
       "id": "CHASE-008",
@@ -308,8 +295,7 @@
         "values": [
           "$TARGET"
         ]
-      },
-      "label": "以前办过 Sapphire Reserve Business"
+      }
     },
     {
       "id": "AMEX-FL-001",
@@ -334,7 +320,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-001",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -363,7 +348,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-002",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -392,7 +376,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-003",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -416,8 +399,7 @@
         "fact": "schwab_relationship",
         "op": "eq",
         "value": "NO"
-      },
-      "label": "Schwab账户要求"
+      }
     },
     {
       "id": "AMEX-REL-002",
@@ -437,8 +419,7 @@
         "fact": "morgan_stanley_relationship",
         "op": "eq",
         "value": "NO"
-      },
-      "label": "Morgan Stanley账户要求"
+      }
     },
     {
       "id": "AMEX-FL-004",
@@ -465,7 +446,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-004",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -501,7 +481,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-005",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -533,7 +512,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-006",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -570,7 +548,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-007",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -604,7 +581,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-008",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -636,7 +612,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-009",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -666,7 +641,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-010",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -694,7 +668,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-012",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -721,7 +694,6 @@
         ]
       },
       "offer_clause": "AMEX-FL-013",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -749,8 +721,7 @@
           "IHG One Rewards Premier"
         ],
         "action": "BLOCK"
-      },
-      "label": "目前是否持有个人 IHG 联名卡"
+      }
     },
     {
       "id": "CHASE-PROD-002",
@@ -774,8 +745,7 @@
           "IHG One Rewards Premier"
         ],
         "action": "WAIT"
-      },
-      "label": "个人 IHG 卡过去 24 个月的开卡奖励"
+      }
     },
     {
       "id": "CHASE-PROD-005",
@@ -815,8 +785,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "Southwest 个人卡持卡及 24 个月奖励记录"
+      }
     },
     {
       "id": "CHASE-PROD-006",
@@ -850,8 +819,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "World of Hyatt 个人卡持卡及 24 个月奖励"
+      }
     },
     {
       "id": "CHASE-PROD-007",
@@ -885,8 +853,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "Aeroplan 持卡及 24 个月奖励"
+      }
     },
     {
       "id": "AMEX-BIZ-001",
@@ -912,7 +879,6 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-001",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -942,7 +908,6 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-002",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -969,7 +934,6 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-005",
-      "label": "历史持卡限制",
       "offer_scenarios": {
         "STANDARD": "PRESENT",
         "NLL": "PRESENT"
@@ -988,8 +952,7 @@
         "fact": "same_product_applied_or_approved_90d",
         "op": "eq",
         "value": "YES"
-      },
-      "label": "90 天内重复申请同一张 Amex 卡"
+      }
     },
     {
       "id": "CHASE-012",
@@ -1006,8 +969,7 @@
         "fact": "approved_chase_business_30d",
         "op": "eq",
         "value": "YES"
-      },
-      "label": "30 天内 Chase 商业卡获批记录"
+      }
     },
     {
       "id": "CHASE-PROD-011",
@@ -1043,8 +1005,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "Freedom 同一产品持卡及 24 个月奖励"
+      }
     },
     {
       "id": "CHASE-PROD-012",
@@ -1080,8 +1041,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "United 同一产品持卡及 24 个月奖励"
+      }
     },
     {
       "id": "CHASE-PROD-013",
@@ -1114,8 +1074,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "United Club 系列持卡历史"
+      }
     },
     {
       "id": "CHASE-PROD-014",
@@ -1151,8 +1110,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "Avios 同一产品持卡及 24 个月奖励"
+      }
     },
     {
       "id": "CHASE-PROD-015",
@@ -1185,8 +1143,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "World of Hyatt 商业卡持卡及奖励"
+      }
     },
     {
       "id": "CHASE-PROD-016",
@@ -1220,8 +1177,7 @@
             "action": "WAIT"
           }
         ]
-      },
-      "label": "Southwest 商业卡同一产品持卡及奖励"
+      }
     },
     {
       "id": "CHASE-PROD-017",
@@ -1243,8 +1199,7 @@
           "$TARGET"
         ],
         "action": "BLOCK"
-      },
-      "label": "目前是否持有 Chase Sapphire Preferred"
+      }
     },
     {
       "id": "CHASE-PROD-018",
@@ -1266,12 +1221,10 @@
           "$TARGET"
         ],
         "action": "BLOCK"
-      },
-      "label": "目前是否持有 Chase Sapphire Reserve"
+      }
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bold_boundless:chase_bold_boundless",
-      "label": "Marriott Now or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1312,7 +1265,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bold_boundless",
-      "label": "Marriott Now/30",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1363,7 +1315,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_business:chase_bold_boundless",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1403,7 +1354,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bold_boundless",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1443,7 +1393,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bold_boundless",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1483,7 +1432,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bountiful:chase_bountiful",
-      "label": "Marriott Now or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1523,7 +1471,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bountiful",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1591,7 +1538,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_business:chase_bountiful",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1659,7 +1605,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bountiful",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1727,7 +1672,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bountiful",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "CHASE",
         "product_name": [
@@ -1795,7 +1739,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Business_American_Express",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -1834,7 +1777,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Business_American_Express",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -1873,7 +1815,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Business_American_Express",
-      "label": "Marriott Now/30",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -1923,7 +1864,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Bevy",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -1991,7 +1931,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Bevy",
-      "label": "Marriott Now/30 or 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2059,7 +1998,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Bevy",
-      "label": "Marriott Now/30",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2109,7 +2047,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Bevy",
-      "label": "Marriott Now/30",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2159,7 +2096,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Brilliant",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2198,7 +2134,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Brilliant",
-      "label": "Marriott 90 or 24",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2237,7 +2172,6 @@
     },
     {
       "id": "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Brilliant",
-      "label": "Marriott Now/30",
       "target": {
         "issuer": "AMEX",
         "product_name": [
@@ -2287,7 +2221,6 @@
     },
     {
       "id": "CITI-001",
-      "label": "8 天内 Citi 个人卡申请记录",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2305,7 +2238,6 @@
     },
     {
       "id": "CITI-002",
-      "label": "65 天内 Citi 申请数量",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD"
@@ -2323,7 +2255,6 @@
     },
     {
       "id": "CITI-003",
-      "label": "90 天内 Citi 商业卡申请记录",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2342,7 +2273,6 @@
     },
     {
       "id": "CITI-004",
-      "label": "同产品 48 个月开卡奖励限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD"
@@ -2397,7 +2327,6 @@
     },
     {
       "id": "CITI-005",
-      "label": "转卡至目标产品的 48 个月奖励限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD"
@@ -2452,7 +2381,6 @@
     },
     {
       "id": "CITI-PROD-001",
-      "label": "Strata / Rewards+ 系列 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2499,7 +2427,6 @@
     },
     {
       "id": "CITI-PROD-003",
-      "label": "AAdvantage Platinum Select 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2537,7 +2464,6 @@
     },
     {
       "id": "CITI-PROD-004",
-      "label": "AAdvantage Executive 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2575,7 +2501,6 @@
     },
     {
       "id": "CITI-PROD-005",
-      "label": "AAdvantage Globe 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2613,7 +2538,6 @@
     },
     {
       "id": "CITI-PROD-006",
-      "label": "AAdvantage MileUp 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2651,7 +2575,6 @@
     },
     {
       "id": "CITI-PROD-007",
-      "label": "AAdvantage Business 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2689,7 +2612,6 @@
     },
     {
       "id": "CITI-PROD-008",
-      "label": "Premier / Strata Premier 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2730,7 +2652,6 @@
     },
     {
       "id": "CITI-PROD-009",
-      "label": "Strata Elite 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2768,7 +2689,6 @@
     },
     {
       "id": "CITI-PROD-010",
-      "label": "Double Cash 48 个月奖励及转卡限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2806,7 +2726,6 @@
     },
     {
       "id": "CITI-REL-001",
-      "label": "Costco 本人有效会员资格",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2829,7 +2748,6 @@
     },
     {
       "id": "CITI-PROD-014",
-      "label": "AT&T Points Plus 仅能持有一个账户",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2853,7 +2771,6 @@
     },
     {
       "id": "CITI-PROD-015",
-      "label": "AT&T Points Plus 48 个月开户优惠限制",
       "target": {
         "issuer": "CITI",
         "product_type": "CREDIT_CARD",
@@ -2880,7 +2797,6 @@
     },
     {
       "id": "BOFA-001",
-      "label": "2/3/4：近期 BofA 信用卡获批数量",
       "target": {
         "issuer": "BOFA",
         "product_type": "CREDIT_CARD"
@@ -2912,7 +2828,6 @@
     },
     {
       "id": "BOFA-002",
-      "label": "个人卡同产品 24 个月持卡限制",
       "target": {
         "issuer": "BOFA",
         "product_type": "CREDIT_CARD",
@@ -2955,7 +2870,6 @@
     },
     {
       "id": "BOFA-003",
-      "label": "商业卡 24 个月持卡限制",
       "target": {
         "issuer": "BOFA",
         "product_type": "CREDIT_CARD",
@@ -2974,7 +2888,6 @@
     },
     {
       "id": "BOFA-PROD-002",
-      "label": "Atmos Ascent 同产品 24 个月持卡限制",
       "target": {
         "issuer": "BOFA",
         "product_type": "CREDIT_CARD",
@@ -2996,7 +2909,6 @@
     },
     {
       "id": "CAP1-001",
-      "label": "6 个月内 Capital One 申请或获批记录",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD"
@@ -3013,7 +2925,6 @@
     },
     {
       "id": "CAP1-002",
-      "label": "30 天内 Capital One 申请次数限制",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD"
@@ -3044,7 +2955,6 @@
     },
     {
       "id": "CAP1-003",
-      "label": "同卡 48 个月开卡奖励限制",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD",
@@ -3080,7 +2990,6 @@
     },
     {
       "id": "CAP1-004",
-      "label": "Venture 系列 48 个月奖励限制（按目标卡方向）",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD",
@@ -3134,7 +3043,6 @@
     },
     {
       "id": "CAP1-005",
-      "label": "Capital One 商业卡历史可能影响奖励",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD",
@@ -3153,7 +3061,6 @@
     },
     {
       "id": "CAP1-007",
-      "label": "具体申请条款中的当前账户数上限",
       "target": {
         "issuer": "CAPITAL_ONE",
         "product_type": "CREDIT_CARD"
@@ -3184,7 +3091,6 @@
     },
     {
       "id": "WF-001",
-      "label": "4 个月内新开 Wells Fargo 品牌个人卡",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3217,7 +3123,6 @@
     },
     {
       "id": "WF-PROD-001",
-      "label": "Wells Fargo Active Cash 当前持有或 48 个月内开户奖励限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3239,7 +3144,6 @@
     },
     {
       "id": "WF-PROD-002",
-      "label": "Wells Fargo Autograph 当前持有或 48 个月内开户奖励限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3261,7 +3165,6 @@
     },
     {
       "id": "WF-PROD-003",
-      "label": "Wells Fargo Autograph Journey 当前持有或 48 个月内开户奖励限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3283,7 +3186,6 @@
     },
     {
       "id": "WF-PROD-004",
-      "label": "Choice 个人卡系列当前持卡限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3307,7 +3209,6 @@
     },
     {
       "id": "WF-PROD-005",
-      "label": "Choice 系列 15 个月内开户且取得奖励",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3331,7 +3232,6 @@
     },
     {
       "id": "WF-PROD-006",
-      "label": "One Key 系列当前持卡限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3357,7 +3257,6 @@
     },
     {
       "id": "WF-PROD-007",
-      "label": "One Key+ 系列当前持卡风险",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3381,7 +3280,6 @@
     },
     {
       "id": "WF-PROD-008",
-      "label": "One Key 系列 48 个月开户奖励限制",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3406,7 +3304,6 @@
     },
     {
       "id": "DISC-001",
-      "label": "Discover 同时持有最多 2 张卡",
       "target": {
         "issuer": "DISCOVER",
         "product_type": "CREDIT_CARD",
@@ -3426,7 +3323,6 @@
     },
     {
       "id": "DISC-003",
-      "label": "指定限时一次性奖励的 48 个月历史限制",
       "target": {
         "issuer": "DISCOVER",
         "product_type": "CREDIT_CARD",
@@ -3447,7 +3343,6 @@
     },
     {
       "id": "BARC-001",
-      "label": "6/24：24 个月新开账户数量",
       "target": {
         "issuer": "BARCLAYS",
         "product_type": "CREDIT_CARD"
@@ -3464,7 +3359,6 @@
     },
     {
       "id": "USB-001",
-      "label": "0/6、1/12：近期新账户敏感度",
       "target": {
         "issuer": "US_BANK",
         "product_type": "CREDIT_CARD"
@@ -3490,7 +3384,6 @@
     },
     {
       "id": "USB-PROD-002",
-      "label": "Altitude Go 5 年同卡新户奖励限制",
       "target": {
         "issuer": "US_BANK",
         "product_type": "CREDIT_CARD",
@@ -3513,7 +3406,6 @@
     },
     {
       "id": "USB-PROD-003",
-      "label": "Altitude Connect 5 年同卡新户奖励限制",
       "target": {
         "issuer": "US_BANK",
         "product_type": "CREDIT_CARD",
@@ -3536,7 +3428,6 @@
     },
     {
       "id": "USB-PROD-004",
-      "label": "Cash+ 原 Cash Rewards 账户或升级奖励限制",
       "target": {
         "issuer": "US_BANK",
         "product_type": "CREDIT_CARD",
@@ -3568,7 +3459,6 @@
     },
     {
       "id": "BILT-001",
-      "label": "Bilt Card 2.0 系列终身奖励限制",
       "target": {
         "issuer": "COLUMN_NA",
         "product_type": "CREDIT_CARD",
@@ -3605,7 +3495,6 @@
     },
     {
       "id": "BILT-003",
-      "label": "最近一次 Bilt 申请被拒不足 45 天",
       "target": {
         "issuer": "COLUMN_NA",
         "product_type": "CREDIT_CARD",
@@ -3627,7 +3516,6 @@
   "coverage_checks": [
     {
       "id": "BOFA-PROD-001",
-      "label": "Summit 的具体开户奖励条款仍需核实",
       "target": {
         "issuer": "BOFA",
         "product_type": "CREDIT_CARD",
@@ -3639,7 +3527,6 @@
     },
     {
       "id": "USB-002",
-      "label": "U.S. Bank 目标产品的具体奖励条款仍需核实",
       "target": {
         "issuer": "US_BANK",
         "product_type": "CREDIT_CARD"
@@ -3657,7 +3544,6 @@
     },
     {
       "id": "BARC-002",
-      "label": "Barclays 目标产品的具体开卡奖励条款仍需核实",
       "target": {
         "issuer": "BARCLAYS",
         "product_type": "CREDIT_CARD"
@@ -3666,7 +3552,6 @@
     },
     {
       "id": "COVERAGE-WF-BUSINESS-APPLICATION",
-      "label": "Wells Fargo 商业卡的具体申请限制尚待核实",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",
@@ -3676,7 +3561,6 @@
     },
     {
       "id": "COVERAGE-WF-BUSINESS-BONUS",
-      "label": "Wells Fargo 商业卡的具体奖励条款尚待核实",
       "target": {
         "issuer": "WELLS_FARGO",
         "product_type": "CREDIT_CARD",

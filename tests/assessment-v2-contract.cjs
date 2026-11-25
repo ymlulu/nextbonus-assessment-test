@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {createClient}=require('../adapters/assessment-api-v2.js');
 const root=path.resolve(__dirname,'..'),source=p=>fs.readFileSync(path.join(root,p),'utf8'),read=p=>JSON.parse(source(p));
-const data={rulebook:read('bank-rules/rules.json'),factbook:read('bank-rules/facts.json'),products:read('bank-rules/products.json'),approval:read('bank-rules/approval.json'),identityIndex:read('data/card-identity-index.json')};
+const data={rulebook:read('bank-rules/rules.json'),factbook:read('bank-rules/facts.json'),products:read('bank-rules/products.json'),approval:read('bank-rules/approval.json'),messages:read('bank-rules/messages.zh-CN.json'),identityIndex:read('data/card-identity-index.json')};
 const client=createClient(data);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',bofa_approved_2m:0,bofa_approved_12m:0,bofa_approved_24m:0,cap1_application_or_approval_lt_6m:'NO',cap1_applications_30d:0,wf_consumer_opened_lt_4m:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
@@ -56,7 +56,7 @@ assert.equal(client.getOfferTiming({product_id:csp,offerTiming:read('data/offer-
 assert.equal(client.getOfferTiming({product_id:'chase_ink_business_premier',offerTiming:read('data/offer-timing.json')}),null);
 assert.throws(()=>client.getOfferHistory({product_id:csp,evaluation_date:'2026-02-30'}),/INVALID_EVALUATION_DATE/);
 assert.doesNotMatch(source('adapters/assessment-api-v2.js'),/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
-const allowedPaths=['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json','bank-rules/approval.json','data/card-identity-index.json','data/amex-formal-product-identities.json','data/offer-history.json','data/offer-timing.json'];
+const allowedPaths=['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json','bank-rules/approval.json','bank-rules/messages.zh-CN.json','data/card-identity-index.json','data/amex-formal-product-identities.json','data/offer-history.json','data/offer-timing.json'];
 const messages=[],requests=[],listeners=[];
 const ctx={URL,console,location:{origin:'https://ymlulu.github.io'},addEventListener:(type,fn)=>{if(type==='message')listeners.push(fn);},
  fetch:async(p,opts)=>{requests.push({p,opts});assert.ok(allowedPaths.includes(p));assert.ok(!opts?.body);assert.ok(!opts?.method||opts.method==='GET');return {ok:true,json:async()=>read(p)};}};
@@ -76,7 +76,7 @@ const send=async(method,params,origin='https://ymlulu.github.io',channel='nextbo
  await send('evaluate',{request:request(csp)},'https://untrusted.example');
  await send('evaluate',{request:request(csp)},'https://ymlulu.github.io','nextbonus-assessment-v1');
  assert.equal(messages.length,1,'untrusted origin and legacy channel ignored');
- assert.equal(requests.length,6,'eligibility only loads public rule and identity assets');
+ assert.equal(requests.length,7,'eligibility only loads public rule and identity assets');
  await send('getOfferHistory',{product_id:'amex_platinum'});
  assert.equal(messages.at(-1).msg.result.historical_reference_only,true);
  assert.equal(requests.at(-1).p,'data/offer-history.json');

@@ -28,3 +28,7 @@ The editable schema includes all common and bank-specific questions; use section
 ### User-facing decision
 
 `evaluation.decision` (also `report.decision`) contains `code`, `label`, `summary`, `reasons` (`kind`, `text`, `rule_ids`), and `note`. Reasons are generated from the actual triggered evidence and base credit calculation, with overlapping explanations deduplicated. The main UI renders the label and readable reasons only; scores, rule IDs and full evaluation remain in a collapsed report. Decision codes and rule effects are unchanged. `facts.json.result_reason` is optional presentation metadata; numeric `{count}` comes from the actual predicate and `{card}` from the selected product/history label.
+
+### Language pack
+
+The current local client requires `messages` from `bank-rules/messages.zh-CN.json`. The pack owns all fact titles/options/history labels, rule labels, result reason templates, decision labels and dynamic UI copy. Rule thresholds and effects remain in `rules.json`; typed fact identities and relation definitions remain in `facts.json`. Locale fields are projected through an explicit display-only allowlist. The HTML shell contains boot-time fallback text and is populated from the pack after loading. Editing wording does not alter decisions. The bridge loads the additional static JSON via GET only.
