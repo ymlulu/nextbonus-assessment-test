@@ -147,6 +147,35 @@ assert.match(onlyIssuerGap.evaluation.application.message,/Amex 申请记录需�
 const completeIssuer=call('Delta SkyMiles Gold Card',clean);
 assert.equal(completeIssuer.evaluation.application.issuer_rules_completed,true);
 assert.equal(completeIssuer.evaluation.application.unresolved_rules.length,0);
+// Every displayed band is equivalent to all exact counts it represents.
+// Also assert that the schema uses the correct card-form-specific threshold.
+for(const [card,rule,threshold] of [
+ ['Blue Cash Everyday Card','AMEX-007',5],[gold,'AMEX-008',10]
+]){
+ const pending=call(card,{...clean,F10_ISSUER_PORTFOLIO_COUNT:undefined});
+ const q=pending.questionnaire.questionnaire.specific.find(x=>x.id==='F10_ISSUER_PORTFOLIO_COUNT');
+ assert.deepEqual(q.count_bands.map(x=>x.value),[0,threshold]);
+ for(let count=0;count<=40;count++){
+  const exact=call(card,{...clean,F10_ISSUER_PORTFOLIO_COUNT:count}).evaluation;
+  const band=call(card,{...clean,F10_ISSUER_PORTFOLIO_COUNT:count>=threshold?threshold:0}).evaluation;
+  assert.equal(exact.rule_results.find(x=>x.rule_id===rule).status,band.rule_results.find(x=>x.rule_id===rule).status);
+  assert.equal(exact.application.status,band.application.status);
+  assert.equal(exact.bonus.status,band.bonus.status);
+ }
+}
+const amex90=call('Blue Cash Everyday Card',{...clean,F02_ISSUER_APPLICATION_HISTORY:undefined})
+ .questionnaire.questionnaire.specific.find(x=>x.id==='F02_ISSUER_APPLICATION_HISTORY')
+ .fields.find(x=>x.id==='approved_revolving_90d');
+assert.deepEqual(amex90.count_bands.map(x=>x.value),[0,2]);
+for(let count=0;count<=30;count++){
+ const evaluate=n=>call('Blue Cash Everyday Card',{...clean,F02_ISSUER_APPLICATION_HISTORY:{
+  approved_revolving_90d:n,same_product_applied_or_approved_90d:'NO'}}).evaluation;
+ const exact=evaluate(count),band=evaluate(count>=2?2:0);
+ assert.equal(exact.application.status,band.application.status);
+ assert.equal(exact.rule_results.find(x=>x.rule_id==='AMEX-006').status,band.rule_results.find(x=>x.rule_id==='AMEX-006').status);
+ assert.equal(exact.bonus.status,band.bonus.status);
+}
+assert.match(call(gold,{...clean,F10_ISSUER_PORTFOLIO_COUNT:0}).evaluation.rule_results.find(x=>x.rule_id==='AMEX-008').reason,/少于 10 张/);
 const secret='PRIVATE_CREDIT_FACT_DO_NOT_ECHO';
 r=call(gold,{...clean,F03_CARD_HISTORY:[secret]});
 assert.ok(!JSON.stringify(r.evaluation).includes(secret),

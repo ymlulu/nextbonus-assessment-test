@@ -97,12 +97,12 @@ function evaluate({plan,product,answers={},policy,approvalConfig,offerContext,ma
   if(id==='AMEX-007'||id==='AMEX-008'){
    const n=a.F10_ISSUER_PORTFOLIO_COUNT,threshold=id==='AMEX-007'?5:10;
    events.push(result(id,!count(n)?'MISSING':n>=threshold?'TRIGGERED':'CLEAR',dim,
-    count(n)?'你现在持有 '+n+' 张同类 Amex 卡；'+threshold+' 张是经验参考，并非一定会拒批':'还需要知道你现在持有几张同类 Amex 卡'));continue;
+    count(n)?'你现在持有 '+(n>=threshold?threshold+' 张或更多':'少于 '+threshold+' 张')+' 同类 Amex 卡；'+threshold+' 张是经验参考，并非一定会拒批':'还需要知道你现在持有几张同类 Amex 卡'));continue;
   }
   if(id==='AMEX-006'){
    const n=activity.approved_revolving_90d;
    events.push(result(id,!count(n)?'MISSING':n>=2?'TRIGGERED':'CLEAR',dim,
-    count(n)?'过去 90 天获批了 '+n+' 张 Amex 普通信用卡':'还需要知道过去 90 天获批了几张 Amex 普通信用卡'));continue;
+    count(n)?'过去 90 天获批的 Amex 普通信用卡为 '+(n>=2?'2 张或更多':'0–1 张'):'还需要知道过去 90 天获批了几张 Amex 普通信用卡'));continue;
   }
   if(id==='AMEX-011'){
    const v=activity.same_product_applied_or_approved_90d;

@@ -24,6 +24,13 @@ const amex=planner.getQuestionnaire({product_id:'amex_platinum'});
 const citi=planner.getQuestionnaire({product_id:'citi_strata_elite'});
 assert.equal(csp.questionnaire.benefits,null,'benefits are owned by a separate module');
 assert.equal(csp.questionnaire.common.length,4);
+for(const id of ['a3','a4']){
+ const options=csp.questionnaire.common.find(q=>q.id===id).options;
+ assert.deepEqual(options.map(o=>o.value),['N0','N2_3','N4_5','N6_PLUS','UNKNOWN']);
+ assert.equal(options[0].label,'0–1 张');
+}
+assert.ok(existing.common.find(q=>q.id==='a3').options.some(o=>o.value==='N1'),
+ 'source-owned questions remain unchanged');
 assert.ok(csp.diagnostics.applicable_rule_ids.includes('CHASE-001'));
 assert.ok(!amex.diagnostics.applicable_rule_ids.includes('CHASE-001'));
 assert.ok(!citi.diagnostics.applicable_rule_ids.includes('CHASE-001'));

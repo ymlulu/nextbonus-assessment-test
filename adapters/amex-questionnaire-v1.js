@@ -61,6 +61,10 @@
           output.allow_none=true;
         }
         if(q.id==='F10_ISSUER_PORTFOLIO_COUNT'){
+          // Use the applicable rule, not a generic list of card counts.
+          const activeCountRule=output.rule_ids.find(id=>template.count_bands_by_rule?.[id]);
+          output.count_bands=template.count_bands_by_rule?.[activeCountRule]||[];
+          delete output.count_bands_by_rule;
           output.title=product.card_form==='REVOLVING_CREDIT'
             ?'你现在有几张 Amex 普通信用卡？（个人卡、商业卡都算）'
             :'你现在有几张 Amex Platinum、Gold 这类签账卡？';
