@@ -19,14 +19,25 @@ const LABEL_TO_ID={
  'AMEX Marriott Bonvoy Brilliant':'amex_marriott_brilliant',
  'AMEX Marriott Bonvoy Business / Legacy SPG Business':'amex_marriott_business'
 };
-const QUESTIONS={
- held_now:{title:'这张卡现在还在你名下吗？',type:'single'},
- closed_within_30d:{title:'如果已经关卡，是过去 30 天内关掉的吗？',type:'single'},
- approved_within_90d:{title:'这张卡是在过去 90 天内获批的吗？',type:'single'},
- bonus_or_upgrade_within_24m:{title:'过去 24 个月，你拿到过这张卡的开卡奖励或升级奖励吗？',type:'single'},
- new_card_bonus_within_24m:{title:'过去 24 个月，你拿到过这类卡的开卡奖励吗？（不包括升级奖励）',type:'single'}
+// Presentation groups use the SAME canonical per-card fact fields as the
+// matrix conditions. Never combine new-card-only and upgrade-inclusive rules.
+const GROUP_TITLES={
+ held_now:'下面这些卡，你现在还持有哪些？',
+ closed_within_30d:'下面这些已关卡或转卡的卡，过去 30 天内你还持有过哪些？',
+ approved_within_90d:'过去 90 天内，你申请并获批过下面哪些卡？',
+ new_card_bonus_within_24m:'过去 24 个月，你拿过下面哪些卡的开卡奖励？（不包括升级奖励）',
+ bonus_or_upgrade_within_24m:'过去 24 个月，你拿过下面哪些卡的开卡奖励或升级奖励？'
 };
-const YESNO=[{value:'YES',label:'是'},{value:'NO',label:'否'}];
+const groupId=field=>'F07_MARRIOTT_GROUP:'+field;
+function groupQuestions(groups,answeredOnly=false){
+ return Object.entries(GROUP_TITLES).flatMap(([field,title])=>{
+  const options=(groups.get(field)||[]).filter(o=>!answeredOnly||o.answered);
+  if(!options.length)return [];
+  return [{id:groupId(field),type:'marriott_multi',fact_field:field,title,
+   description:'只列出与你刚才选择的持卡历史及本次申请条款有关的卡。勾选符合条件的卡；都不符合就选以上都没有。',
+   options,allow_none:true,rule_ids:options.map(o=>'MARRIOTT-MATRIX:'+o.value)}];
+ });
+}
 function parseHistories(v){
  if(!Array.isArray(v)||v.length===0)return null;
  if(v.includes('NONE'))return v.length===1?[]:null;
@@ -90,13 +101,13 @@ function createMatrix(index){
       description:chase?'包括已经关掉的卡。只列出可能影响这次申请或开卡奖励的产品。':'包括已经关掉的卡。只列出可能影响你这次开卡奖励的产品。',
       options:index.prior_products.filter(p=>{
         const v=p.cells[target];return v!=='OK'&&v!=='LL'&&v!=='LL / family';
-      }).map(p=>({value:choiceFor(p),label:labelFor(p)})),allow_none:true,
+      }).map(p=>({value:choiceFor(p),label:labelFor(p),prior_id:p.id})),allow_none:true,
       rule_ids:['MARRIOTT-MATRIX']}]};
   // Only the selected histories can ever influence the decision.
   // LL restrictions are evaluated by the separate AMEX family/lifetime rules.
   // A cross-issuer history list containing only LL/irrelevant products is clear
   // for this matrix, not proof that all lifetime restrictions are absent.
-  const pending=[],events=[],questions=[];
+  const pending=[],events=[],groups=new Map();
   const facts=known_facts.F07_MARRIOTT_DETAILS&&typeof known_facts.F07_MARRIOTT_DETAILS==='object'?
     known_facts.F07_MARRIOTT_DETAILS:{};
   for(const id of selected){
@@ -111,6 +122,19 @@ function createMatrix(index){
     ...(productGate?{product_eligibility:true}:chase?{hard_bonus_eligibility:true}:{})};
    const checks=clauses.map(type=>({type,result:condition(type,current),required:fields(type,current)}));
    const positive=checks.filter(x=>x.result===true);
+   const unknown=checks.filter(x=>x.result===null);
+   // Preserve answered options in the same group for editing. Only include
+   // a close-date option after confirming that its card is no longer held.
+   // Chase QA keeps independent conditions available even after a trigger;
+   // Amex still short-circuits after a decisive bonus blocker.
+   const required=new Set(chase||!positive.length?unknown.flatMap(x=>x.required):[]);
+   for(const field of new Set(clauses.flatMap(conditionKey))){
+    if(field==='closed_within_30d'&&current.held_now!=='NO')continue;
+    const answered=current[field]==='YES'||current[field]==='NO';
+    if(!answered&&!required.has(field))continue;
+    if(!groups.has(field))groups.set(field,[]);
+    groups.get(field).push({value:id,label,answered,pending:!answered&&required.has(field)});
+   }
    if(positive.length){
     const reasons={held_now:'目前仍持有相关卡',closed_within_30d:'过去 30 天内持有过相关卡',
       approved_within_90d:'过去 90 天内申请并获批相关卡',
@@ -121,38 +145,30 @@ function createMatrix(index){
     const reason=chase?label+'：'+fields.map(k=>reasons[k]).join('；'):
       '根据 '+prior.label+' 的持卡时间或奖励记录，这次开卡奖励可能受限（条件：'+positive.map(x=>x.type).join('、')+'）';
     events.push({...eventBase,status:'TRIGGERED',reason,
-      ...(chase?{trigger_sources:[
+      trigger_sources:[
         {question_id:'F07_MARRIOTT_HISTORY',value:choiceFor(prior),reason},
-        ...fields.map(field=>({question_id:'F07_MARRIOTT_DETAILS:'+id,field,reason:reasons[field]}))
-      ]}:{})});
+        ...fields.map(field=>({question_id:groupId(field),value:id,reason:reasons[field]}))
+      ]});
     continue;
    }
-   const unknown=checks.filter(x=>x.result===null);
    if(!unknown.length){
     events.push({...eventBase,status:'CLEAR',reason:'按目前填写的时间，'+label+' 的相关限制没有触发'});
     continue;
    }
    pending.push(id);
-   const needed=[...new Set(unknown.flatMap(x=>x.required))];
-   const chaseCopy={held_now:'现在还持有上面这类卡中的任何一张吗？',
-    closed_within_30d:'过去 30 天内还持有过这类卡吗？（包括后来关卡或转卡）',
-    approved_within_90d:'过去 90 天内，你申请并获批过这类卡吗？',
-    bonus_or_upgrade_within_24m:'过去 24 个月，你拿过这类卡的开卡奖励或升级奖励吗？'};
-   const fieldsNeeded=needed.map(k=>({id:k,type:QUESTIONS[k].type,label:chase?(chaseCopy[k]||QUESTIONS[k].title):QUESTIONS[k].title,options:YESNO}));
-   questions.push({id:'F07_MARRIOTT_DETAILS:'+id,type:'structured_marriott',
-    prior_id:id,title:'关于 '+label+'，再确认一下时间',description:productGate?'这些时间会影响你能不能申请这张卡和拿到开卡奖励。':'只问可能影响这次开卡奖励的时间，其他问题不需要多答。',
-    fields:fieldsNeeded,rule_ids:['MARRIOTT-MATRIX:'+id]});
    events.push({...eventBase,status:'MISSING',reason:'还需要确认 '+label+' 的持卡或拿奖励时间'});
   }
   // A confirmed trigger resolves bonus eligibility under the assumed standard
   // matrix. Drop irrelevant pending questions, but still return explanation rows.
   if(!chase&&events.some(e=>e.status==='TRIGGERED'))return{
    applicable:true,status:'TRIGGERED',history_known:true,
-   rule_results:events,questions:[],pending_ids:[]};
+   rule_results:events,questions:[],editable_questions:groupQuestions(groups,true),pending_ids:[]};
   // Chase must keep checking card availability even after a bonus-only
   // blocker, and retain every independent answer for QA.
-  return{applicable:true,status:events.some(e=>e.status==='TRIGGERED')?'TRIGGERED':questions.length?'MISSING':'CLEAR',history_known:true,
-   rule_results:events,questions,pending_ids:pending};
+  const editable_questions=groupQuestions(groups);
+  const questions=editable_questions.filter(q=>q.options.some(o=>o.pending));
+  return{applicable:true,status:events.some(e=>e.status==='TRIGGERED')?'TRIGGERED':pending.length?'MISSING':'CLEAR',history_known:true,
+   rule_results:events,questions,editable_questions,pending_ids:pending};
  }
  return Object.freeze({evaluate,version:'1',targetNames:[...TARGETS,...Object.keys(index.chase_targets||{})]});
 }
