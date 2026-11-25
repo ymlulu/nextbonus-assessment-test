@@ -60,7 +60,7 @@ for(const p of ids.products.filter(p=>p.issuer==='AMEX')){
 assert.equal(ask(rt,csp,base,{offer_variant:'NLL'}).offer_context,null);
 assert.deepEqual(ask(rt,csp,base,{offer_variant:'NLL'}).diagnostics,ask(rt,csp,base).diagnostics);
 const runtimeSource=fs.readFileSync(path.join(root,'engines/bank-rules-runtime.js'),'utf8');
-assert.doesNotMatch(runtimeSource,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\\(/,'live rule engine performs no network or storage operations');
+assert.doesNotMatch(runtimeSource,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/,'live rule engine performs no network or storage operations');
 
 assert.equal(ask(rt,'chase_ink_business_premier',{...base,F03_CARD_HISTORY:['Ink Business Premier']}).evaluation.bonus.impact,2);
 const history=['AMEX Marriott Bonvoy Business / Legacy SPG Business','AMEX Marriott Bonvoy Bevy','AMEX Marriott Bonvoy Brilliant'];
