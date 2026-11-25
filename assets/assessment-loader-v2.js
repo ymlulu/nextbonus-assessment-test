@@ -4,9 +4,9 @@
 let clientPromise=null,historyPromise=null,timingPromise=null;
 const json=async path=>{const r=await fetch(path,{cache:'no-cache'});if(!r.ok)throw Error('数据文件加载失败：'+path+' (HTTP '+r.status+')');return r.json();};
 function load(){
- if(!clientPromise)clientPromise=Promise.all(['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json','bank-rules/approval.json',
-  'data/card-identity-index.json','data/amex-formal-product-identities.json'].map(json)).then(([rulebook,factbook,products,approval,identityIndex,formalAmex])=>({
-  client:root.NextBonusAssessmentV2.createClient({rulebook,factbook,products,approval,identityIndex}),formalAmex
+ if(!clientPromise)clientPromise=Promise.all(['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json','bank-rules/approval.json','bank-rules/messages.zh-CN.json',
+  'data/card-identity-index.json','data/amex-formal-product-identities.json'].map(json)).then(([rulebook,factbook,products,approval,messages,identityIndex,formalAmex])=>({
+  client:root.NextBonusAssessmentV2.createClient({rulebook,factbook,products,approval,identityIndex,messages}),formalAmex,messages
  })).catch(e=>{clientPromise=null;throw e;});
  return clientPromise;
 }

@@ -6,9 +6,9 @@
 'use strict';
 const VERSION='2';
 const validDate=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
-function createClient({rulebook,factbook,products,approval,identityIndex}){
+function createClient({rulebook,factbook,products,approval,identityIndex,messages}){
  const lookup=Identity.createLookup(identityIndex);
- const runtime=Rules.createRuntime({rulebook,factbook,products,approval});
+ const runtime=Rules.createRuntime({rulebook,factbook,products,approval,messages});
  const facade=runtime.createFacade(lookup);
  const version={contract_version:VERSION,...facade.getVersion()};
  const plan=request=>({...facade.plan(request),contract_version:VERSION,release_id:version.release_id});

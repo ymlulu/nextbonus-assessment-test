@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path');
 const {createRuntime}=require('../engines/bank-rules-runtime.js');
 const root=path.resolve(__dirname,'..'),read=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
 const rulebook=read('bank-rules/rules.json'),factbook=read('bank-rules/facts.json'),products=read('bank-rules/products.json'),approval=read('bank-rules/approval.json'),ids=read('data/card-identity-index.json');
-const runtime=createRuntime({rulebook,factbook,products,approval});
+const runtime=createRuntime({rulebook,factbook,products,approval,messages:read('bank-rules/messages.zh-CN.json')});
 const assert=(v,label)=>{if(!v)throw Error(label);};
 const eq=(a,b,label)=>assert(JSON.stringify(a)===JSON.stringify(b),label+': '+JSON.stringify(a)+' != '+JSON.stringify(b));
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,

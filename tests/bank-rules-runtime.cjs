@@ -3,7 +3,8 @@ const {createRuntime,countBands}=require('../engines/bank-rules-runtime.js');
 const root=path.resolve(__dirname,'..');
 const read=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
 const rulebook=read('bank-rules/rules.json'),factbook=read('bank-rules/facts.json'),products=read('bank-rules/products.json'),approval=read('bank-rules/approval.json'),ids=read('data/card-identity-index.json');
-const runtime=(book=rulebook)=>createRuntime({rulebook:book,factbook,products,approval});
+const messages=read('bank-rules/messages.zh-CN.json');
+const runtime=(book=rulebook)=>createRuntime({rulebook:book,factbook,products,approval,messages});
 const byId=id=>ids.products.find(p=>p.product_id===id);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,
  F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
@@ -114,7 +115,7 @@ assert.equal(ask(altered,csp,answers).evaluation.application.impact,2);
 assert.equal(ask(altered,csp,answers).evaluation.bonus.impact,2);
 book.rules.at(-1).effect={application:0,bonus:0};assert.throws(()=>runtime(book),/NONZERO/);
 book=structuredClone(rulebook);book.rules.push({...book.rules[0]});assert.throws(()=>runtime(book),/DUPLICATE/);
-assert.deepEqual(countBands([2,5]).map(x=>x.value),[0,2,5]);
+assert.deepEqual(countBands([2,5],undefined,messages).map(x=>x.value),[0,2,5]);
 
 const smart='history_ot_u_s_bank_058',bofa='history_ot_bankofamerica_024';
 const shared=ask(rt,smart,{});
@@ -154,5 +155,35 @@ assert.equal(evt(ask(combined,smart,{...base,recent_new_accounts_12m:3}),'TEST-S
 assert.equal(evt(ask(combined,smart,{...base,recent_new_accounts_12m:{min:2,max:2}}),'TEST-SHARED').status,'CLEAR');
 unified.rules=unified.rules.filter(r=>r.id!=='TEST-SHARED');
 assert.deepEqual(cuts(q(ask(runtime(unified),smart,{}),'recent_new_accounts_12m')),[0,2,4,6]);
+
+
+const adviceOf=(id,patch={},opts={})=>ask(rt,id,{...base,...patch},opts).evaluation.decision;
+const five=adviceOf('chase_sapphire_preferred',{F01_RECENT_NEW_ACCOUNTS:5});
+assert.equal(five.code,'WAIT');
+assert.equal(five.label,'建议等一等再申请');
+assert.ok(five.reasons.some(r=>r.text.includes('过去24个月')&&r.text.includes('至少5张')&&r.text.includes('申请限制')));
+assert.ok(five.reasons.every(r=>!r.text.includes('CHASE-001')));
+const goldAdvice=adviceOf('amex_gold',{F03_CARD_HISTORY:['The Platinum Card']});
+assert.equal(goldAdvice.code,'BLOCK');
+assert.ok(goldAdvice.reasons.some(r=>r.text.includes('Platinum')&&r.text.includes('拿不到开卡奖励')));
+assert.ok(!goldAdvice.reasons.some(r=>r.text.includes('不符合申请条件')));
+const biltAdvice=adviceOf('bilt_palladium',{F03_CARD_HISTORY:['Bilt Blue'],F04_EVER_BONUS_HISTORY:['NONE']});
+assert.equal(biltAdvice.code,'BLOCK');
+assert.ok(biltAdvice.reasons.some(r=>r.text.includes('Bilt Blue')&&r.text.includes('开卡奖励')));
+const usbAdvice=adviceOf('history_ot_u_s_bank_058',{recent_new_accounts_6m:1,recent_new_accounts_12m:2});
+assert.equal(usbAdvice.code,'REVIEW'); // known soft risk, unknown Smartly bonus terms
+assert.ok(usbAdvice.reasons.some(r=>r.text.includes('过去6个月')&&r.text.includes('至少1张')&&r.text.includes('可能影响获批')));
+assert.ok(usbAdvice.reasons.some(r=>r.kind==='REVIEW'));
+const lowCredit=adviceOf('chase_sapphire_preferred',{a1:'LT_6M'});
+assert.equal(lowCredit.code,'RISK');
+assert.ok(lowCredit.reasons.some(r=>r.text.includes('信用卡历史')&&r.text.includes('获批把握偏低')));
+const clearAdvice=adviceOf('chase_sapphire_preferred');
+assert.equal(clearAdvice.code,'CLEAR');
+assert.equal(clearAdvice.reasons.length,0);
+assert.ok(clearAdvice.note.includes('不保证'));
+for(const p of ids.products.filter(p=>rulebook.supported_issuers.includes(p.issuer))){
+ const d=rt.assess({product:p,answers:{}}).evaluation.decision;
+ assert.equal(d.code,'REVIEW');assert.ok(d.reasons.length);
+}
 
 console.log(JSON.stringify({suite:'bank-rules-runtime',rules:rulebook.rules.length,cards:ids.products.filter(p=>rulebook.supported_issuers.includes(p.issuer)).length,mutations:'add/remove/threshold/scope/impact',matrix:'grouped',status:'PASS'}));
