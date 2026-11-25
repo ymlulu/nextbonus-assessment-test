@@ -1,9 +1,16 @@
 {
-  "version": "2026-11-25.2",
+  "version": "2026-11-25.3",
   "supported_issuers": [
     "AMEX",
     "CHASE",
-    "CITI"
+    "CITI",
+    "BOFA",
+    "CAPITAL_ONE",
+    "WELLS_FARGO",
+    "US_BANK",
+    "BARCLAYS",
+    "DISCOVER",
+    "COLUMN_NA"
   ],
   "rules": [
     {
@@ -2870,6 +2877,812 @@
       "offer_scenarios": {
         "STANDARD": "PRESENT"
       }
+    },
+    {
+      "id": "BOFA-001",
+      "label": "2/3/4：近期 BofA 信用卡获批数量",
+      "target": {
+        "issuer": "BOFA",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "bofa_approved_2m",
+            "op": "gte",
+            "value": 2
+          },
+          {
+            "fact": "bofa_approved_12m",
+            "op": "gte",
+            "value": 3
+          },
+          {
+            "fact": "bofa_approved_24m",
+            "op": "gte",
+            "value": 4
+          }
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      }
+    },
+    {
+      "id": "BOFA-002",
+      "label": "个人卡同产品 24 个月持卡限制",
+      "target": {
+        "issuer": "BOFA",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "PERSONAL"
+      },
+      "condition": {
+        "fact": "F03_HELD_WITHIN_24M",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "offer_clause": "BOFA-002",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Atmos Rewards Ascent"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        },
+        {
+          "target": {
+            "product_name": [
+              "Atmos Rewards Summit"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "ABSENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "BOFA-003",
+      "label": "商业卡 24 个月持卡限制",
+      "target": {
+        "issuer": "BOFA",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "condition": {
+        "fact": "bofa_business_held_24m",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "offer_clause": "BOFA-003"
+    },
+    {
+      "id": "BOFA-PROD-002",
+      "label": "Atmos Ascent 同产品 24 个月持卡限制",
+      "target": {
+        "issuer": "BOFA",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Atmos Rewards Ascent"
+        ]
+      },
+      "condition": {
+        "fact": "F03_HELD_WITHIN_24M",
+        "op": "includes_any",
+        "values": [
+          "Atmos Rewards Ascent"
+        ]
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "CAP1-001",
+      "label": "6 个月内 Capital One 申请或获批记录",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "cap1_application_or_approval_lt_6m",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 1,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "CAP1-002",
+      "label": "30 天内 Capital One 申请次数限制",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "cap1_applications_30d",
+        "op": "gte",
+        "value": 2
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      },
+      "offer_clause": "CAP1-002",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Capital One Venture X"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CAP1-003",
+      "label": "同卡 48 个月开卡奖励限制",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "PERSONAL"
+      },
+      "condition": {
+        "fact": "F04_BONUS_RECEIVED_48M",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CAP1-003",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Capital One VentureOne",
+              "Capital One Venture",
+              "Capital One Venture X"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CAP1-004",
+      "label": "Venture 系列 48 个月奖励限制（按目标卡方向）",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Capital One VentureOne",
+          "Capital One Venture",
+          "Capital One Venture X"
+        ]
+      },
+      "condition": {
+        "fact": "F04_BONUS_RECEIVED_48M",
+        "op": "includes_any",
+        "values": [
+          "Capital One VentureOne",
+          "Capital One Venture",
+          "Capital One Venture X"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "overrides": [
+        {
+          "target": {
+            "product_name": "Capital One Venture"
+          },
+          "condition": {
+            "fact": "F04_BONUS_RECEIVED_48M",
+            "op": "includes_any",
+            "values": [
+              "Capital One Venture",
+              "Capital One Venture X"
+            ]
+          }
+        },
+        {
+          "target": {
+            "product_name": "Capital One Venture X"
+          },
+          "condition": {
+            "fact": "F04_BONUS_RECEIVED_48M",
+            "op": "includes_any",
+            "values": [
+              "Capital One Venture X"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CAP1-005",
+      "label": "Capital One 商业卡历史可能影响奖励",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "condition": {
+        "fact": "cap1_business_ever_held",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "offer_clause": "CAP1-005"
+    },
+    {
+      "id": "CAP1-007",
+      "label": "具体申请条款中的当前账户数上限",
+      "target": {
+        "issuer": "CAPITAL_ONE",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "cap1_open_accounts",
+        "op": "gte",
+        "value_from": "offer_limit"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK"
+      },
+      "offer_clause": "CAP1-007",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Capital One Venture X"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "ABSENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WF-001",
+      "label": "4 个月内新开 Wells Fargo 品牌个人卡",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "PERSONAL"
+      },
+      "condition": {
+        "fact": "wf_consumer_opened_lt_4m",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "offer_clause": "WF-001",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Wells Fargo Active Cash",
+              "Wells Fargo Autograph",
+              "Wells Fargo Autograph Journey"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WF-PROD-001",
+      "label": "Wells Fargo Active Cash 当前持有或 48 个月内开户奖励限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Wells Fargo Active Cash"
+        ]
+      },
+      "condition": {
+        "fact": "F03_HELD_OR_OPENED_48M",
+        "op": "includes_any",
+        "values": [
+          "Wells Fargo Active Cash"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      }
+    },
+    {
+      "id": "WF-PROD-002",
+      "label": "Wells Fargo Autograph 当前持有或 48 个月内开户奖励限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Wells Fargo Autograph"
+        ]
+      },
+      "condition": {
+        "fact": "F03_HELD_OR_OPENED_48M",
+        "op": "includes_any",
+        "values": [
+          "Wells Fargo Autograph"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      }
+    },
+    {
+      "id": "WF-PROD-003",
+      "label": "Wells Fargo Autograph Journey 当前持有或 48 个月内开户奖励限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Wells Fargo Autograph Journey"
+        ]
+      },
+      "condition": {
+        "fact": "F03_HELD_OR_OPENED_48M",
+        "op": "includes_any",
+        "values": [
+          "Wells Fargo Autograph Journey"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      }
+    },
+    {
+      "id": "WF-PROD-004",
+      "label": "Choice 个人卡系列当前持卡限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Choice Privileges Mastercard",
+          "Choice Privileges Select Mastercard"
+        ]
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Choice Privileges Mastercard",
+          "Choice Privileges Select Mastercard"
+        ]
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "WF-PROD-005",
+      "label": "Choice 系列 15 个月内开户且取得奖励",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Choice Privileges Mastercard",
+          "Choice Privileges Select Mastercard"
+        ]
+      },
+      "condition": {
+        "fact": "F03_OPENED_AND_RECEIVED_BONUS_15M",
+        "op": "includes_any",
+        "values": [
+          "Choice Privileges Mastercard",
+          "Choice Privileges Select Mastercard"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      }
+    },
+    {
+      "id": "WF-PROD-006",
+      "label": "One Key 系列当前持卡限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "One Key Card"
+        ]
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "One Key Card",
+          "One Key+ Card",
+          "Hotels.com Card"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      }
+    },
+    {
+      "id": "WF-PROD-007",
+      "label": "One Key+ 系列当前持卡风险",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "One Key+ Card"
+        ]
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "One Key Card",
+          "One Key+ Card",
+          "Hotels.com Card"
+        ]
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "WF-PROD-008",
+      "label": "One Key 系列 48 个月开户奖励限制",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "One Key Card",
+          "One Key+ Card"
+        ]
+      },
+      "condition": {
+        "fact": "F03_OPENED_WITHIN_48M",
+        "op": "includes_any",
+        "values": [
+          "One Key Card",
+          "One Key+ Card",
+          "Hotels.com Card"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      }
+    },
+    {
+      "id": "DISC-001",
+      "label": "Discover 同时持有最多 2 张卡",
+      "target": {
+        "issuer": "DISCOVER",
+        "product_type": "CREDIT_CARD",
+        "brand": "DISCOVER"
+      },
+      "condition": {
+        "fact": "discover_current_cards",
+        "op": "gte",
+        "value": 2
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      }
+    },
+    {
+      "id": "DISC-003",
+      "label": "指定限时一次性奖励的 48 个月历史限制",
+      "target": {
+        "issuer": "DISCOVER",
+        "product_type": "CREDIT_CARD",
+        "brand": "DISCOVER"
+      },
+      "condition": {
+        "fact": "F04_BONUS_RECEIVED_48M",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "offer_clause": "DISC-003"
+    },
+    {
+      "id": "BARC-001",
+      "label": "6/24：24 个月新开账户数量",
+      "target": {
+        "issuer": "BARCLAYS",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "F01_RECENT_NEW_ACCOUNTS",
+        "op": "gte",
+        "value": 6
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "USB-001",
+      "label": "0/6、1/12：近期新账户敏感度",
+      "target": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "recent_new_accounts_6m",
+            "op": "gte",
+            "value": 1
+          },
+          {
+            "fact": "recent_new_accounts_12m",
+            "op": "gte",
+            "value": 2
+          }
+        ]
+      },
+      "effect": {
+        "application": 1,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "USB-PROD-002",
+      "label": "Altitude Go 5 年同卡新户奖励限制",
+      "target": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "U.S. Bank Altitude Go Visa Signature"
+        ]
+      },
+      "condition": {
+        "fact": "F04_BONUS_RECEIVED_60M",
+        "op": "includes_any",
+        "values": [
+          "U.S. Bank Altitude Go Visa Signature"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      }
+    },
+    {
+      "id": "USB-PROD-003",
+      "label": "Altitude Connect 5 年同卡新户奖励限制",
+      "target": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "U.S. Bank Altitude Connect Visa Signature"
+        ]
+      },
+      "condition": {
+        "fact": "F04_BONUS_RECEIVED_60M",
+        "op": "includes_any",
+        "values": [
+          "U.S. Bank Altitude Connect Visa Signature"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      }
+    },
+    {
+      "id": "USB-PROD-004",
+      "label": "Cash+ 原 Cash Rewards 账户或升级奖励限制",
+      "target": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "U.S. Bank Cash+ Visa Signature"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "U.S. Bank Cash Rewards Visa"
+            ]
+          },
+          {
+            "fact": "usb_cashplus_upgrade",
+            "op": "eq",
+            "value": "YES"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      }
+    },
+    {
+      "id": "BILT-001",
+      "label": "Bilt Card 2.0 系列终身奖励限制",
+      "target": {
+        "issuer": "COLUMN_NA",
+        "product_type": "CREDIT_CARD",
+        "brand": "BILT",
+        "generation": "BILT_2_0"
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "Bilt Blue",
+              "Bilt Obsidian",
+              "Bilt Palladium"
+            ]
+          },
+          {
+            "fact": "F04_EVER_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "Bilt Blue",
+              "Bilt Obsidian",
+              "Bilt Palladium"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      }
+    },
+    {
+      "id": "BILT-003",
+      "label": "最近一次 Bilt 申请被拒不足 45 天",
+      "target": {
+        "issuer": "COLUMN_NA",
+        "product_type": "CREDIT_CARD",
+        "brand": "BILT",
+        "generation": "BILT_2_0"
+      },
+      "condition": {
+        "fact": "bilt_decline_lt_45d",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      }
+    }
+  ],
+  "coverage_checks": [
+    {
+      "id": "BOFA-PROD-001",
+      "label": "Summit 的具体开户奖励条款仍需核实",
+      "target": {
+        "issuer": "BOFA",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Atmos Rewards Summit"
+        ]
+      },
+      "dimension": "BONUS"
+    },
+    {
+      "id": "USB-002",
+      "label": "U.S. Bank 目标产品的具体奖励条款仍需核实",
+      "target": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD"
+      },
+      "covered_targets": {
+        "issuer": "US_BANK",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "U.S. Bank Altitude Go Visa Signature",
+          "U.S. Bank Altitude Connect Visa Signature",
+          "U.S. Bank Cash+ Visa Signature"
+        ]
+      },
+      "dimension": "BONUS"
+    },
+    {
+      "id": "BARC-002",
+      "label": "Barclays 目标产品的具体开卡奖励条款仍需核实",
+      "target": {
+        "issuer": "BARCLAYS",
+        "product_type": "CREDIT_CARD"
+      },
+      "dimension": "BONUS"
+    },
+    {
+      "id": "COVERAGE-WF-BUSINESS-APPLICATION",
+      "label": "Wells Fargo 商业卡的具体申请限制尚待核实",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "dimension": "APPLICATION"
+    },
+    {
+      "id": "COVERAGE-WF-BUSINESS-BONUS",
+      "label": "Wells Fargo 商业卡的具体奖励条款尚待核实",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "dimension": "BONUS"
     }
   ]
 }

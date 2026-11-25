@@ -7,9 +7,9 @@ const runtime=(book=rulebook)=>createRuntime({rulebook:book,factbook,products,ap
 const byId=id=>ids.products.find(p=>p.product_id===id);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',
  F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
- F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO'},
+ F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',bofa_approved_2m:0,bofa_approved_12m:0,bofa_approved_24m:0,cap1_application_or_approval_lt_6m:'NO',cap1_applications_30d:0,wf_consumer_opened_lt_4m:'NO'},
  F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],
- F07_MARRIOTT_HISTORY:['NONE'],F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES'};
+ F07_MARRIOTT_HISTORY:['NONE'],F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES',F03_HELD_WITHIN_24M:['NONE'],bofa_business_held_24m:'NO',F04_BONUS_RECEIVED_48M:['NONE'],cap1_business_ever_held:'NO',cap1_open_accounts:0,F03_HELD_OR_OPENED_48M:['NONE'],F03_OPENED_AND_RECEIVED_BONUS_15M:['NONE'],F03_OPENED_WITHIN_48M:['NONE'],discover_current_cards:0,recent_new_accounts_6m:0,recent_new_accounts_12m:0,F04_BONUS_RECEIVED_60M:['NONE'],usb_cashplus_upgrade:'NO',bilt_decline_lt_45d:'NO'};
 const ask=(rt,id,answers=base,opts={})=>rt.assess({product:byId(id),answers,...opts});
 const evt=(r,id)=>r.evaluation.rule_results.find(x=>x.rule_id===id);
 const q=(r,id)=>r.questionnaire.editable.find(x=>x.id===id);
@@ -19,13 +19,18 @@ const rt=runtime();
 assert.ok(rulebook.rules.length>0);
 assert.equal(new Set(rulebook.rules.map(r=>r.id)).size,rulebook.rules.length);
 assert.ok(!rulebook.rules.some(r=>r.id==='AMEX-010'));
+const appReview=new Set(["history_ot_wellsfargo_097","capital_one_venture","history_ot_bankofamerica_029","history_ot_bankofamerica_030","history_ot_capitalone_049","history_ot_capitalone_050","history_ot_capitalone_051","history_ot_bankofamerica_052","history_ot_bankofamerica_053","history_ot_bankofamerica_054","history_ot_wellsfargo_061","history_ot_wellsfargo_062","history_ot_capitalone_076","history_ot_capitalone_077","history_ot_capitalone_083","history_ot_bankofamerica_085","history_ot_capitalone_090","history_ot_capitalone_091","wf_choice","wf_choice_select"]),bonusReview=new Set(["history_ot_wellsfargo_097","citi_costco_anywhere_visa","citi_costco_anywhere_business","bofa_atmos_rewards_summit","history_ot_capitalone_049","history_ot_capitalone_050","history_ot_u_s_bank_058","history_ot_discovercapitalone_063","history_ot_barclays_066","history_ot_barclays_067","history_ot_barclays_068","history_ot_barclays_069","history_ot_capitalone_076","history_ot_capitalone_077","history_ot_capitalone_083","history_ot_u_s_bank_088","history_ot_u_s_bank_089","history_ot_capitalone_090","history_ot_capitalone_091","history_ot_u_s_bank_096","history_ot_barclays_098"]);
 for(const p of ids.products.filter(p=>rulebook.supported_issuers.includes(p.issuer))){
  const blank=rt.assess({product:p}),clean=rt.assess({product:p,answers:base});
- assert.ok(blank.questionnaire.editable.length,p.product_id);
+ if(p.product_id==='history_ot_wellsfargo_097'){
+  assert.equal(blank.questionnaire.editable.length,0,'no invented issuer-specific question');
+  assert.equal(blank.questionnaire.common.length,4,'all base questions still available');
+  assert.deepEqual(blank.diagnostics.unresolved_system_gates.map(x=>x.rule_id),['COVERAGE-WF-BUSINESS-APPLICATION','COVERAGE-WF-BUSINESS-BONUS']);
+ }else assert.ok(blank.questionnaire.editable.length,p.product_id);
  assert.equal(clean.evaluation.application.impact,0,p.product_id);
  assert.equal(clean.evaluation.bonus.impact,0,p.product_id);
- assert.equal(clean.evaluation.application.status,'MODEL_ONLY',p.product_id);
- assert.equal(clean.evaluation.bonus.status,p.product_id.startsWith('citi_costco_')?'NEEDS_REVIEW':'NO_TRIGGER_FOUND',p.product_id);
+ assert.equal(clean.evaluation.application.status,appReview.has(p.product_id)?'INSUFFICIENT_DATA':'MODEL_ONLY',p.product_id);
+ assert.equal(clean.evaluation.bonus.status,bonusReview.has(p.product_id)?'NEEDS_REVIEW':'NO_TRIGGER_FOUND',p.product_id);
  assert.equal(clean.evaluation.answers_transmitted,false);
  assert.deepEqual(clean,rt.assess({product:p,answers:base}));
 }

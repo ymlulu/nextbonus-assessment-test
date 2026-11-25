@@ -305,6 +305,46 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(walk(get('questions')).some(n=>/不足 90 天内/.test(n.textContent)));
  assert.ok(!walk(get('questions')).some(n=>/不足 8 天内/.test(n.textContent)));
  assert.ok(get('card-select').options.some(x=>/Costco Anywhere Visa Business/.test(x.textContent)));
+
+ // Smoke each remaining bank using the real shared DOM code, with one positive input.
+ function pick(bank,kind,pattern){
+  get('issuer').value=bank;get('issuer').fire('change');
+  get('customer-type').value=kind;get('customer-type').fire('change');
+  const opt=get('card-select').options.find(x=>pattern.test(x.textContent));
+  assert.ok(opt,bank+' identity selectable');get('card-select').value=opt.value;get('card-select').fire('change');
+  assert.ok(get('questions').children.length>4,bank+' generic questions');
+  assert.ok(walk(get('assessment-result')).some(n=>/查看完整报告/.test(n.textContent)));
+ }
+ function answerCount(bands,value){
+  const select=selectValues(bands);assert.ok(select,'count bands '+bands.join(','));
+  select.value=value;select.fire('change');
+ }
+ pick('BOFA','PERSONAL',/Atmos Rewards Ascent/);
+ answerCount(['','0','2'],'2');
+ assert.ok(walk(get('assessment-result')).some(n=>/建议等待申请限制解除/.test(n.textContent)));
+ pick('CAPITAL_ONE','PERSONAL',/Venture X$/);
+ answerCount(['','0','2'],'2');
+ assert.ok(walk(get('assessment-result')).some(n=>/建议等待申请限制解除/.test(n.textContent)));
+ pick('WELLS_FARGO','PERSONAL',/Active Cash/);
+ selectHistory('Wells Fargo Active Cash');
+ assert.ok(walk(get('assessment-result')).some(n=>/可能拿不到开卡奖励/.test(n.textContent)));
+ pick('WELLS_FARGO','BUSINESS',/Signify Business Cash/);
+ assert.ok(walk(get('questions')).some(n=>/目前没有其他需要回答的问题/.test(n.textContent)));
+ assert.ok(get('gaps').textContent.includes('COVERAGE-WF-BUSINESS-APPLICATION'));
+ assert.ok(get('gaps').textContent.includes('COVERAGE-WF-BUSINESS-BONUS'));
+ assert.ok(walk(get('assessment-result')).some(n=>/还需要确认/.test(n.textContent)));
+ pick('US_BANK','PERSONAL',/Altitude Go/);
+ selectHistory('U.S. Bank Altitude Go Visa Signature');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ pick('BARCLAYS','PERSONAL',/Wyndham Earner$/);
+ answerCount(['','0','6'],'6');
+ assert.ok(walk(get('assessment-result')).some(n=>/发现可能影响申请的情况/.test(n.textContent)));
+ pick('DISCOVER','PERSONAL',/Discover it Cash Back/);
+ answerCount(['','0','2'],'2');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这张卡的申请条件/.test(n.textContent)));
+ pick('COLUMN_NA','PERSONAL',/Bilt Palladium/);
+ selectHistory('Bilt Blue');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
  // Exercise the transient failure branch and successful retry on a fresh page.
  const retryContext={...context,window:null};
  // Reuse script/bootstrap module only after changing fetch to test the recovery path.
@@ -338,5 +378,5 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.equal(get2('card-select').value,'');
  console.log(JSON.stringify({suite:'browser-startup-smoke',
   controls:'bank/type/card',identity:'exact id',onBoot:'no stale report',
-  failureRetry:'works',amexChaseCiti:'verified',answersUploaded:false,status:'PASS'}));
+  failureRetry:'works',allTenIssuers:'verified',answersUploaded:false,status:'PASS'}));
 })().catch(e=>{console.error(e);process.exitCode=1;});

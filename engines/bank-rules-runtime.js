@@ -109,6 +109,10 @@ function validate({rulebook,factbook,products,approval}){
   }else if(f.type==='number'){
    if(own(node,'values')||own(node,'legacy')||(own(node,'value')===own(node,'value_from')))
     fail('INVALID_THRESHOLD',r.id);
+   if(node.value_from==='offer_limit'){
+    if(!r.offer_clause||node.op!=='gte')fail('INVALID_OFFER_THRESHOLD',r.id);
+    return;
+   }
    const v=node.value_from==='condition.value'?r.condition?.value:node.value;
    if(!validCount(v)||v>=Number.MAX_SAFE_INTEGER||own(node,'value_from')&&node.value_from!=='condition.value')
     fail('INVALID_THRESHOLD',r.id);
@@ -136,6 +140,14 @@ function validate({rulebook,factbook,products,approval}){
   }
   if(own(r,'offer_clause')&&!nonempty(r.offer_clause))fail('INVALID_OFFER_CLAUSE',r.id);
   if(own(r,'offer_scenarios'))scenarios(r.offer_scenarios,r);
+ }
+ const checks=rulebook.coverage_checks||[];
+ if(!Array.isArray(checks))fail('INVALID_COVERAGE_CHECKS','rulebook');
+ for(const c of checks){
+  if(!allowedKeys(c,['id','label','target','covered_targets','dimension'])||!nonempty(c.id)||ids.has(c.id)||!nonempty(c.label)||!['APPLICATION','BONUS'].includes(c.dimension))
+   fail('INVALID_COVERAGE_CHECK',c?.id);
+  ids.add(c.id);scope(c.target,c.id,{requireIssuer:true});
+  if(c.covered_targets)scope(c.covered_targets,c.id,{requireIssuer:true});
  }
  for(const [id,p] of Object.entries(products.overrides)){
   if(!nonempty(id))fail('INVALID_PRODUCT_MAPPING',id);
@@ -225,7 +237,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   function leaf(node,r){
    const f=defs[node.fact],raw=factValue(node.fact,node,a);
    const values=node.op==='includes_any'?resolved(node.values,p):[];
-   const threshold=node.value_from==='condition.value'?r.condition.value:node.value;
+   const threshold=node.value_from==='offer_limit'?offer_facts?.rule_limits?.[r.offer_clause]:node.value_from==='condition.value'?r.condition.value:node.value;
    if(node.op==='includes_any'&&!values.length)return {state:null,hits:[],actions:[]};
    let hits=[],state=null,reason='',qid;
    if(node.op==='includes_any'){
@@ -289,6 +301,7 @@ function createRuntime({rulebook,factbook,products,approval}){
     ...(fired&&x.pending?{pending_facts:true}:{}),
     reason:reason|| (fired?(x.hits.map(h=>h.reason).filter(Boolean).join('；')||label):status==='MISSING'?'还需要补充相关信息':status==='REVIEW'?'相关条款或事实需要核实':'未触发限制')};
   }
+  const needsOfferLimit=node=>node?.value_from==='offer_limit'||(node?.any||node?.all||[]).some(needsOfferLimit);
   for(const sourceRule of rules){
    const scope=targetState(sourceRule.target,p);
    if(scope===false)continue;
@@ -301,6 +314,9 @@ function createRuntime({rulebook,factbook,products,approval}){
     else if(offer_facts===undefined&&state)assumed.push(r.offer_clause);
     if(state==='ABSENT')continue;
     if(state!=='PRESENT'){gated.push({rule_id:r.id,stage:'SYSTEM_GATE'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'本次 Offer 条款需要核实'));continue;}
+    if([r.condition,r.when,r.review?.condition].some(needsOfferLimit)&&(!validCount(offer_facts?.rule_limits?.[r.offer_clause])||offer_facts.rule_limits[r.offer_clause]<1||offer_facts.rule_limits[r.offer_clause]>=Number.MAX_SAFE_INTEGER)){
+     gated.push({rule_id:r.id,stage:'OFFER_LIMIT'});events.push(makeEvent(r,'REVIEW',e,label,undefined,'具体申请条款的账户数门槛尚未核实'));continue;
+    }
    }
    active.push(r.id);
    const gate=r.when?evaluate(r.when,r):{state:true,hits:[],actions:[]};
@@ -313,6 +329,16 @@ function createRuntime({rulebook,factbook,products,approval}){
    else if(review?.state===true)events.push(makeEvent(r,'REVIEW',e,label,undefined,r.review.label));
    else if(review?.state===null)events.push(makeEvent(r,'MISSING',e,label));
    else events.push(makeEvent(r,'CLEAR',e,label));
+  }
+  // Coverage gaps are source-backed missing system knowledge, not negative
+  // rules or questions. Only explicit reviewed coverage can resolve them.
+  for(const c of rulebook.coverage_checks||[]){
+   const matched=targetState(c.target,p);
+   if(matched===false||c.covered_targets&&targetState(c.covered_targets,p)===true)continue;
+   if(matched===true&&offer_facts?.coverage_state?.[c.id]==='CONFIRMED_NO_ADDITIONAL_RULES')continue;
+   gated.push({rule_id:c.id,stage:'COVERAGE'});
+   events.push({rule_id:c.id,label:c.label,dimension:c.dimension,coverage_dimension:c.dimension,status:'REVIEW',application_impact:0,bonus_impact:0,
+    configured_application_impact:0,configured_bonus_impact:0,application_action:'CLEAR',bonus_action:'CLEAR',reason:c.label});
   }
   function form(e){
    const out={id:e.id,type:e.type,title:e.title,rule_ids:[...e.rules],...(e.description?{description:e.description}:{})};
@@ -328,8 +354,8 @@ function createRuntime({rulebook,factbook,products,approval}){
    return out;
   }
   const questions=[...groups.values()].map(form),pending=[...groups.values()].filter(e=>e.pending).map(form);
-  const app=events.filter(x=>x.configured_application_impact>0);
-  const bonus=events.filter(x=>x.configured_bonus_impact>0||x.product_eligibility);
+  const app=events.filter(x=>x.configured_application_impact>0||x.coverage_dimension==='APPLICATION');
+  const bonus=events.filter(x=>x.configured_bonus_impact>0||x.product_eligibility||x.coverage_dimension==='BONUS');
   const triggered=xs=>xs.filter(x=>x.status==='TRIGGERED');
   const gaps=xs=>xs.filter(x=>['MISSING','REVIEW'].includes(x.status)||x.pending_facts);
   const productBlockers=triggered(app).filter(x=>x.product_eligibility);
@@ -390,6 +416,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   const knownIds=new Set(catalog.map(p=>p.product_id));
   for(const id of Object.keys(products.overrides))if(!knownIds.has(id))throw Error('UNKNOWN_PRODUCT_MAPPING '+id);
   const targets=[...catalog,...(products.unlisted_targets||[])];
+  for(const c of rulebook.coverage_checks||[])if(!targets.some(p=>targetState(c.target,p)===true))throw Error('COVERAGE_TARGET_NOT_FOUND '+c.id);
   for(const r of rules){
    if(!targets.some(p=>targetState(r.target,p)===true))throw Error('RULE_TARGET_NOT_FOUND '+r.id);
    if(Array.isArray(r.target.product_name))for(const name of r.target.product_name)
@@ -419,7 +446,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   return Object.freeze({plan,listCards:()=>lookup.list().filter(p=>supported.has(p.issuer)),
    getVersion:()=>({source_count:lookup.getVersion().count,rules_indexed:rules.length,release_id:rulebook.version})});
  }
- return Object.freeze({assess,createFacade,commonQuestions:approval.questions,ruleLabels:Object.fromEntries(rules.map(r=>[r.id,r.label||r.id])),version:rulebook.version});
+ return Object.freeze({assess,createFacade,commonQuestions:approval.questions,ruleLabels:Object.fromEntries([...rules,...(rulebook.coverage_checks||[])].map(r=>[r.id,r.label||r.id])),version:rulebook.version});
 }
 return Object.freeze({createRuntime,validate,countBands,targetState});
 });
