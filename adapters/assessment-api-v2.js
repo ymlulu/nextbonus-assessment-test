@@ -50,7 +50,7 @@ function createClient({rulebook,factbook,products,approval,identityIndex}){
   return {product_id,offer_timing_id:p.offer_timing_id,snapshot_date:record.snapshot_date,historical_reference_only:true,
    reference_offer:record.current_offer||null,timing_result:record.timing_result||null};
  }
- return Object.freeze({getVersion:()=>({...version}),listCards:facade.listCards,commonQuestions:runtime.commonQuestions,
+ return Object.freeze({getVersion:()=>({...version}),listCards:facade.listCards,
   ruleLabels:runtime.ruleLabels,plan,evaluate,reportFromPlan,getOfferHistory,getOfferTiming});
 }
 return Object.freeze({contractVersion:VERSION,createClient});

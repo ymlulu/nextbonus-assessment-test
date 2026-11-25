@@ -3,7 +3,6 @@
   const $=id=>document.getElementById(id);
   const answers=Object.create(null);
   let facade=null,selectedProductId='',cards=[],loading=false;
-  let baseQuestionLibrary=[];
     function el(tag,cls,text){
     const n=document.createElement(tag);
     if(cls)n.className=cls;
@@ -86,7 +85,7 @@
     const a=previous.evaluation,b=current.evaluation;
     if(!a||!b)return '';
     const effects=[];
-    if(item.id.startsWith('a')&&/^a[1-4]$/.test(item.id)){
+    if(item.base_credit){
       if(a.application.base_risk!==b.application.base_risk)
         effects.push('基础信用档位：'+(riskStates[a.application.base_risk]||'待计算')+
           ' → '+(riskStates[b.application.base_risk]||'待计算'));
@@ -436,11 +435,12 @@
         :(ISSUER_LABELS[result.identity.issuer]||result.identity.issuer)+' 按现有规则库模拟；卡片历史身份和当前申请条款尚需分别核实。');
     // The rule planner intentionally returns only unanswered facts, but this
     // QA page keeps all previously displayed questions editable and visible.
-    const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));
+    const activeIds=new Set([...plan.questionnaire.common,...plan.questionnaire.specific].map(q=>q.id));
     list.replaceChildren(el('h2','','先了解一下你的信用情况'));
-    for(const q of baseQuestionLibrary)list.append(question(q,true,result,true));
+    const allQuestions=plan.questionnaire.editable;
+    for(const q of allQuestions.filter(q=>q.section==='common'))list.append(question(q,true,result,activeIds.has(q.id)));
     list.append(el('h2','','关于这张卡，还想了解这些情况'));
-    const currentQuestions=plan.questionnaire.editable||plan.questionnaire.specific;
+    const currentQuestions=allQuestions.filter(q=>q.section==='specific');
     if(!currentQuestions.length)list.append(el('p','muted','目前没有其他需要回答的问题。'));
     for(const q of currentQuestions)list.append(question(q,false,result,activeIds.has(q.id)));
     const report=$('assessment-result');
@@ -524,7 +524,8 @@
     $('scope').textContent='对应的规则编号：'+info.applicable_rule_ids.join('、');
     $('gaps').textContent='待核实的申请条款：'+
       (info.unresolved_system_gates.map(x=>x.rule_id).join('、')||'无')+
-      '；卡片信息缺失：'+(info.unresolved_target_mappings.map(x=>x.rule_id).join('、')||'无');
+      '；卡片信息缺失：'+(info.unresolved_target_mappings.map(x=>x.rule_id).join('、')||'无')+
+      (info.answer_conflicts.length?'；答案需要检查：'+info.answer_conflicts.map(x=>x.message).join('；'):'');
   }
   async function start(){
     if(loading)return;
@@ -535,7 +536,6 @@
     try{
       const {client,formalAmex}=await window.NextBonusAssessmentLoaderV2.load();
       facade=client;
-      baseQuestionLibrary=client.commonQuestions;
       Object.assign(readableRuleNames,client.ruleLabels);
       const formalNames=new Map((formalAmex.products||[]).map(x=>[x.assessment_product_id,x.display_name]));
       cards=facade.listCards().filter(p=>p.issuer&&p.customer_type)

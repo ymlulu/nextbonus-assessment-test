@@ -31,7 +31,7 @@ const allowedKeys=(obj,keys)=>isObject(obj)&&Object.keys(obj).every(k=>keys.incl
 const TARGET_FIELDS=['issuer','approval_issuer','product_type','customer_type','card_form','product_name','product_lineage','product_id','brand','generation'];
 function validate({rulebook,factbook,products,approval}){
  if(!nonempty(rulebook?.version)||!uniqueStrings(rulebook.supported_issuers)||!Array.isArray(rulebook.rules)||!isObject(factbook?.facts)||
-    !isObject(products?.overrides)||!isObject(approval?.base_matrix)||!Array.isArray(approval.questions))
+    !isObject(products?.overrides)||!isObject(approval?.base_matrix)||!Array.isArray(approval.activity_facts)||!Array.isArray(approval.activity_bands))
   throw Error('BANK_RULES_DATA_REQUIRED');
  const defs=factbook.facts,ids=new Set(),answerKeys=new Set(),groupTitles=new Map();
  const allowedTypes=['number','single','multi','grouped_multi'];
@@ -65,6 +65,30 @@ function validate({rulebook,factbook,products,approval}){
   const key=f.type==='grouped_multi'?f.details_id+'.'+id:f.group?f.group+'.'+id:f.answer_key||id;
   if(!nonempty(key)||answerKeys.has(key))fail('DUPLICATE_FACT_ANSWER_KEY',id);
   answerKeys.add(key);
+ }
+ // All base-model inputs reference the same typed fact library as bank rules.
+ const baseIds=[approval.age_fact,approval.score_fact,...approval.activity_facts];
+ if(!uniqueStrings(baseIds)||defs[approval.age_fact]?.type!=='single'||defs[approval.score_fact]?.type!=='single'||
+    !approval.activity_facts.length||approval.activity_facts.some(id=>defs[id]?.type!=='number')||
+    baseIds.some(id=>defs[id].group||defs[id].answer_key))
+  fail('INVALID_APPROVAL_FACTS','approval');
+ for(const [id,map] of [[approval.age_fact,approval.age_map],[approval.score_fact,approval.score_map]]){
+  if(!isObject(map)||defs[id].options.some(o=>o.value!=='UNKNOWN'&&!nonempty(map[o.value])))fail('INVALID_APPROVAL_MAP',id);
+ }
+ if(!Array.isArray(approval.activity_levels)||!approval.activity_bands.length||approval.activity_bands[0].min!==0||
+    approval.activity_bands.some((b,i)=>!validCount(b.min)||b.min>=Number.MAX_SAFE_INTEGER||
+      !Number.isInteger(b.level)||b.level<0||b.level>=approval.activity_levels.length||
+      i>0&&(b.min<=approval.activity_bands[i-1].min||b.level<=approval.activity_bands[i-1].level)))
+  fail('INVALID_APPROVAL_BANDS','approval');
+ const relations=factbook.count_relations||[];
+ if(!Array.isArray(relations))fail('INVALID_COUNT_RELATIONS','facts');
+ for(const r of relations){
+  if(!allowedKeys(r,['shorter','longer','message'])||!nonempty(r.message))fail('INVALID_COUNT_RELATION','facts');
+  const s=defs[r.shorter],l=defs[r.longer];
+  if(s?.type!=='number'||l?.type!=='number'||!nonempty(s.metric)||s.metric!==l.metric||
+     !nonempty(s.population)||s.population!==l.population||!s.window||!l.window||
+     s.window.unit!==l.window.unit||s.window.value>=l.window.value)
+   fail('INVALID_COUNT_RELATION',r.shorter);
  }
  function scope(s,id,{requireIssuer=false,allowArrays=true}={}){
   if(!allowedKeys(s,TARGET_FIELDS)||!Object.keys(s).length||requireIssuer&&!nonempty(s.issuer)&&!uniqueStrings(s.issuer))
@@ -165,6 +189,7 @@ function countBands(cuts,unit='张'){
 function createRuntime({rulebook,factbook,products,approval}){
  validate({rulebook,factbook,products,approval});
  const defs=factbook.facts, rules=rulebook.rules;
+ const baseIds=[approval.age_fact,approval.score_fact,...approval.activity_facts],baseSet=new Set(baseIds);
  const supported=new Set(rulebook.supported_issuers);
  const canonical=p=>({...p,...products.overrides[p.product_id]});
  const key=(id,f)=>f.answer_key||id;
@@ -180,13 +205,15 @@ function createRuntime({rulebook,factbook,products,approval}){
    ...(extra.prior_id?{prior_id:extra.prior_id}:{})};
  }
  function baseRisk(a,issuer){
-  const age=approval.age_map[a.a1],score=approval.score_map[a.a2],x=approval.activity_map[a.a3],y=approval.activity_map[a.a4];
-  if(!age||!score||x===undefined||y===undefined)return {rating:'INSUFFICIENT_DATA',activity:'UNKNOWN'};
-  const activity=approval.activity_levels[Math.max(x,y)],base=approval.base_matrix[age]?.[score]||'INSUFFICIENT_DATA';
+  const age=approval.age_map[factValue(approval.age_fact,{},a)],score=approval.score_map[factValue(approval.score_fact,{},a)];
+  const activityValues=approval.activity_facts.map(id=>factValue(id,{},a));
+  if(!age||!score||activityValues.some(x=>!validCount(x)))return {rating:'INSUFFICIENT_DATA',activity:'UNKNOWN'};
+  const levels=activityValues.map(n=>approval.activity_bands.filter(b=>b.min<=n).at(-1).level);
+  const activity=approval.activity_levels[Math.max(...levels)],base=approval.base_matrix[age]?.[score]||'INSUFFICIENT_DATA';
   const i=approval.risk_levels.indexOf(base),adjustment=approval.activity_adjustment[activity]?.[approval.issuer_sensitivity[issuer]]||0;
   return {rating:i<0?base:approval.risk_levels[Math.min(approval.risk_levels.length-1,i+adjustment)],activity};
  }
- function assess({product,answers={},offer_variant='STANDARD',offer_facts,offer_rule_overrides={}}={}){
+ function assessCore({product,answers={},offer_variant='STANDARD',offer_facts,offer_rule_overrides={}}={}){
   const p=canonical(product||{});
   if(!supported.has(p.issuer))return null;
   const a=answers&&typeof answers==='object'&&!Array.isArray(answers)?answers:{};
@@ -207,11 +234,12 @@ function createRuntime({rulebook,factbook,products,approval}){
       ...(f.type==='multi'&&f.details_id?{details_id:f.details_id}:{})};
     groups.set(qid,entry);
    }
-   entry.rules.add(r.id);
+   if(r)entry.rules.add(r.id);
+   if(baseSet.has(id))entry.base_credit=true;
    let e=entry;
    if(f.group){
     if(!entry.fields.has(id))entry.fields.set(id,{id,type:f.type,label:f.title,rules:new Set(),cuts:new Set(),options:new Map(),pending:false,count_unit:f.count_unit});
-    e=entry.fields.get(id);e.rules.add(r.id);
+    e=entry.fields.get(id);if(r)e.rules.add(r.id);
    }
    const missing=f.type==='multi'?!knownList(raw):f.type==='number'?!validCount(raw):f.type==='grouped_multi'?!['YES','NO'].includes(raw):empty(raw)||!f.options?.some(o=>o.value===raw);
    if(missing){e.pending=true;entry.pending=true;}
@@ -233,6 +261,14 @@ function createRuntime({rulebook,factbook,products,approval}){
     e.options.set(node.prior,{value:node.prior,label,answered:!missing,pending:missing,rule_ids:uniq([...(old?.rule_ids||[]),r.id])});
    }else for(const o of f.options||[])e.options.set(o.value,o);
    return qid;
+  }
+  // Register base facts first; bank predicates add their cuts and rule IDs
+  // to the same question entry, not to a second question list.
+  for(const id of baseIds){
+   const raw=factValue(id,{},a);
+   if(defs[id].type==='number'){
+    for(const band of approval.activity_bands)record({fact:id,op:'gte'},null,[],band.min,raw);
+   }else record({fact:id,op:'eq'},null,[],undefined,raw);
   }
   function leaf(node,r){
    const f=defs[node.fact],raw=factValue(node.fact,node,a);
@@ -341,7 +377,7 @@ function createRuntime({rulebook,factbook,products,approval}){
     configured_application_impact:0,configured_bonus_impact:0,application_action:'CLEAR',bonus_action:'CLEAR',reason:c.label});
   }
   function form(e){
-   const out={id:e.id,type:e.type,title:e.title,rule_ids:[...e.rules],...(e.description?{description:e.description}:{})};
+   const out={id:e.id,type:e.type,title:e.title,section:e.base_credit?'common':'specific',base_credit:!!e.base_credit,rule_ids:[...e.rules],...(e.description?{description:e.description}:{})};
    if(e.type==='structured')out.fields=[...e.fields.values()].map(f=>({id:f.id,type:f.type,label:f.label,rule_ids:[...f.rules],
     ...(f.type==='number'?{count_bands:countBands([...f.cuts],f.count_unit)}:{options:[...f.options.values()]})}));
    else if(e.type==='number')out.count_bands=countBands([...e.cuts],e.count_unit);
@@ -402,13 +438,49 @@ function createRuntime({rulebook,factbook,products,approval}){
    actions.includes('RISK')||application.base_risk==='HIGH_RISK'?{code:'RISK',label:'谨慎考虑申请',summary:'有可能影响获批或开卡奖励的情况。'}:
    {code:'CLEAR',label:'可以考虑申请',summary:'按已填信息及参考条款，暂未发现明显限制；实际结果以银行为准。'};
   const matrixEvents=events.filter(x=>rules.find(r=>r.id===x.rule_id)?.when?.fact&&defs[rules.find(r=>r.id===x.rule_id).when.fact]?.details_id);
-  return {questionnaire:{common:approval.questions.filter(q=>empty(a[q.id])),specific:pending,editable:questions,benefits:null},
-   diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved},
+  return {questionnaire:{common:pending.filter(q=>q.section==='common'),specific:pending.filter(q=>q.section==='specific'),editable:questions,benefits:null},
+   diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved,answer_conflicts:[]},
    evaluation:{issuer:p.issuer,product_id:p.product_id,offer_variant,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS',
     application,bonus:bonusResult,decision,
     rule_results:events,answers_transmitted:false,caveat:'确定性规则模型，不代表银行实际审批结果；答案仅在本机计算。'},
    marriott_matrix:matrixEvents.length?{status:triggered(matrixEvents).length?'TRIGGERED':gaps(matrixEvents).length?'MISSING':'CLEAR'}:null,
    offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
+ }
+ // Number choices are ranges (lower-bound representatives), so reject only
+ // contradictions that are impossible for every count in the selected bands.
+ // Re-evaluate without the conflicting facts: unrelated verified blockers survive.
+ function assess(request={}){
+  const first=assessCore(request);
+  if(!first)return null;
+  const a=request.answers||{},qmap=new Map();
+  for(const q of first.questionnaire.editable){
+   if(q.type==='number')qmap.set(q.id,q.count_bands);
+   else if(q.type==='structured')for(const field of q.fields)if(field.type==='number')qmap.set(field.id,field.count_bands);
+  }
+  function interval(id){
+   const f=defs[id],bands=qmap.get(key(id,f)),raw=factValue(id,{},a);
+   if(!bands||!validCount(raw))return null;
+   const i=bands.findIndex(b=>b.value===raw);
+   return i<0?[raw,raw]:[raw,i+1<bands.length?bands[i+1].value-1:Infinity];
+  }
+  const conflicts=[],invalid=new Set();
+  for(const r of factbook.count_relations||[]){
+   const short=interval(r.shorter),long=interval(r.longer);
+   if(short&&long&&short[0]>long[1]){
+    conflicts.push({fact_ids:[r.shorter,r.longer],message:r.message});
+    invalid.add(r.shorter);invalid.add(r.longer);
+   }
+  }
+  if(!invalid.size)return first;
+  const clean={...a};
+  for(const id of invalid){
+   const f=defs[id];
+   if(f.group){clean[f.group]={...clean[f.group]};delete clean[f.group][id];}
+   else delete clean[key(id,f)];
+  }
+  const result=assessCore({...request,answers:clean});
+  result.diagnostics.answer_conflicts=conflicts;
+  return result;
  }
  function createFacade(lookup){
   if(!lookup?.findById||!lookup?.resolve||!lookup?.list)throw Error('IDENTITY_LOOKUP_REQUIRED');
@@ -446,7 +518,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   return Object.freeze({plan,listCards:()=>lookup.list().filter(p=>supported.has(p.issuer)),
    getVersion:()=>({source_count:lookup.getVersion().count,rules_indexed:rules.length,release_id:rulebook.version})});
  }
- return Object.freeze({assess,createFacade,commonQuestions:approval.questions,ruleLabels:Object.fromEntries([...rules,...(rulebook.coverage_checks||[])].map(r=>[r.id,r.label||r.id])),version:rulebook.version});
+ return Object.freeze({assess,createFacade,ruleLabels:Object.fromEntries([...rules,...(rulebook.coverage_checks||[])].map(r=>[r.id,r.label||r.id])),version:rulebook.version});
 }
 return Object.freeze({createRuntime,validate,countBands,targetState});
 });
