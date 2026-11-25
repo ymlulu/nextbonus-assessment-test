@@ -16,7 +16,7 @@ function equalReport(r){
  assert.equal(r.report.answers_transmitted,false);
  assert.equal(r.report.benefits.status,'NOT_IN_SCOPE');
 }
-const reviewIds=new Set(["history_ot_wellsfargo_097","capital_one_venture","history_ot_bankofamerica_029","history_ot_bankofamerica_030","history_ot_capitalone_049","history_ot_capitalone_050","history_ot_capitalone_051","history_ot_bankofamerica_052","history_ot_bankofamerica_053","history_ot_bankofamerica_054","history_ot_wellsfargo_061","history_ot_wellsfargo_062","history_ot_capitalone_076","history_ot_capitalone_077","history_ot_capitalone_083","history_ot_bankofamerica_085","history_ot_capitalone_090","history_ot_capitalone_091","wf_choice","wf_choice_select","citi_costco_anywhere_visa","citi_costco_anywhere_business","bofa_atmos_rewards_summit","history_ot_u_s_bank_058","history_ot_discovercapitalone_063","history_ot_barclays_066","history_ot_barclays_067","history_ot_barclays_068","history_ot_barclays_069","history_ot_u_s_bank_088","history_ot_u_s_bank_089","history_ot_u_s_bank_096","history_ot_barclays_098"]);
+const reviewIds=new Set(["history_ot_wellsfargo_097","capital_one_venture","history_ot_bankofamerica_029","history_ot_bankofamerica_030","history_ot_capitalone_049","history_ot_capitalone_050","history_ot_capitalone_051","history_ot_bankofamerica_052","history_ot_bankofamerica_053","history_ot_bankofamerica_054","history_ot_wellsfargo_061","history_ot_wellsfargo_062","history_ot_capitalone_076","history_ot_capitalone_077","history_ot_capitalone_083","history_ot_bankofamerica_085","history_ot_capitalone_090","history_ot_capitalone_091","wf_choice","wf_choice_select","citi_costco_anywhere_visa","citi_costco_anywhere_business","bofa_atmos_rewards_summit","history_ot_u_s_bank_058","history_ot_discovercapitalone_063","history_ot_barclays_066","history_ot_barclays_067","history_ot_barclays_068","history_ot_barclays_069","history_ot_u_s_bank_088","history_ot_u_s_bank_089","history_ot_u_s_bank_096","history_ot_barclays_098","barclays_aarp_essential","barclays_aarp_travel","barclays_frontier","barclays_jetblue_business","barclays_miles_and_more","barclays_upromise"]);
 for(const p of client.listCards()){
  const r=client.evaluate(request(p.product_id));equalReport(r);
  assert.equal(r.report.decision.code,reviewIds.has(p.product_id)?'REVIEW':'CLEAR',p.product_id);
@@ -43,6 +43,24 @@ const alt=createClient(modified),facts={...base,F02_ISSUER_APPLICATION_HISTORY:{
 assert.equal(client.evaluate(request(csp,facts)).report.decision.code,'WAIT');
 const changed=alt.evaluate(request(csp,facts));equalReport(changed);assert.equal(changed.report.decision.code,'CLEAR');
 assert.deepEqual(changed.questionnaire.questionnaire.editable.find(q=>q.id==='F02_ISSUER_APPLICATION_HISTORY').fields.find(f=>f.id==='approved_chase_30d').count_bands.map(b=>b.value),[0,3]);
+
+ // Product identity expansion must reuse existing predicates; no invented bonus rule.
+ for(const id of ["barclays_aarp_essential","barclays_aarp_travel","barclays_frontier","barclays_jetblue_business","barclays_miles_and_more","barclays_upromise"]){
+  const clean=client.evaluate(request(id));equalReport(clean);
+  assert.equal(clean.report.decision.code,'REVIEW',id+' bonus terms remain unverified');
+  assert.ok(clean.questionnaire.diagnostics.applicable_rule_ids.includes('BARC-001'));
+  assert.ok(clean.questionnaire.diagnostics.unresolved_system_gates.some(x=>x.rule_id==='BARC-002'));
+  const limited=client.evaluate(request(id,{...base,F01_RECENT_NEW_ACCOUNTS:6}));
+  assert.equal(limited.report.dimensions.application.impact,2);
+ }
+ for(const [id,name] of [['chase_aer_lingus','Aer Lingus Visa'],['chase_iberia','Iberia Visa']]){
+  assert.ok(client.plan(request(id)).questionnaire.diagnostics.applicable_rule_ids.includes('CHASE-PROD-014'));
+  check(id,{F03_CURRENT_CARD_HISTORY:[name]},'BLOCK');
+  check(id,{F04_BONUS_HISTORY:[name]},'WAIT');
+  check(id,{F01_RECENT_NEW_ACCOUNTS:5},'WAIT');
+ }
+ assert.equal(client.plan({input:'Chase IHG Premier Select'}).questionnaire,null,'Distinct IHG product stays unresolved');
+
 // Offer history and timing are explicitly dated optional snapshots, not current eligibility inputs.
 const history=client.getOfferHistory({product_id:'amex_platinum',offerHistory:read('data/offer-history.json')});
 assert.ok(history.history.length>0);
