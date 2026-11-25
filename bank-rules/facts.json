@@ -83,22 +83,28 @@
             "以前的 SPG Business"
           ]
         }
-      }
+      },
+      "evidence_prefix": "以前办过 "
     },
     "F03_CURRENT_CARD_HISTORY": {
       "type": "multi",
       "title": "下面这些卡，你现在还持有哪些？",
-      "description": "只选现在还没有关掉的卡。"
+      "description": "只选现在还没有关掉的卡。",
+      "evidence_prefix": "目前持有 "
     },
     "F04_BONUS_HISTORY": {
       "type": "multi",
       "title": "过去 24 个月，你拿到过下面哪些卡的新卡开卡奖励？",
-      "description": "以实际收到奖励的日期为准。"
+      "description": "以实际收到奖励的日期为准。",
+      "evidence_prefix": "过去 24 个月拿过 ",
+      "evidence_suffix": " 的开卡奖励"
     },
     "F04_EVER_BONUS_HISTORY": {
       "type": "multi",
       "title": "你以前拿过下面哪些卡的新卡开卡奖励？",
-      "description": "不管是几年前拿到的，都请选上。"
+      "description": "不管是几年前拿到的，都请选上。",
+      "evidence_prefix": "以前拿过 ",
+      "evidence_suffix": " 的开卡奖励"
     },
     "schwab_relationship": {
       "type": "single",
@@ -190,7 +196,8 @@
           }
         }
       },
-      "details_id": "F07_MARRIOTT_DETAILS"
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "evidence_prefix": "办过 "
     },
     "held_now": {
       "type": "grouped_multi",

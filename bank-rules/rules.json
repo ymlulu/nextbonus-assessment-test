@@ -23,7 +23,11 @@
         ]
       },
       "offer_clause": "AMEX-001",
-      "label": "同卡历史持卡限制"
+      "label": "同卡历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "ABSENT"
+      }
     },
     {
       "id": "AMEX-006",
@@ -278,7 +282,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-001",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-002",
@@ -303,7 +311,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-002",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-003",
@@ -328,7 +340,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-003",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-REL-001",
@@ -397,7 +413,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-004",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-005",
@@ -429,7 +449,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-005",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-006",
@@ -457,7 +481,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-006",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-007",
@@ -490,7 +518,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-007",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-008",
@@ -520,7 +552,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-008",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-009",
@@ -548,7 +584,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-009",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-010",
@@ -574,7 +614,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-010",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-012",
@@ -602,7 +646,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-012",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-FL-013",
@@ -629,7 +677,11 @@
         ]
       },
       "offer_clause": "AMEX-FL-013",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "CHASE-PROD-001",
@@ -816,7 +868,11 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-001",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-BIZ-002",
@@ -842,7 +898,11 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-002",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-BIZ-005",
@@ -866,7 +926,11 @@
         ]
       },
       "offer_clause": "AMEX-BIZ-005",
-      "label": "历史持卡限制"
+      "label": "历史持卡限制",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT",
+        "NLL": "PRESENT"
+      }
     },
     {
       "id": "AMEX-011",
