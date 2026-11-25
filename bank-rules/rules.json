@@ -1,0 +1,2182 @@
+{
+  "version": "2026-11-25.1",
+  "supported_issuers": [
+    "AMEX",
+    "CHASE"
+  ],
+  "rules": [
+    {
+      "id": "AMEX-001",
+      "target": {
+        "issuer": "AMEX"
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "offer_clause": "AMEX-001",
+      "label": "同卡历史持卡限制"
+    },
+    {
+      "id": "AMEX-006",
+      "target": {
+        "issuer": "AMEX",
+        "card_form": "REVOLVING_CREDIT"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      },
+      "condition": {
+        "fact": "approved_revolving_90d",
+        "op": "gte",
+        "value": 2
+      },
+      "label": "90天获批数量"
+    },
+    {
+      "id": "AMEX-007",
+      "target": {
+        "issuer": "AMEX",
+        "card_form": "REVOLVING_CREDIT"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "condition": {
+        "fact": "amex_revolving_count",
+        "op": "gte",
+        "value": 5
+      },
+      "label": "普通信用卡持卡数量"
+    },
+    {
+      "id": "AMEX-008",
+      "target": {
+        "issuer": "AMEX",
+        "card_form": "CHARGE_OR_PAY_OVER_TIME"
+      },
+      "effect": {
+        "application": 1,
+        "bonus": 0
+      },
+      "condition": {
+        "fact": "amex_charge_count",
+        "op": "gte",
+        "value": 10
+      },
+      "label": "签账卡持卡数量"
+    },
+    {
+      "id": "CHASE-001",
+      "target": {
+        "issuer": "CHASE",
+        "product_type": "CREDIT_CARD"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      },
+      "condition": {
+        "fact": "F01_RECENT_NEW_ACCOUNTS",
+        "op": "gte",
+        "value": 5
+      },
+      "label": "5/24：过去 24 个月的新账户数量",
+      "review": {
+        "condition": {
+          "fact": "F06_REPORTED_NEW_ACCOUNTS",
+          "op": "gte",
+          "value_from": "condition.value"
+        },
+        "label": "含副卡的信用报告账户达到门槛，但本人主卡未达到；需核实银行是否排除副卡"
+      },
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Amazon Prime Visa"
+            ]
+          },
+          "effect": {
+            "application": 2,
+            "bonus": 0
+          },
+          "label": "Amazon Prime Visa 有5/24例外报告，不能保证获批"
+        }
+      ]
+    },
+    {
+      "id": "CHASE-002",
+      "target": {
+        "issuer": "CHASE",
+        "product_type": "CREDIT_CARD"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      },
+      "condition": {
+        "fact": "approved_chase_30d",
+        "op": "gte",
+        "value": 2
+      },
+      "label": "30 天内 Chase 信用卡获批记录"
+    },
+    {
+      "id": "CHASE-003",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Chase Sapphire Preferred",
+          "Chase Sapphire Reserve"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      },
+      "condition": {
+        "fact": "F04_EVER_BONUS_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ],
+        "action": "BLOCK"
+      },
+      "label": "同一张 Sapphire 卡的历史开卡奖励"
+    },
+    {
+      "id": "CHASE-005",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Ink Business Cash",
+          "Ink Business Unlimited"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Ink Business Cash",
+          "Ink Business Unlimited"
+        ]
+      },
+      "label": "以前办过的无年费 Chase 商业卡",
+      "review": {
+        "condition": {
+          "fact": "F03_CARD_HISTORY",
+          "op": "includes_any",
+          "values": [
+            "OTHER_CHASE_NO_FEE_BUSINESS"
+          ]
+        },
+        "label": "其他无年费商业卡的具体产品需核实",
+        "show_with_primary": true
+      }
+    },
+    {
+      "id": "CHASE-006",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Ink Business Preferred"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "label": "以前办过 Ink Business Preferred"
+    },
+    {
+      "id": "CHASE-007",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Ink Business Premier"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "label": "以前办过 Ink Business Premier"
+    },
+    {
+      "id": "CHASE-008",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Sapphire Reserve for Business"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 2
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "label": "以前办过 Sapphire Reserve Business"
+    },
+    {
+      "id": "AMEX-FL-001",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "The Platinum Card"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "The Platinum Card",
+          "Platinum for Charles Schwab",
+          "Platinum for Morgan Stanley"
+        ]
+      },
+      "offer_clause": "AMEX-FL-001",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-002",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Platinum for Charles Schwab"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Platinum for Charles Schwab",
+          "The Platinum Card",
+          "Platinum for Morgan Stanley"
+        ]
+      },
+      "offer_clause": "AMEX-FL-002",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-003",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Platinum for Morgan Stanley"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Platinum for Morgan Stanley",
+          "The Platinum Card",
+          "Platinum for Charles Schwab"
+        ]
+      },
+      "offer_clause": "AMEX-FL-003",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-REL-001",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Platinum for Charles Schwab"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "schwab_relationship",
+        "op": "eq",
+        "value": "NO"
+      },
+      "label": "Schwab账户要求"
+    },
+    {
+      "id": "AMEX-REL-002",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Platinum for Morgan Stanley"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "morgan_stanley_relationship",
+        "op": "eq",
+        "value": "NO"
+      },
+      "label": "Morgan Stanley账户要求"
+    },
+    {
+      "id": "AMEX-FL-004",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Personal AMEX Gold"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Personal AMEX Gold",
+          "Premier Rewards Gold",
+          "The Platinum Card",
+          "Platinum for Charles Schwab",
+          "Platinum for Morgan Stanley"
+        ]
+      },
+      "offer_clause": "AMEX-FL-004",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-005",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Blue Cash Everyday"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Blue Cash Everyday",
+          "Cash Magnet",
+          "Blue Cash Preferred",
+          "Morgan Stanley Blue Cash Preferred"
+        ],
+        "legacy": [
+          "Blue Cash Everyday",
+          "Cash Magnet",
+          "Blue Cash Preferred",
+          "Morgan Stanley Blue Cash Preferred"
+        ]
+      },
+      "offer_clause": "AMEX-FL-005",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-006",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Blue Cash Preferred"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Blue Cash Preferred",
+          "Morgan Stanley Blue Cash Preferred"
+        ],
+        "legacy": [
+          "Blue Cash Preferred",
+          "Morgan Stanley Blue Cash Preferred"
+        ]
+      },
+      "offer_clause": "AMEX-FL-006",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-007",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Delta SkyMiles Blue (Personal)"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Delta SkyMiles Blue (Personal)",
+          "Delta SkyMiles Options",
+          "Delta SkyMiles Gold (Personal)",
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ],
+        "legacy": [
+          "Delta SkyMiles Blue (Personal)",
+          "Delta SkyMiles Gold (Personal)",
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ]
+      },
+      "offer_clause": "AMEX-FL-007",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-008",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Delta SkyMiles Gold (Personal)"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Delta SkyMiles Gold (Personal)",
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ],
+        "legacy": [
+          "Delta SkyMiles Gold (Personal)",
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ]
+      },
+      "offer_clause": "AMEX-FL-008",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-009",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Delta SkyMiles Platinum (Personal)"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ],
+        "legacy": [
+          "Delta SkyMiles Platinum (Personal)",
+          "Delta SkyMiles Reserve (Personal)"
+        ]
+      },
+      "offer_clause": "AMEX-FL-009",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-010",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Delta SkyMiles Reserve (Personal)"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Delta SkyMiles Reserve (Personal)"
+        ],
+        "legacy": [
+          "Delta SkyMiles Reserve (Personal)"
+        ]
+      },
+      "offer_clause": "AMEX-FL-010",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-012",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Bevy"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Marriott Bonvoy Bevy",
+          "Marriott Bonvoy Brilliant"
+        ],
+        "legacy": [
+          "Marriott Bonvoy Bevy",
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "offer_clause": "AMEX-FL-012",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-FL-013",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Marriott Bonvoy Brilliant",
+          "以前的 SPG Luxury"
+        ],
+        "legacy": [
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "offer_clause": "AMEX-FL-013",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "CHASE-PROD-001",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "IHG One Rewards Traveler",
+          "IHG One Rewards Premier"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "IHG One Rewards Traveler",
+          "IHG One Rewards Premier"
+        ],
+        "action": "BLOCK"
+      },
+      "label": "目前是否持有个人 IHG 联名卡"
+    },
+    {
+      "id": "CHASE-PROD-002",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "IHG One Rewards Traveler",
+          "IHG One Rewards Premier"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "F04_BONUS_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "IHG One Rewards Traveler",
+          "IHG One Rewards Premier"
+        ],
+        "action": "WAIT"
+      },
+      "label": "个人 IHG 卡过去 24 个月的开卡奖励"
+    },
+    {
+      "id": "CHASE-PROD-005",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Southwest Plus",
+          "Southwest Premier",
+          "Southwest Priority"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "Southwest Plus",
+              "Southwest Premier",
+              "Southwest Priority"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "Southwest Plus",
+              "Southwest Premier",
+              "Southwest Priority"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "Southwest 个人卡持卡及 24 个月奖励记录"
+    },
+    {
+      "id": "CHASE-PROD-006",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "World of Hyatt Personal"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "World of Hyatt 个人卡持卡及 24 个月奖励"
+    },
+    {
+      "id": "CHASE-PROD-007",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Chase Aeroplan Card"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "Aeroplan 持卡及 24 个月奖励"
+    },
+    {
+      "id": "AMEX-BIZ-001",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Business Platinum"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Business Platinum"
+        ],
+        "legacy": [
+          "Business Platinum"
+        ]
+      },
+      "offer_clause": "AMEX-BIZ-001",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-BIZ-002",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Business Gold"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Business Gold"
+        ],
+        "legacy": [
+          "Business Gold"
+        ]
+      },
+      "offer_clause": "AMEX-BIZ-002",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-BIZ-005",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Business American Express"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "BLOCK"
+      },
+      "condition": {
+        "fact": "F03_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Marriott Bonvoy Business American Express",
+          "以前的 SPG Business"
+        ]
+      },
+      "offer_clause": "AMEX-BIZ-005",
+      "label": "历史持卡限制"
+    },
+    {
+      "id": "AMEX-011",
+      "target": {
+        "issuer": "AMEX"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "condition": {
+        "fact": "same_product_applied_or_approved_90d",
+        "op": "eq",
+        "value": "YES"
+      },
+      "label": "90 天内重复申请同一张 Amex 卡"
+    },
+    {
+      "id": "CHASE-012",
+      "target": {
+        "issuer": "CHASE",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      },
+      "condition": {
+        "fact": "approved_chase_business_30d",
+        "op": "eq",
+        "value": "YES"
+      },
+      "label": "30 天内 Chase 商业卡获批记录"
+    },
+    {
+      "id": "CHASE-PROD-011",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Freedom Rise",
+          "Freedom Flex",
+          "Freedom Unlimited"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "Freedom 同一产品持卡及 24 个月奖励"
+    },
+    {
+      "id": "CHASE-PROD-012",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "United Gateway",
+          "United Explorer",
+          "United Quest"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "United 同一产品持卡及 24 个月奖励"
+    },
+    {
+      "id": "CHASE-PROD-013",
+      "target": {
+        "issuer": "CHASE",
+        "customer_type": "PERSONAL",
+        "product_lineage": "UNITED_CLUB"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "United Club"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "United Club"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "United Club 系列持卡历史"
+    },
+    {
+      "id": "CHASE-PROD-014",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "British Airways Visa",
+          "Iberia Visa",
+          "Aer Lingus Visa"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "Avios 同一产品持卡及 24 个月奖励"
+    },
+    {
+      "id": "CHASE-PROD-015",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "World of Hyatt Business Credit Card"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "World of Hyatt 商业卡持卡及奖励"
+    },
+    {
+      "id": "CHASE-PROD-016",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Southwest Premier Business",
+          "Southwest Performance Business"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
+      },
+      "label": "Southwest 商业卡同一产品持卡及奖励"
+    },
+    {
+      "id": "CHASE-PROD-017",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Chase Sapphire Preferred"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ],
+        "action": "BLOCK"
+      },
+      "label": "目前是否持有 Chase Sapphire Preferred"
+    },
+    {
+      "id": "CHASE-PROD-018",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Chase Sapphire Reserve"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ],
+        "action": "BLOCK"
+      },
+      "label": "目前是否持有 Chase Sapphire Reserve"
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bold_boundless:chase_bold_boundless",
+      "label": "Marriott Now or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bold",
+          "Marriott Bonvoy Boundless"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bold / Boundless"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "fact": "new_card_bonus_within_24m",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bold_boundless",
+      "label": "Marriott Now/30",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bold",
+          "Marriott Bonvoy Boundless"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott / Legacy SPG Personal"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "amex_marriott_legacy_personal",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "all": [
+              {
+                "fact": "held_now",
+                "prior": "amex_marriott_legacy_personal",
+                "op": "eq",
+                "value": "NO",
+                "action": "WAIT"
+              },
+              {
+                "fact": "closed_within_30d",
+                "prior": "amex_marriott_legacy_personal",
+                "op": "eq",
+                "value": "YES",
+                "action": "WAIT"
+              }
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_business:chase_bold_boundless",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bold",
+          "Marriott Bonvoy Boundless"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Business / Legacy SPG Business"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_business",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_business",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bold_boundless",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bold",
+          "Marriott Bonvoy Boundless"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Bevy"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_bevy",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_bevy",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bold_boundless",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bold",
+          "Marriott Bonvoy Boundless"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Brilliant"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_brilliant",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_brilliant",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bountiful:chase_bountiful",
+      "label": "Marriott Now or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bountiful"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bountiful"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "fact": "new_card_bonus_within_24m",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_legacy_personal:chase_bountiful",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bountiful"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott / Legacy SPG Personal"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "amex_marriott_legacy_personal",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "amex_marriott_legacy_personal",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "amex_marriott_legacy_personal",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_legacy_personal",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_legacy_personal",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_business:chase_bountiful",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bountiful"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Business / Legacy SPG Business"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "amex_marriott_business",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "amex_marriott_business",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "amex_marriott_business",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_business",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_business",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_bevy:chase_bountiful",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bountiful"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Bevy"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "amex_marriott_bevy",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "amex_marriott_bevy",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "amex_marriott_bevy",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_bevy",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_bevy",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:amex_marriott_brilliant:chase_bountiful",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "Marriott Bonvoy Bountiful"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AMEX Marriott Bonvoy Brilliant"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "amex_marriott_brilliant",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "amex_marriott_brilliant",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "amex_marriott_brilliant",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "amex_marriott_brilliant",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "amex_marriott_brilliant",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Business_American_Express",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Business American Express"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bold / Boundless"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Business_American_Express",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Business American Express"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bountiful"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Business_American_Express",
+      "label": "Marriott Now/30",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Business American Express"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Business（历史卡）"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_marriott_business_legacy",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "all": [
+              {
+                "fact": "held_now",
+                "prior": "chase_marriott_business_legacy",
+                "op": "eq",
+                "value": "NO",
+                "action": "WAIT"
+              },
+              {
+                "fact": "closed_within_30d",
+                "prior": "chase_marriott_business_legacy",
+                "op": "eq",
+                "value": "YES",
+                "action": "WAIT"
+              }
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Bevy",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Bevy"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bold / Boundless"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "chase_bold_boundless",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "chase_bold_boundless",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "chase_bold_boundless",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Bevy",
+      "label": "Marriott Now/30 or 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Bevy"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bountiful"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "any": [
+              {
+                "fact": "held_now",
+                "prior": "chase_bountiful",
+                "op": "eq",
+                "value": "YES",
+                "action": "BLOCK"
+              },
+              {
+                "all": [
+                  {
+                    "fact": "held_now",
+                    "prior": "chase_bountiful",
+                    "op": "eq",
+                    "value": "NO",
+                    "action": "WAIT"
+                  },
+                  {
+                    "fact": "closed_within_30d",
+                    "prior": "chase_bountiful",
+                    "op": "eq",
+                    "value": "YES",
+                    "action": "WAIT"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Bevy",
+      "label": "Marriott Now/30",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Bevy"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Ritz-Carlton"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_ritz_carlton",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "all": [
+              {
+                "fact": "held_now",
+                "prior": "chase_ritz_carlton",
+                "op": "eq",
+                "value": "NO",
+                "action": "WAIT"
+              },
+              {
+                "fact": "closed_within_30d",
+                "prior": "chase_ritz_carlton",
+                "op": "eq",
+                "value": "YES",
+                "action": "WAIT"
+              }
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_marriott_business_legacy:Marriott_Bonvoy_Bevy",
+      "label": "Marriott Now/30",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Bevy"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Business（历史卡）"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_marriott_business_legacy",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "all": [
+              {
+                "fact": "held_now",
+                "prior": "chase_marriott_business_legacy",
+                "op": "eq",
+                "value": "NO",
+                "action": "WAIT"
+              },
+              {
+                "fact": "closed_within_30d",
+                "prior": "chase_marriott_business_legacy",
+                "op": "eq",
+                "value": "YES",
+                "action": "WAIT"
+              }
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bold_boundless:Marriott_Bonvoy_Brilliant",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bold / Boundless"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bold_boundless",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_bountiful:Marriott_Bonvoy_Brilliant",
+      "label": "Marriott 90 or 24",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Marriott Bonvoy Bountiful"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "approved_within_90d",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          },
+          {
+            "fact": "bonus_or_upgrade_within_24m",
+            "prior": "chase_bountiful",
+            "op": "eq",
+            "value": "YES",
+            "action": "WAIT"
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    },
+    {
+      "id": "MARRIOTT-MATRIX:chase_ritz_carlton:Marriott_Bonvoy_Brilliant",
+      "label": "Marriott Now/30",
+      "target": {
+        "issuer": "AMEX",
+        "product_name": [
+          "Marriott Bonvoy Brilliant"
+        ]
+      },
+      "when": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "Chase Ritz-Carlton"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "held_now",
+            "prior": "chase_ritz_carlton",
+            "op": "eq",
+            "value": "YES",
+            "action": "BLOCK"
+          },
+          {
+            "all": [
+              {
+                "fact": "held_now",
+                "prior": "chase_ritz_carlton",
+                "op": "eq",
+                "value": "NO",
+                "action": "WAIT"
+              },
+              {
+                "fact": "closed_within_30d",
+                "prior": "chase_ritz_carlton",
+                "op": "eq",
+                "value": "YES",
+                "action": "WAIT"
+              }
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3
+      }
+    }
+  ]
+}

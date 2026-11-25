@@ -1,0 +1,230 @@
+{
+  "questions": [
+    {
+      "id": "a1",
+      "title": "你的第一张美国信用卡开了多久？",
+      "type": "single",
+      "options": [
+        {
+          "value": "NO_US_CARD",
+          "label": "还没有美国信用卡"
+        },
+        {
+          "value": "LT_6M",
+          "label": "不到 6 个月"
+        },
+        {
+          "value": "M6_11",
+          "label": "6–11 个月"
+        },
+        {
+          "value": "Y1_2",
+          "label": "1–2 年"
+        },
+        {
+          "value": "Y2_PLUS",
+          "label": "2年以上"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不确定"
+        }
+      ]
+    },
+    {
+      "id": "a2",
+      "title": "你目前的信用分大约是多少？",
+      "type": "single",
+      "options": [
+        {
+          "value": "SCORE_740_PLUS",
+          "label": "740+"
+        },
+        {
+          "value": "SCORE_700_739",
+          "label": "700–739"
+        },
+        {
+          "value": "SCORE_670_699",
+          "label": "670–699"
+        },
+        {
+          "value": "SCORE_LT_670",
+          "label": "670 以下"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不知道"
+        }
+      ]
+    },
+    {
+      "id": "a3",
+      "title": "过去 12 个月，你一共获批了多少张美国信用卡？",
+      "type": "single",
+      "options": [
+        {
+          "value": "N0",
+          "label": "0–1 张"
+        },
+        {
+          "value": "N2_3",
+          "label": "2–3 张"
+        },
+        {
+          "value": "N4_5",
+          "label": "4–5 张"
+        },
+        {
+          "value": "N6_PLUS",
+          "label": "6 张或更多"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不确定"
+        }
+      ]
+    },
+    {
+      "id": "a4",
+      "title": "过去 6 个月，你申请过几张美国信用卡？不管最后是否获批。",
+      "type": "single",
+      "options": [
+        {
+          "value": "N0",
+          "label": "0–1 张"
+        },
+        {
+          "value": "N2_3",
+          "label": "2–3 张"
+        },
+        {
+          "value": "N4_5",
+          "label": "4–5 张"
+        },
+        {
+          "value": "N6_PLUS",
+          "label": "6 张或更多"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不确定"
+        }
+      ]
+    }
+  ],
+  "age_map": {
+    "NO_US_CARD": "None",
+    "LT_6M": "<6m",
+    "M6_11": "6–11m",
+    "Y1_2": "1–2y",
+    "Y2_PLUS": "2y+"
+  },
+  "score_map": {
+    "SCORE_740_PLUS": "740+",
+    "SCORE_700_739": "700–739",
+    "SCORE_670_699": "670–699",
+    "SCORE_LT_670": "<670"
+  },
+  "activity_map": {
+    "N0": 0,
+    "N1": 0,
+    "N2_3": 1,
+    "N4_5": 2,
+    "N6_PLUS": 3
+  },
+  "activity_levels": [
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "VERY_HIGH"
+  ],
+  "risk_levels": [
+    "HIGH",
+    "MEDIUM",
+    "HIGH_RISK"
+  ],
+  "base_matrix": {
+    "None": {
+      "740+": "HIGH_RISK",
+      "700–739": "HIGH_RISK",
+      "670–699": "HIGH_RISK",
+      "<670": "HIGH_RISK",
+      "Unknown": "INSUFFICIENT_DATA"
+    },
+    "<6m": {
+      "740+": "HIGH_RISK",
+      "700–739": "HIGH_RISK",
+      "670–699": "HIGH_RISK",
+      "<670": "HIGH_RISK",
+      "Unknown": "INSUFFICIENT_DATA"
+    },
+    "6–11m": {
+      "740+": "MEDIUM",
+      "700–739": "MEDIUM",
+      "670–699": "HIGH_RISK",
+      "<670": "HIGH_RISK",
+      "Unknown": "INSUFFICIENT_DATA"
+    },
+    "1–2y": {
+      "740+": "HIGH",
+      "700–739": "MEDIUM",
+      "670–699": "MEDIUM",
+      "<670": "HIGH_RISK",
+      "Unknown": "INSUFFICIENT_DATA"
+    },
+    "2y+": {
+      "740+": "HIGH",
+      "700–739": "HIGH",
+      "670–699": "MEDIUM",
+      "<670": "HIGH_RISK",
+      "Unknown": "INSUFFICIENT_DATA"
+    },
+    "Unknown": {
+      "740+": "INSUFFICIENT_DATA",
+      "700–739": "INSUFFICIENT_DATA",
+      "670–699": "INSUFFICIENT_DATA",
+      "<670": "INSUFFICIENT_DATA",
+      "Unknown": "INSUFFICIENT_DATA"
+    }
+  },
+  "issuer_sensitivity": {
+    "AMEX": "MEDIUM",
+    "CHASE": "MEDIUM",
+    "CITI": "HIGH",
+    "CAPITAL_ONE": "HIGH",
+    "BOFA": "MEDIUM",
+    "USBANK": "HIGH",
+    "BARCLAYS": "HIGH",
+    "WELLS_FARGO": "MEDIUM",
+    "DISCOVER": "LOW",
+    "BILT": "HIGH"
+  },
+  "activity_adjustment": {
+    "LOW": {
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 0
+    },
+    "MEDIUM": {
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 1
+    },
+    "HIGH": {
+      "LOW": 0,
+      "MEDIUM": 1,
+      "HIGH": 1
+    },
+    "VERY_HIGH": {
+      "LOW": 0,
+      "MEDIUM": 1,
+      "HIGH": 2
+    },
+    "UNKNOWN": {
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 0
+    }
+  }
+}

@@ -1,0 +1,238 @@
+{
+  "facts": {
+    "F01_RECENT_NEW_ACCOUNTS": {
+      "type": "number",
+      "title": "过去 24 个月，你本人作为主卡人新开了几张信用卡？",
+      "description": "不计仅作为副卡人或未上报个人信用报告的账户。"
+    },
+    "F06_REPORTED_NEW_ACCOUNTS": {
+      "type": "number",
+      "title": "包括副卡在内，过去 24 个月信用报告上新增了多少张信用卡账户？"
+    },
+    "approved_chase_30d": {
+      "type": "number",
+      "title": "过去 30 天，你获批了几张 Chase 信用卡？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "最近 30 天，你在 Chase 的获批情况"
+    },
+    "approved_chase_business_30d": {
+      "type": "single",
+      "title": "过去 30 天，你有 Chase 商业信用卡获批吗？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "最近 30 天，你在 Chase 的获批情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "approved_revolving_90d": {
+      "type": "number",
+      "title": "过去 90 天，你获批过几张 Amex 普通信用卡？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Amex 的情况"
+    },
+    "same_product_applied_or_approved_90d": {
+      "type": "single",
+      "title": "过去 90 天，你申请过现在选中的这张卡吗？（无论是否获批）",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Amex 的情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "amex_revolving_count": {
+      "type": "number",
+      "title": "你现在有几张 Amex 普通信用卡？（个人卡、商业卡都算）",
+      "description": "只算主卡，不算副卡。",
+      "answer_key": "F10_ISSUER_PORTFOLIO_COUNT"
+    },
+    "amex_charge_count": {
+      "type": "number",
+      "title": "你现在有几张 Amex Platinum、Gold 这类签账卡？",
+      "description": "只算主卡，不算副卡。",
+      "answer_key": "F10_CHARGE_PORTFOLIO_COUNT"
+    },
+    "F03_CARD_HISTORY": {
+      "type": "multi",
+      "title": "下面这些卡，你现在有或者以前办过哪些？",
+      "description": "以前办过、后来关掉的也算；即使当时没拿到开卡奖励，也请选上。",
+      "positive_aliases": {
+        "fact": "F07_MARRIOTT_HISTORY",
+        "map": {
+          "AMEX Marriott Bonvoy Bevy": [
+            "Marriott Bonvoy Bevy"
+          ],
+          "AMEX Marriott Bonvoy Brilliant": [
+            "Marriott Bonvoy Brilliant"
+          ],
+          "AMEX Marriott Bonvoy Business / Legacy SPG Business": [
+            "Marriott Bonvoy Business American Express",
+            "以前的 SPG Business"
+          ]
+        }
+      }
+    },
+    "F03_CURRENT_CARD_HISTORY": {
+      "type": "multi",
+      "title": "下面这些卡，你现在还持有哪些？",
+      "description": "只选现在还没有关掉的卡。"
+    },
+    "F04_BONUS_HISTORY": {
+      "type": "multi",
+      "title": "过去 24 个月，你拿到过下面哪些卡的新卡开卡奖励？",
+      "description": "以实际收到奖励的日期为准。"
+    },
+    "F04_EVER_BONUS_HISTORY": {
+      "type": "multi",
+      "title": "你以前拿过下面哪些卡的新卡开卡奖励？",
+      "description": "不管是几年前拿到的，都请选上。"
+    },
+    "schwab_relationship": {
+      "type": "single",
+      "title": "你有符合要求的 Schwab 账户吗？",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "morgan_stanley_relationship": {
+      "type": "single",
+      "title": "你有符合要求的 Morgan Stanley 或 E*TRADE 账户吗？",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "F07_MARRIOTT_HISTORY": {
+      "type": "multi",
+      "title": "下面这些 Marriott / Ritz-Carlton 卡，你办过哪些？",
+      "description": "包括已经关掉的卡。",
+      "options_by_value": {
+        "Chase Marriott Bonvoy Bold / Boundless": {
+          "prior_id": "chase_bold_boundless",
+          "label": "Chase Marriott Bold / Boundless",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Bold / Boundless / Marriott Premier / Rewards Premier / Premier Plus"
+          }
+        },
+        "Chase Marriott Bonvoy Bountiful": {
+          "prior_id": "chase_bountiful",
+          "label": "Chase Marriott Bountiful",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Bountiful"
+          }
+        },
+        "Chase Ritz-Carlton": {
+          "prior_id": "chase_ritz_carlton",
+          "label": "Chase Ritz-Carlton",
+          "labels_by_issuer": {
+            "CHASE": "Chase Ritz-Carlton"
+          }
+        },
+        "Chase Marriott Business（历史卡）": {
+          "prior_id": "chase_marriott_business_legacy",
+          "label": "Chase Marriott Business (discontinued)",
+          "labels_by_issuer": {
+            "CHASE": "Chase Marriott Business (discontinued)"
+          }
+        },
+        "AMEX Marriott / Legacy SPG Personal": {
+          "prior_id": "amex_marriott_legacy_personal",
+          "label": "AMEX Marriott Bonvoy / legacy SPG personal",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Bonvoy / 旧版 SPG Personal"
+          }
+        },
+        "AMEX Marriott Bonvoy Business / Legacy SPG Business": {
+          "prior_id": "amex_marriott_business",
+          "label": "AMEX Marriott Business",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Business / 旧版 SPG Business"
+          }
+        },
+        "AMEX Marriott Bonvoy Bevy": {
+          "prior_id": "amex_marriott_bevy",
+          "label": "AMEX Marriott Bevy",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Bevy"
+          }
+        },
+        "AMEX Marriott Bonvoy Brilliant": {
+          "prior_id": "amex_marriott_brilliant",
+          "label": "AMEX Marriott Brilliant",
+          "labels_by_issuer": {
+            "CHASE": "Amex Marriott Brilliant / 旧版 SPG Luxury"
+          }
+        }
+      },
+      "details_id": "F07_MARRIOTT_DETAILS"
+    },
+    "held_now": {
+      "type": "grouped_multi",
+      "title": "下面这些卡，你现在还持有哪些？",
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "history_id": "F07_MARRIOTT_HISTORY",
+      "group_prefix": "F07_MARRIOTT_GROUP",
+      "clear_when_not_no": [
+        "closed_within_30d"
+      ]
+    },
+    "closed_within_30d": {
+      "type": "grouped_multi",
+      "title": "下面这些已关卡或转卡的卡，过去 30 天内你还持有过哪些？",
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "history_id": "F07_MARRIOTT_HISTORY",
+      "group_prefix": "F07_MARRIOTT_GROUP"
+    },
+    "approved_within_90d": {
+      "type": "grouped_multi",
+      "title": "过去 90 天内，你申请并获批过下面哪些卡？",
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "history_id": "F07_MARRIOTT_HISTORY",
+      "group_prefix": "F07_MARRIOTT_GROUP"
+    },
+    "new_card_bonus_within_24m": {
+      "type": "grouped_multi",
+      "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励？（不包括升级奖励）",
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "history_id": "F07_MARRIOTT_HISTORY",
+      "group_prefix": "F07_MARRIOTT_GROUP"
+    },
+    "bonus_or_upgrade_within_24m": {
+      "type": "grouped_multi",
+      "title": "过去 24 个月，你拿过下面哪些卡的开卡奖励或升级奖励？",
+      "details_id": "F07_MARRIOTT_DETAILS",
+      "history_id": "F07_MARRIOTT_HISTORY",
+      "group_prefix": "F07_MARRIOTT_GROUP"
+    }
+  },
+  "labels": {
+    "OTHER_CHASE_NO_FEE_BUSINESS": "其他无年费 Chase 商业信用卡（具体产品待核实）",
+    "Chase Aeroplan Card": "Chase Aeroplan Card（包括旧版本）"
+  }
+}
