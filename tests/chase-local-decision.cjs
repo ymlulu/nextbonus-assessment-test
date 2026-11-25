@@ -66,6 +66,32 @@ for(const item of chase){
  else assert.ok(!r.questionnaire.diagnostics.applicable_rule_ids.includes('CHASE-012'));
 }
 const csp='chase_sapphire_preferred',csr='chase_sapphire_reserve';
+// Verify the compact UI contract and exact-count equivalence on both sides
+// of the existing decision boundaries, including 4/24 with authorized users.
+const pendingCounts=run(csp,{F01_RECENT_NEW_ACCOUNTS:undefined,F02_ISSUER_APPLICATION_HISTORY:undefined})
+ .questionnaire.questionnaire.specific;
+assert.deepEqual(pendingCounts.find(q=>q.id==='F01_RECENT_NEW_ACCOUNTS').count_bands.map(x=>x.value),[0,4,5]);
+assert.deepEqual(pendingCounts.find(q=>q.id==='F02_ISSUER_APPLICATION_HISTORY').fields.find(f=>f.id==='approved_chase_30d').count_bands.map(x=>x.value),[0,2]);
+const auQuestion=run(csp,{F01_RECENT_NEW_ACCOUNTS:4,F06_AU_BREAKDOWN:undefined})
+ .questionnaire.questionnaire.specific.find(q=>q.id==='F06_AU_BREAKDOWN');
+assert.deepEqual(auQuestion.count_bands.map(x=>x.value),[0,1]);
+assert.deepEqual(auQuestion.visible_when,{fact:'F01_RECENT_NEW_ACCOUNTS',equals:4});
+for(let count=0;count<=30;count++)for(const au of [undefined,0,1,4]){
+ const evaluate=(n,a)=>run(csp,{F01_RECENT_NEW_ACCOUNTS:n,F06_AU_BREAKDOWN:a}).evaluation;
+ const exact=evaluate(count,au),band=evaluate(count>=5?5:count===4?4:0,au===undefined?undefined:au>0?1:0);
+ assert.equal(exact.rule_results.find(x=>x.rule_id==='CHASE-001').status,band.rule_results.find(x=>x.rule_id==='CHASE-001').status);
+ assert.equal(exact.application.status,band.application.status);
+ assert.equal(exact.bonus.status,band.bonus.status);
+}
+for(let count=0;count<=30;count++){
+ const evaluate=n=>run(csp,{F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:n}}).evaluation;
+ const exact=evaluate(count),band=evaluate(count>=2?2:0);
+ assert.equal(exact.rule_results.find(x=>x.rule_id==='CHASE-002').status,band.rule_results.find(x=>x.rule_id==='CHASE-002').status);
+ assert.equal(exact.application.status,band.application.status);
+ assert.equal(exact.bonus.status,band.bonus.status);
+}
+assert.match(run(csp,{F01_RECENT_NEW_ACCOUNTS:5}).evaluation.rule_results.find(x=>x.rule_id==='CHASE-001').reason,/5 张或更多/);
+
 assert.ok(hasTrigger(run(csp,{F01_RECENT_NEW_ACCOUNTS:5}),'CHASE-001'));
 assert.ok(!hasTrigger(run(csp,{F01_RECENT_NEW_ACCOUNTS:4,F06_AU_BREAKDOWN:0}),'CHASE-001'));
 let r=run(csp,{F01_RECENT_NEW_ACCOUNTS:4,F06_AU_BREAKDOWN:1});

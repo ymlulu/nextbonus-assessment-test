@@ -149,7 +149,17 @@
           "type": "number",
           "label": "过去 90 天，你获批过几张 Amex 普通信用卡？",
           "min": 0,
-          "max": 30
+          "max": 30,
+          "count_bands": [
+            {
+              "value": 0,
+              "label": "0–1 张"
+            },
+            {
+              "value": 2,
+              "label": "2 张或更多"
+            }
+          ]
         },
         {
           "id": "same_product_applied_or_approved_90d",
@@ -202,7 +212,29 @@
       "description": "只算自己名下的主卡，不算副卡。",
       "type": "number",
       "min": 0,
-      "max": 99
+      "max": 99,
+      "count_bands_by_rule": {
+        "AMEX-007": [
+          {
+            "value": 0,
+            "label": "0–4 张"
+          },
+          {
+            "value": 5,
+            "label": "5 张或更多"
+          }
+        ],
+        "AMEX-008": [
+          {
+            "value": 0,
+            "label": "0–9 张"
+          },
+          {
+            "value": 10,
+            "label": "10 张或更多"
+          }
+        ]
+      }
     }
   },
   "legacy_variant_scope_by_rule": {

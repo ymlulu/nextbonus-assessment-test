@@ -84,12 +84,24 @@
     return Number.isInteger(count)&&count>=4;
   }
 
+  // The two original activity answers N0/N1 both encode severity 0.
+  // Keep the locked source data intact, but expose one equivalent choice.
+  function compactCommonQuestions(questions=[]){
+    return questions.map(q=>{
+      if(!['a3','a4'].includes(q.id))return q;
+      const options=q.options||[];
+      if(!options.some(o=>o.value==='N0')||!options.some(o=>o.value==='N1'))return q;
+      return {...q,options:options.filter(o=>o.value!=='N1')
+        .map(o=>o.value==='N0'?{...o,label:'0–1 张'}:o)};
+    });
+  }
   function makePlanner({ruleIndex,products,baseQuestions=[],frozenOfferFacts={}}){
     if(ruleIndex?.counts?.rules!==129||!Array.isArray(ruleIndex.rules)||
        ruleIndex.rules.length!==129)throw Error('129-rule reviewed source index required');
     if(!Array.isArray(ruleIndex.facts)||ruleIndex.facts.length!==12)
       throw Error('Reviewed F01-F12 registry required');
     const catalog=products?.cards||{};
+    const commonQuestions=compactCommonQuestions(baseQuestions);
     const groups=new Map(ruleIndex.facts.map(f=>[f.id,f]));
     function getVersion(){
       return Object.freeze({contract_version:CONTRACT_VERSION,
@@ -143,7 +155,7 @@
       }
       return Object.freeze({contract_version:CONTRACT_VERSION,
         release_id:ruleIndex.release_id,product_id,locale:'zh-CN',
-        questionnaire:{common:baseQuestions.filter(q=>!isAnswered(facts,q.id))
+        questionnaire:{common:commonQuestions.filter(q=>!isAnswered(facts,q.id))
           .map(q=>({id:q.id,title:q.title,type:q.type,options:q.options||[]})),
           specific,benefits:null},
         diagnostics:{applicable_rule_ids:routed,unresolved_system_gates:gated,
@@ -161,5 +173,5 @@
     return Object.freeze({getVersion,listProducts,getQuestionnaire,getQuestionnaireForProduct});
   }
   return Object.freeze({contractVersion:CONTRACT_VERSION,targetState,gateState,
-    makePlanner});
+    makePlanner,compactCommonQuestions});
 });

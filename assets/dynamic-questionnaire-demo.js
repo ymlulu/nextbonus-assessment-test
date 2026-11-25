@@ -178,35 +178,31 @@
     if(note)row.append(note);
     return row;
   }
-  function numericOptions(max){
-    const values=[];
-    for(let n=0;n<=Math.min(15,max);n++)values.push(n);
-    for(const n of [16,17,18,19,20,25,30,40,50,60,75,99])
-      if(n<=max&&!values.includes(n))values.push(n);
-    return values.sort((a,b)=>a-b);
-  }
-  function countSelector({value,max=30,commit}){
-    const select=el('select');
-    select.append(option('','请选择张数'));
-    for(const n of numericOptions(max))select.append(option(String(n),n+' 张'));
-    select.append(option('OTHER','其他张数…'));
-    const chosen=value===undefined||value===null?'':String(value);
-    select.value=chosen&&numericOptions(max).includes(Number(chosen))?chosen:
-      chosen?'OTHER':'';
-    const number=el('input');number.type='number';number.min='0';
-    number.max=String(max);number.step='1';number.placeholder='输入张数';
-    number.value=chosen&&!numericOptions(max).includes(Number(chosen))?chosen:'';
-    number.hidden=select.value!=='OTHER';
-    select.addEventListener('change',()=>{
-      number.hidden=select.value!=='OTHER';
-      if(select.value==='OTHER')return;
-      commit(select.value===''?null:Number(select.value));
-    });
-    number.addEventListener('change',()=>{
-      if(!/^\d+$/.test(number.value)||Number(number.value)>max)return;
-      commit(Number(number.value));
-    });
-    const row=el('div','count-picker');row.append(select,number);
+  function countSelector({value,bands,max=99,commit}){
+    const row=el('div','count-picker');
+    // A band stores its lower-bound representative. Rule results must only
+    // describe the band, never claim that its representative is an exact count.
+    // Bands come from issuer question schemas; the UI owns no bank thresholds.
+    if(Array.isArray(bands)&&bands.length){
+      const select=el('select');
+      select.append(option('','请选择'));
+      for(const band of bands)select.append(option(String(band.value),band.label));
+      const chosen=Number.isInteger(value)?bands.filter(b=>b.value<=value).at(-1):null;
+      select.value=chosen?String(chosen.value):'';
+      select.addEventListener('change',()=>commit(select.value===''?null:Number(select.value)));
+      row.append(select);
+    }else{
+      // For a future fact that genuinely needs an exact count, use a simple
+      // numeric input, not a fabricated set of thresholds or dozens of options.
+      const number=el('input');number.type='number';number.min='0';
+      number.max=String(max);number.step='1';number.placeholder='请输入张数';
+      number.value=Number.isInteger(value)?String(value):'';
+      number.addEventListener('change',()=>{
+        if(number.value===''){commit(null);return;}
+        if(/^\d+$/.test(number.value)&&Number(number.value)<=max)commit(Number(number.value));
+      });
+      row.append(number);
+    }
     return row;
   }
   function yesNoOptions({options,value,commit}){
@@ -275,7 +271,7 @@
           render();
         };
         const control=field.type==='number'?
-          countSelector({value:entry[field.id],max:field.max??30,commit}):
+          countSelector({value:entry[field.id],bands:field.count_bands,max:field.max??30,commit}):
           yesNoOptions({options:field.options,value:entry[field.id],commit});
         label.append(control);line.append(label);
         const note=feedback(item,result,field.id);
@@ -321,7 +317,7 @@
       card.append(options);
     }else if(item.type==='number'){
       const row=el('div','choice-inline');
-      row.append(countSelector({value:answers[item.id],max:item.max??99,
+      row.append(countSelector({value:answers[item.id],bands:item.count_bands,max:item.max??99,
         commit:value=>{
           if(value===null)delete answers[item.id];
           else answers[item.id]=value;
@@ -470,8 +466,10 @@
     const grouped=plan.questionnaire.marriott_followups||[];
     if(!seenQuestions.size&&!grouped.length)
       list.append(el('p','muted','目前没有其他需要回答的问题。'));
-    for(const q of seenQuestions.values())
+    for(const q of seenQuestions.values()){
+      if(q.visible_when&&answers[q.visible_when.fact]!==q.visible_when.equals)continue;
       list.append(question(q,false,result,activeIds.has(q.id)));
+    }
     // Group options depend on the CURRENT history, not the accumulated
     // question cache. Removed historical cards must not leave stale options.
     for(const q of grouped)list.append(question(q,false,result,activeIds.has(q.id)));
@@ -578,7 +576,8 @@
         a3:'过去 12 个月，你一共获批过几张美国信用卡？',
         a4:'过去 6 个月，你一共申请过几张美国信用卡？没批的也算。'
       };
-      baseQuestionLibrary=(questions.common||[]).map(q=>({
+      baseQuestionLibrary=window.NextBonusQuestionnairePlannerV1
+        .compactCommonQuestions(questions.common||[]).map(q=>({
         ...q,title:commonTitles[q.id]||q.title,
         options:(q.options||[]).map(x=>({...x,label:
           x.value==='Y2_PLUS'?'2 年或更久':

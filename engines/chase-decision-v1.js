@@ -64,20 +64,20 @@ function evaluate({plan,product,answers={},policy,approvalConfig,marriottResult}
    if(!count(n))events.push(event(id,'MISSING','APPLICATION',
        '还要知道过去 24 个月你本人新开了几张信用卡'));
    else if(n>=5)events.push(event(id,'TRIGGERED','APPLICATION',
-       '过去 24 个月本人新开了 '+n+' 张信用卡，已达到 Chase 5/24。'+
+       '过去 24 个月本人新开了 5 张或更多信用卡，已达到 Chase 5/24。'+
        (product.product_name==='Amazon Prime Visa'?' Amazon Prime Visa 有过例外报告，但不能保证获批。':'')));
    else if(n===4&&!count(au))events.push(event(id,'MISSING','APPLICATION',
        '目前有 4 张本人新账户，还需要确认信用报告里有没有副卡'));
    else if(n===4&&au>0)events.push(event(id,'REVIEW','APPLICATION',
-       '本人新账户 4 张，另有 '+au+' 张副卡；系统可能一并计算，是否能人工排除不确定'));
+       '本人新账户 4 张，另有至少 1 张副卡；系统可能一并计算，是否能人工排除不确定'));
    else events.push(event(id,'CLEAR','APPLICATION',
-       '本人新账户 '+n+' 张，没有达到 5/24 的本人主卡门槛；副卡及信用报告记录可能另需核实'));
+       '本人新账户 '+(n===4?'4 张':'0–3 张')+'，没有达到 5/24 的本人主卡门槛；副卡及信用报告记录可能另需核实'));
    continue;
   }
   if(rule.mode==='approval_30d'){
    const n=activity.approved_chase_30d;
    events.push(event(id,!count(n)?'MISSING':n>=2?'TRIGGERED':'CLEAR',dimension,
-    count(n)?'过去 30 天 Chase 信用卡获批 '+n+' 张':'还要知道过去 30 天获批了几张 Chase 卡'));
+    count(n)?'过去 30 天 Chase 信用卡获批 '+(n>=2?'2 张或更多':'0–1 张'):'还要知道过去 30 天获批了几张 Chase 卡'));
    continue;
   }
   if(rule.mode==='business_30d'){

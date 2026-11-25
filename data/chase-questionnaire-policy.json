@@ -303,14 +303,42 @@
       "title": "过去 24 个月，你本人作为主卡人新开了几张信用卡？",
       "description": "计算 Chase 5/24。主要看个人信用报告里的新账户；只做副卡的账户请在下一题单独填写。",
       "min": 0,
-      "max": 30
+      "max": 30,
+      "count_bands": [
+        {
+          "value": 0,
+          "label": "0–3 张"
+        },
+        {
+          "value": 4,
+          "label": "4 张"
+        },
+        {
+          "value": 5,
+          "label": "5 张或更多"
+        }
+      ]
     },
     "F06_AU_BREAKDOWN": {
       "type": "number",
-      "title": "过去 24 个月，你的信用报告里还有几张别人的信用卡副卡？",
+      "title": "过去 24 个月新增的信用卡副卡账户，有没有还在你的信用报告上的？",
       "description": "接近 5/24 边界时，副卡可能也被系统计入；是否可以人工排除没有保证。",
       "min": 0,
-      "max": 30
+      "max": 30,
+      "count_bands": [
+        {
+          "value": 0,
+          "label": "没有"
+        },
+        {
+          "value": 1,
+          "label": "有（至少 1 张）"
+        }
+      ],
+      "visible_when": {
+        "fact": "F01_RECENT_NEW_ACCOUNTS",
+        "equals": 4
+      }
     },
     "F02_ISSUER_APPLICATION_HISTORY": {
       "type": "structured",
@@ -325,6 +353,16 @@
           "max": 30,
           "rule_ids": [
             "CHASE-002"
+          ],
+          "count_bands": [
+            {
+              "value": 0,
+              "label": "0–1 张"
+            },
+            {
+              "value": 2,
+              "label": "2 张或更多"
+            }
           ]
         },
         {

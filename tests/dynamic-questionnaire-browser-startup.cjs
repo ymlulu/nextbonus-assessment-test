@@ -91,6 +91,12 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    return walk(get('questions')).find(n=>n.tag==='select'&&
      n.options.some(o=>o.value===value));
  }
+ const selectValues=values=>walk(get('questions')).find(n=>n.tag==='select'&&
+   JSON.stringify(n.options.map(o=>o.value))===JSON.stringify(values));
+ assert.ok(selectValues(['','0','2']),'Amex 2/90 only needs two choices');
+ assert.ok(selectValues(['','0','5']),'Amex revolving portfolio only needs two choices');
+ assert.equal(optionSelector('N0').options.find(o=>o.value==='N0').textContent,'0–1 张');
+ assert.ok(!optionSelector('N1'),'equal-severity activity options are merged');
  for(const value of ['Y1_2','SCORE_700_739','N0']){
    const select=optionSelector(value);
    assert.ok(select,'answer option rendered '+value);
@@ -150,10 +156,19 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    'Chase now reuses Amex two-panel application/bonus decision UI');
  assert.ok(walk(get('assessment-result')).some(n=>/Chase 卡适不适合现在申请/.test(n.textContent)),
    'issuer label changes without a second UI');
- const five24=walk(get('questions')).find(n=>n.tag==='select'&&
-   n.options.some(o=>o.value==='5')&&n.options.some(o=>o.value==='OTHER'));
- assert.ok(five24,'Chase 5/24 is an actual count selector, not free text');
- five24.value='5';five24.fire('change');
+ const five24=selectValues(['','0','4','5']);
+ assert.ok(five24,'Chase 5/24 has only three threshold bands');
+ assert.deepEqual(five24.options.slice(1).map(o=>o.textContent),['0–3 张','4 张','5 张或更多']);
+ assert.ok(selectValues(['','0','2']),'Chase 2/30 only needs two choices');
+ five24.value='4';five24.fire('change');
+ const au=selectValues(['','0','1']);
+ assert.ok(au,'4/24 requires a two-choice AU follow-up');
+ au.value='1';au.fire('change');
+ assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&/CHASE-001/.test(n.textContent)));
+ const newFive24=selectValues(['','0','4','5']);
+ newFive24.value='5';newFive24.fire('change');
+ assert.ok(!selectValues(['','0','1']),'AU question no longer relevant at 5+');
+ assert.ok(!walk(get('questions')).some(n=>n.tag==='input'&&n.type==='number'),'modeled count questions require no exact entry');
  assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&
    /CHASE-001/.test(n.textContent)),
    '5/24 selected answer must produce the same inline red rule-change UI');
