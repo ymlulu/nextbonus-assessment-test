@@ -95,18 +95,17 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
    JSON.stringify(n.options.map(o=>o.value))===JSON.stringify(values));
  assert.ok(selectValues(['','0','2']),'Amex 2/90 only needs two choices');
  assert.ok(selectValues(['','0','5']),'Amex revolving portfolio only needs two choices');
- assert.equal(optionSelector('N0').options.find(o=>o.value==='N0').textContent,'0–1 张');
- assert.ok(!optionSelector('N1'),'equal-severity activity options are merged');
- for(const value of ['Y1_2','SCORE_700_739','N0']){
+ const baseBands=['','0','2','4','6'];
+ assert.equal(selectValues(baseBands).options[1].textContent,'0–1 张');
+ for(const value of ['Y1_2','SCORE_700_739']){
    const select=optionSelector(value);
    assert.ok(select,'answer option rendered '+value);
    select.value=value;select.fire('change');
  }
- // A3 and A4 both offer N0; after A3 is filled choose the next unanswered N0.
- const a4=walk(get('questions')).filter(n=>n.tag==='select'&&
-   n.options.some(o=>o.value==='N0')&&n.value==='')[0];
- assert.ok(a4,'fourth base question remains present');
- a4.value='N0';a4.fire('change');
+ for(let i=0;i<2;i++){
+  const control=walk(get('questions')).find(n=>n.tag==='select'&&JSON.stringify(n.options.map(o=>o.value))===JSON.stringify(baseBands)&&n.value==='');
+  assert.ok(control,'unanswered shared activity fact');control.value='0';control.fire('change');
+ }
  const questionCards=walk(get('questions')).filter(n=>n.tag==='section'&&
    n.className==='question');
  assert.ok(questionCards.length>=4,'all four baseline questions persist after answering');
@@ -336,6 +335,14 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  pick('US_BANK','PERSONAL',/Altitude Go/);
  selectHistory('U.S. Bank Altitude Go Visa Signature');
  assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ pick('US_BANK','PERSONAL',/Smartly/);
+ const opened=walk(get('questions')).filter(n=>n.tag==='strong'&&/过去 12 个月.*新开/.test(n.textContent));
+ assert.equal(opened.length,1,'Smartly 12m new accounts asked exactly once');
+ const sharedSection=walk(get('questions')).find(n=>n.tag==='section'&&walk(n).includes(opened[0]));
+ assert.ok(walk(sharedSection).some(n=>/对应规则：USB-001/.test(n.textContent)));
+ const openedSelect=walk(sharedSection).find(n=>n.tag==='select');
+ openedSelect.value='2';openedSelect.fire('change');
+ assert.ok(walk(get('questions')).some(n=>n.className==='rule-delta'&&/USB-001/.test(n.textContent)));
  pick('BARCLAYS','PERSONAL',/Wyndham Earner$/);
  answerCount(['','0','6'],'6');
  assert.ok(walk(get('assessment-result')).some(n=>/发现可能影响申请的情况/.test(n.textContent)));

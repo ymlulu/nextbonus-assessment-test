@@ -7,7 +7,7 @@ const rulebook=read('bank-rules/rules.json'),factbook=read('bank-rules/facts.jso
 const runtime=createRuntime({rulebook,factbook,products,approval});
 const assert=(v,label)=>{if(!v)throw Error(label);};
 const eq=(a,b,label)=>assert(JSON.stringify(a)===JSON.stringify(b),label+': '+JSON.stringify(a)+' != '+JSON.stringify(b));
-const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
+const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
  F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',bofa_approved_2m:0,bofa_approved_12m:0,bofa_approved_24m:0,cap1_application_or_approval_lt_6m:'NO',cap1_applications_30d:0,wf_consumer_opened_lt_4m:'NO'},
  F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],
  F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES',F03_HELD_WITHIN_24M:['NONE'],bofa_business_held_24m:'NO',F04_BONUS_RECEIVED_48M:['NONE'],cap1_business_ever_held:'NO',cap1_open_accounts:0,F03_HELD_OR_OPENED_48M:['NONE'],F03_OPENED_AND_RECEIVED_BONUS_15M:['NONE'],F03_OPENED_WITHIN_48M:['NONE'],discover_current_cards:0,recent_new_accounts_6m:0,recent_new_accounts_12m:0,F04_BONUS_RECEIVED_60M:['NONE'],usb_cashplus_upgrade:'NO',bilt_decline_lt_45d:'NO'};
@@ -269,7 +269,13 @@ const gatedHistory=(id,p,fact,value,impacts,actions)=>{
 const ascent=card('Atmos Rewards Ascent'),summit=card('Atmos Rewards Summit'),bofaBiz=card('Atmos Rewards Business'),bofaPremium=card('Premium Rewards');
 for(const p of [ascent,bofaBiz]){
  for(const [field,n] of [['bofa_approved_2m',2],['bofa_approved_12m',3],['bofa_approved_24m',4]])
-  numeric('BOFA-001',p,x=>structured(field,x),n,3,'WAIT');
+  {
+   const keys=['bofa_approved_2m','bofa_approved_12m','bofa_approved_24m'],idx=keys.indexOf(field);
+   const patch=x=>({F02_ISSUER_APPLICATION_HISTORY:{...base.F02_ISSUER_APPLICATION_HISTORY,
+    ...Object.fromEntries(keys.map((k,i)=>[k,i===idx?x:i<idx?0:(x??0)]))}});
+   for(const x of [n-1,n,n+1])check('BOFA-001',p,patch(x),x<n?'CLEAR':'TRIGGERED',...(x<n?[]:app(3,'WAIT')));
+   check('BOFA-001',p,patch(undefined),'MISSING');
+  }
 }
 gatedHistory('BOFA-002',bofaPremium,'F03_HELD_WITHIN_24M','Premium Rewards',...app(2));
 check('BOFA-002',bofaBiz,{},'ABSENT');
@@ -319,7 +325,7 @@ for(const id of ['COVERAGE-WF-BUSINESS-APPLICATION','COVERAGE-WF-BUSINESS-BONUS'
  check(id,wfActive,{},'ABSENT');
 }
 const wfBizUnknown=assess(wfBiz);
-eq(wfBizUnknown.questionnaire.editable.length,0,'no fabricated WF business facts');
+eq(wfBizUnknown.questionnaire.editable.filter(q=>q.section==='specific').length,0,'no fabricated WF business facts');
 eq(wfBizUnknown.evaluation.application.action,'UNKNOWN','business application coverage gap');
 eq(wfBizUnknown.evaluation.bonus.action,'UNKNOWN','business bonus coverage gap');
 eq(wfBizUnknown.evaluation.decision.code,'REVIEW','no false clear on uncovered product');
@@ -357,7 +363,8 @@ check('BARC-002',barc,{},'REVIEW');
 eq(assess(barc,{F03_CARD_HISTORY:['Wyndham Earner Plus']}).evaluation.bonus.action,'UNKNOWN','unverified cross-product history must not create a hard block');
 eq(assess(barc,{}, {offer_facts:{coverage_state:{'BARC-002':'CONFIRMED_NO_ADDITIONAL_RULES'}}}).evaluation.bonus.action,'CLEAR','explicit coverage state');
 const usbGo=card('U.S. Bank Altitude Go Visa Signature'),usbConnect=card('U.S. Bank Altitude Connect Visa Signature'),usbCash=card('U.S. Bank Cash+ Visa Signature'),usbSmart=card('Smartly');
-for(const [field,n] of [['recent_new_accounts_6m',1],['recent_new_accounts_12m',2]])numeric('USB-001',usbGo,x=>({[field]:x}),n,1,'RISK');
+numeric('USB-001',usbGo,x=>({recent_new_accounts_6m:x,recent_new_accounts_12m:x===undefined?1:x<2?1:2}),1,1,'RISK');
+numeric('USB-001',usbGo,x=>({recent_new_accounts_12m:x}),2,1,'RISK');
 history('USB-PROD-002',usbGo,'F04_BONUS_RECEIVED_60M',[usbGo.product_name],...bonus(3,'WAIT'));
 history('USB-PROD-003',usbConnect,'F04_BONUS_RECEIVED_60M',[usbConnect.product_name],...bonus(3,'WAIT'));
 check('USB-PROD-002',usbGo,{F04_BONUS_RECEIVED_48M:[usbGo.product_name]},'CLEAR');

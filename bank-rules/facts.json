@@ -372,7 +372,9 @@
       "window": {
         "unit": "month",
         "value": 2
-      }
+      },
+      "metric": "APPROVALS",
+      "population": "BOFA_CREDIT_CARDS_SELF"
     },
     "bofa_approved_12m": {
       "type": "number",
@@ -382,7 +384,9 @@
       "window": {
         "unit": "month",
         "value": 12
-      }
+      },
+      "metric": "APPROVALS",
+      "population": "BOFA_CREDIT_CARDS_SELF"
     },
     "bofa_approved_24m": {
       "type": "number",
@@ -392,7 +396,9 @@
       "window": {
         "unit": "month",
         "value": 24
-      }
+      },
+      "metric": "APPROVALS",
+      "population": "BOFA_CREDIT_CARDS_SELF"
     },
     "F03_HELD_WITHIN_24M": {
       "type": "multi",
@@ -540,19 +546,25 @@
     },
     "recent_new_accounts_6m": {
       "type": "number",
-      "title": "过去 6 个月，你新开了几张信用卡？",
+      "title": "过去 6 个月，你新开了几张美国信用卡？",
       "window": {
         "unit": "month",
         "value": 6
-      }
+      },
+      "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
+      "metric": "OPENED_ACCOUNTS",
+      "population": "US_CREDIT_CARDS_SELF"
     },
     "recent_new_accounts_12m": {
       "type": "number",
-      "title": "过去 12 个月，你新开了几张信用卡？",
+      "title": "过去 12 个月，你新开了几张美国信用卡？",
       "window": {
         "unit": "month",
         "value": 12
-      }
+      },
+      "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
+      "metric": "OPENED_ACCOUNTS",
+      "population": "US_CREDIT_CARDS_SELF"
     },
     "F04_BONUS_RECEIVED_60M": {
       "type": "multi",
@@ -597,6 +609,74 @@
         "unit": "day",
         "value": 45
       }
+    },
+    "a1": {
+      "title": "你的第一张美国信用卡开了多久？",
+      "type": "single",
+      "options": [
+        {
+          "value": "NO_US_CARD",
+          "label": "还没有美国信用卡"
+        },
+        {
+          "value": "LT_6M",
+          "label": "不到 6 个月"
+        },
+        {
+          "value": "M6_11",
+          "label": "6–11 个月"
+        },
+        {
+          "value": "Y1_2",
+          "label": "1–2 年"
+        },
+        {
+          "value": "Y2_PLUS",
+          "label": "2年以上"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不确定"
+        }
+      ]
+    },
+    "a2": {
+      "title": "你目前的信用分大约是多少？",
+      "type": "single",
+      "options": [
+        {
+          "value": "SCORE_740_PLUS",
+          "label": "740+"
+        },
+        {
+          "value": "SCORE_700_739",
+          "label": "700–739"
+        },
+        {
+          "value": "SCORE_670_699",
+          "label": "670–699"
+        },
+        {
+          "value": "SCORE_LT_670",
+          "label": "670 以下"
+        },
+        {
+          "value": "UNKNOWN",
+          "label": "不知道"
+        }
+      ]
+    },
+    "recent_applications_6m": {
+      "type": "number",
+      "title": "过去 6 个月，你提交过几次美国信用卡申请？",
+      "description": "包括获批、被拒以及仍在审核的申请。",
+      "count_unit": "次",
+      "window": {
+        "unit": "month",
+        "value": 6
+      },
+      "metric": "APPLICATIONS",
+      "population": "US_CREDIT_CARDS_SELF"
     }
   },
   "labels": {
@@ -606,5 +686,27 @@
     "Citi / AAdvantage Executive": "Citi AAdvantage Executive",
     "Citi / AAdvantage Globe": "Citi AAdvantage Globe",
     "Citi / AAdvantage Business": "Citi AAdvantage Business"
-  }
+  },
+  "count_relations": [
+    {
+      "shorter": "recent_new_accounts_6m",
+      "longer": "recent_new_accounts_12m",
+      "message": "过去 6 个月新开的信用卡数量不能超过过去 12 个月。请检查这两项答案。"
+    },
+    {
+      "shorter": "bofa_approved_2m",
+      "longer": "bofa_approved_12m",
+      "message": "过去 2 个月获批的 BofA 信用卡数量不能超过过去 12 个月。请检查这两项答案。"
+    },
+    {
+      "shorter": "bofa_approved_12m",
+      "longer": "bofa_approved_24m",
+      "message": "过去 12 个月获批的 BofA 信用卡数量不能超过过去 24 个月。请检查这两项答案。"
+    },
+    {
+      "shorter": "bofa_approved_2m",
+      "longer": "bofa_approved_24m",
+      "message": "过去 2 个月获批的 BofA 信用卡数量不能超过过去 24 个月。请检查这两项答案。"
+    }
+  ]
 }
