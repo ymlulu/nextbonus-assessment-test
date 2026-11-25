@@ -9,6 +9,21 @@ const OPS=new Set(['gte','gt','lt','lte','eq','includes_any']);
 const ACTIONS=new Set(['WAIT','BLOCK']);
 const uniq=a=>[...new Set(a)];
 const validCount=x=>Number.isSafeInteger(x)&&x>=0;
+const countRange=x=>validCount(x)?[x,x]:
+ x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===2&&validCount(x.min)&&
+ (x.max===null||validCount(x.max)&&x.max>=x.min)?[x.min,x.max===null?Infinity:x.max]:null;
+function countPredicate(raw,op,t){
+ const range=countRange(raw);if(!range||!validCount(t))return null;
+ const [lo,hi]=range;
+ switch(op){
+  case 'gte':return lo>=t?true:hi<t?false:null;
+  case 'gt':return lo>t?true:hi<=t?false:null;
+  case 'lt':return hi<t?true:lo>=t?false:null;
+  case 'lte':return hi<=t?true:lo>t?false:null;
+  case 'eq':return lo===t&&hi===t?true:t<lo||t>hi?false:null;
+  default:return null;
+ }
+}
 const knownList=x=>Array.isArray(x)&&x.length>0&&!x.includes('UNKNOWN')&&
  (!x.includes('NONE')||x.length===1)&&x.every(v=>typeof v==='string');
 const own=(o,k)=>Object.prototype.hasOwnProperty.call(o||{},k);
@@ -207,8 +222,11 @@ function createRuntime({rulebook,factbook,products,approval}){
  function baseRisk(a,issuer){
   const age=approval.age_map[factValue(approval.age_fact,{},a)],score=approval.score_map[factValue(approval.score_fact,{},a)];
   const activityValues=approval.activity_facts.map(id=>factValue(id,{},a));
-  if(!age||!score||activityValues.some(x=>!validCount(x)))return {rating:'INSUFFICIENT_DATA',activity:'UNKNOWN'};
-  const levels=activityValues.map(n=>approval.activity_bands.filter(b=>b.min<=n).at(-1).level);
+  if(!age||!score||activityValues.some(x=>!countRange(x)))return {rating:'INSUFFICIENT_DATA',activity:'UNKNOWN'};
+  const level=n=>approval.activity_bands.filter(b=>b.min<=n).at(-1).level;
+  const low=Math.max(...activityValues.map(x=>level(countRange(x)[0]))),high=Math.max(...activityValues.map(x=>level(countRange(x)[1])));
+  if(low!==high)return {rating:'INSUFFICIENT_DATA',activity:'UNKNOWN'};
+  const levels=[low];
   const activity=approval.activity_levels[Math.max(...levels)],base=approval.base_matrix[age]?.[score]||'INSUFFICIENT_DATA';
   const i=approval.risk_levels.indexOf(base),adjustment=approval.activity_adjustment[activity]?.[approval.issuer_sensitivity[issuer]]||0;
   return {rating:i<0?base:approval.risk_levels[Math.min(approval.risk_levels.length-1,i+adjustment)],activity};
@@ -241,7 +259,7 @@ function createRuntime({rulebook,factbook,products,approval}){
     if(!entry.fields.has(id))entry.fields.set(id,{id,type:f.type,label:f.title,rules:new Set(),cuts:new Set(),options:new Map(),pending:false,count_unit:f.count_unit});
     e=entry.fields.get(id);if(r)e.rules.add(r.id);
    }
-   const missing=f.type==='multi'?!knownList(raw):f.type==='number'?!validCount(raw):f.type==='grouped_multi'?!['YES','NO'].includes(raw):empty(raw)||!f.options?.some(o=>o.value===raw);
+   const missing=f.type==='multi'?!knownList(raw):f.type==='number'?countPredicate(raw,node.op,threshold)===null:f.type==='grouped_multi'?!['YES','NO'].includes(raw):empty(raw)||!f.options?.some(o=>o.value===raw);
    if(missing){e.pending=true;entry.pending=true;}
    if(f.type==='number'){
     const t=threshold;
@@ -286,9 +304,9 @@ function createRuntime({rulebook,factbook,products,approval}){
     reason=hits.map(v=>(f.evidence_prefix||'已选择 ')+v+(f.evidence_suffix||'')).join('、');
    }else{
     qid=record(node,r,values,threshold,raw);
-    const valid=f.type==='number'?validCount(raw):f.type==='grouped_multi'?['YES','NO'].includes(raw):f.options?.some(o=>o.value===raw)&&!empty(raw);
+    const valid=f.type==='number'?countPredicate(raw,node.op,threshold)!==null:f.type==='grouped_multi'?['YES','NO'].includes(raw):f.options?.some(o=>o.value===raw)&&!empty(raw);
     if(valid){
-     state=node.op==='eq'?raw===threshold:node.op==='gte'?raw>=threshold:node.op==='gt'?raw>threshold:node.op==='lt'?raw<threshold:raw<=threshold;
+     state=f.type==='number'?countPredicate(raw,node.op,threshold):raw===threshold;
      if(f.type==='number'){
       const comparator={gte:'达到 ',gt:'超过 ',lt:'少于 ',lte:'不超过 ',eq:'等于 '}[node.op];
       reason=f.title+' '+(state?comparator:node.op==='gte'?'少于 ':node.op==='gt'?'不超过 ':node.op==='lt'?'达到 ':node.op==='lte'?'超过 ':'不等于 ')+threshold+' '+(f.count_unit||'张');
@@ -446,7 +464,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    marriott_matrix:matrixEvents.length?{status:triggered(matrixEvents).length?'TRIGGERED':gaps(matrixEvents).length?'MISSING':'CLEAR'}:null,
    offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
  }
- // Number choices are ranges (lower-bound representatives), so reject only
+ // Number choices are explicit ranges; numeric API inputs are exact. Reject only
  // contradictions that are impossible for every count in the selected bands.
  // Re-evaluate without the conflicting facts: unrelated verified blockers survive.
  function assess(request={}){
@@ -458,10 +476,8 @@ function createRuntime({rulebook,factbook,products,approval}){
    else if(q.type==='structured')for(const field of q.fields)if(field.type==='number')qmap.set(field.id,field.count_bands);
   }
   function interval(id){
-   const f=defs[id],bands=qmap.get(key(id,f)),raw=factValue(id,{},a);
-   if(!bands||!validCount(raw))return null;
-   const i=bands.findIndex(b=>b.value===raw);
-   return i<0?[raw,raw]:[raw,i+1<bands.length?bands[i+1].value-1:Infinity];
+   const f=defs[id];
+   return qmap.has(key(id,f))?countRange(factValue(id,{},a)):null;
   }
   const conflicts=[],invalid=new Set();
   for(const r of factbook.count_relations||[]){

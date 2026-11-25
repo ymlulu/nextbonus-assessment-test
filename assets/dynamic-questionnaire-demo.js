@@ -158,16 +158,21 @@
   }
   function countSelector({value,bands,max=99,commit}){
     const row=el('div','count-picker');
-    // A band stores its lower-bound representative. Rule results must only
-    // describe the band, never claim that its representative is an exact count.
+    // Keep the selected interval, not a guessed exact count. If a later
+    // threshold splits it, ask for a narrower selection.
     // Bands come from issuer question schemas; the UI owns no bank thresholds.
     if(Array.isArray(bands)&&bands.length){
       const select=el('select');
       select.append(option('','请选择'));
       for(const band of bands)select.append(option(String(band.value),band.label));
-      const chosen=Number.isInteger(value)?bands.filter(b=>b.value<=value).at(-1):null;
-      select.value=chosen?String(chosen.value):'';
-      select.addEventListener('change',()=>commit(select.value===''?null:Number(select.value)));
+      const range=Number.isInteger(value)?{min:value,max:value}:value;
+      const index=range&&Number.isInteger(range.min)?bands.findIndex((b,i)=>b.value<=range.min&&
+        (i===bands.length-1||range.max!==null&&Number.isInteger(range.max)&&range.max<bands[i+1].value)):-1;
+      select.value=index>=0?String(bands[index].value):'';
+      select.addEventListener('change',()=>{
+        const i=bands.findIndex(b=>String(b.value)===select.value);
+        commit(i<0?null:{min:bands[i].value,max:i+1<bands.length?bands[i+1].value-1:null});
+      });
       row.append(select);
     }else{
       // For a future fact that genuinely needs an exact count, use a simple
