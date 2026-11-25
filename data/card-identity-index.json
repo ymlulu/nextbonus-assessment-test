@@ -22,7 +22,7 @@
       "note": "Issuer official product identity only; no offer history invented."
     }
   },
-  "count": 116,
+  "count": 118,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -185,7 +185,7 @@
     {
       "product_id": "capital_one_venture",
       "name": "Capital One Venture",
-      "product_name": "Venture",
+      "product_name": "Capital One Venture",
       "issuer": "CAPITAL_ONE",
       "approval_issuer": "CAPITAL_ONE",
       "product_type": "CREDIT_CARD",
@@ -705,7 +705,7 @@
     {
       "product_id": "history_ot_wellsfargo_032",
       "name": "Wells Fargo Autograph Journey",
-      "product_name": "Autograph Journey",
+      "product_name": "Wells Fargo Autograph Journey",
       "issuer": "WELLS_FARGO",
       "approval_issuer": "WELLS_FARGO",
       "product_type": "CREDIT_CARD",
@@ -1065,7 +1065,7 @@
     {
       "product_id": "history_ot_capitalone_051",
       "name": "Capital One VentureOne",
-      "product_name": "VentureOne",
+      "product_name": "Capital One VentureOne",
       "issuer": "CAPITAL_ONE",
       "approval_issuer": "CAPITAL_ONE",
       "product_type": "CREDIT_CARD",
@@ -1140,7 +1140,7 @@
     {
       "product_id": "history_ot_u_s_bank_055",
       "name": "U.S. Bank Cash+",
-      "product_name": "Cash+",
+      "product_name": "U.S. Bank Cash+ Visa Signature",
       "issuer": "US_BANK",
       "approval_issuer": "US_BANK",
       "product_type": "CREDIT_CARD",
@@ -1153,13 +1153,14 @@
       "aliases": [
         "U.S. Bank Cash+",
         "Cash+",
-        "US Bank Cash+"
+        "US Bank Cash+",
+        "U.S. Bank Cash+ Visa Signature"
       ]
     },
     {
       "product_id": "history_ot_u_s_bank_056",
       "name": "U.S. Bank Altitude Go",
-      "product_name": "Altitude Go",
+      "product_name": "U.S. Bank Altitude Go Visa Signature",
       "issuer": "US_BANK",
       "approval_issuer": "US_BANK",
       "product_type": "CREDIT_CARD",
@@ -1172,13 +1173,14 @@
       "aliases": [
         "U.S. Bank Altitude Go",
         "Altitude Go",
-        "US Bank Altitude Go"
+        "US Bank Altitude Go",
+        "U.S. Bank Altitude Go Visa Signature"
       ]
     },
     {
       "product_id": "history_ot_u_s_bank_057",
       "name": "U.S. Bank Altitude Connect",
-      "product_name": "Altitude Connect",
+      "product_name": "U.S. Bank Altitude Connect Visa Signature",
       "issuer": "US_BANK",
       "approval_issuer": "US_BANK",
       "product_type": "CREDIT_CARD",
@@ -1191,7 +1193,8 @@
       "aliases": [
         "U.S. Bank Altitude Connect",
         "Altitude Connect",
-        "US Bank Altitude Connect"
+        "US Bank Altitude Connect",
+        "U.S. Bank Altitude Connect Visa Signature"
       ]
     },
     {
@@ -1216,7 +1219,7 @@
     {
       "product_id": "history_ot_wellsfargo_059",
       "name": "Wells Fargo Active Cash",
-      "product_name": "Active Cash",
+      "product_name": "Wells Fargo Active Cash",
       "issuer": "WELLS_FARGO",
       "approval_issuer": "WELLS_FARGO",
       "product_type": "CREDIT_CARD",
@@ -1234,7 +1237,7 @@
     {
       "product_id": "history_ot_wellsfargo_060",
       "name": "Wells Fargo Autograph",
-      "product_name": "Autograph",
+      "product_name": "Wells Fargo Autograph",
       "issuer": "WELLS_FARGO",
       "approval_issuer": "WELLS_FARGO",
       "product_type": "CREDIT_CARD",
@@ -1252,7 +1255,7 @@
     {
       "product_id": "history_ot_wellsfargo_061",
       "name": "Wells Fargo One Key",
-      "product_name": "One Key",
+      "product_name": "One Key Card",
       "issuer": "WELLS_FARGO",
       "approval_issuer": "WELLS_FARGO",
       "product_type": "CREDIT_CARD",
@@ -1264,13 +1267,14 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Wells Fargo One Key",
-        "One Key"
+        "One Key",
+        "One Key Card"
       ]
     },
     {
       "product_id": "history_ot_wellsfargo_062",
       "name": "Wells Fargo One Key+",
-      "product_name": "One Key+",
+      "product_name": "One Key+ Card",
       "issuer": "WELLS_FARGO",
       "approval_issuer": "WELLS_FARGO",
       "product_type": "CREDIT_CARD",
@@ -1282,15 +1286,16 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Wells Fargo One Key+",
-        "One Key+"
+        "One Key+",
+        "One Key+ Card"
       ]
     },
     {
       "product_id": "history_ot_discovercapitalone_063",
       "name": "Discover it Cash Back",
       "product_name": "Discover it Cash Back",
-      "issuer": null,
-      "approval_issuer": null,
+      "issuer": "DISCOVER",
+      "approval_issuer": "DISCOVER",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
       "card_form": null,
@@ -1306,14 +1311,14 @@
     {
       "product_id": "history_ot_biltcolumn_064",
       "name": "Bilt Blue",
-      "product_name": "Blue",
+      "product_name": "Bilt Blue",
       "issuer": "COLUMN_NA",
       "approval_issuer": "BILT",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
       "card_form": null,
-      "brand": null,
-      "generation": null,
+      "brand": "BILT",
+      "generation": "BILT_2_0",
       "offer_timing_id": "OT-BILTCOLUMN-064",
       "identity_source": "HISTORY_ONLY",
       "aliases": [
@@ -1324,14 +1329,14 @@
     {
       "product_id": "history_ot_biltcolumn_065",
       "name": "Bilt Obsidian",
-      "product_name": "Obsidian",
+      "product_name": "Bilt Obsidian",
       "issuer": "COLUMN_NA",
       "approval_issuer": "BILT",
       "product_type": "CREDIT_CARD",
       "customer_type": "PERSONAL",
       "card_form": null,
-      "brand": null,
-      "generation": null,
+      "brand": "BILT",
+      "generation": "BILT_2_0",
       "offer_timing_id": "OT-BILTCOLUMN-065",
       "identity_source": "HISTORY_ONLY",
       "aliases": [
@@ -1360,7 +1365,7 @@
     {
       "product_id": "history_ot_barclays_067",
       "name": "Barclays Wyndham Earner+",
-      "product_name": "Wyndham Earner+",
+      "product_name": "Wyndham Earner Plus",
       "issuer": "BARCLAYS",
       "approval_issuer": "BARCLAYS",
       "product_type": "CREDIT_CARD",
@@ -1372,7 +1377,8 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Barclays Wyndham Earner+",
-        "Wyndham Earner+"
+        "Wyndham Earner+",
+        "Wyndham Earner Plus"
       ]
     },
     {
@@ -2404,6 +2410,42 @@
         "AT&T Points Plus Card",
         "Citi AT&T Points Plus",
         "AT&T Points Plus"
+      ]
+    },
+    {
+      "product_id": "wf_choice",
+      "name": "Choice Privileges Mastercard",
+      "product_name": "Choice Privileges Mastercard",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Choice Privileges Mastercard",
+        "Wells Fargo Choice Privileges Mastercard"
+      ]
+    },
+    {
+      "product_id": "wf_choice_select",
+      "name": "Choice Privileges Select Mastercard",
+      "product_name": "Choice Privileges Select Mastercard",
+      "issuer": "WELLS_FARGO",
+      "approval_issuer": "WELLS_FARGO",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Choice Privileges Select Mastercard",
+        "Wells Fargo Choice Privileges Select Mastercard"
       ]
     }
   ]

@@ -328,7 +328,7 @@
   const ISSUER_LABELS={
     AMEX:'American Express',CHASE:'Chase',CITI:'Citi',
     CAPITAL_ONE:'Capital One',BOFA:'Bank of America',US_BANK:'U.S. Bank',
-    WELLS_FARGO:'Wells Fargo',BARCLAYS:'Barclays',COLUMN_NA:'Bilt / Column'
+    WELLS_FARGO:'Wells Fargo',BARCLAYS:'Barclays',DISCOVER:'Discover',COLUMN_NA:'Bilt / Column'
   };
   function option(value,label){
     const n=el('option','',label);

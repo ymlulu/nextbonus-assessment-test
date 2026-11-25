@@ -198,7 +198,9 @@
     "BARCLAYS": "HIGH",
     "WELLS_FARGO": "MEDIUM",
     "DISCOVER": "LOW",
-    "BILT": "HIGH"
+    "BILT": "HIGH",
+    "US_BANK": "HIGH",
+    "COLUMN_NA": "HIGH"
   },
   "activity_adjustment": {
     "LOW": {

@@ -363,6 +363,240 @@
       },
       "evidence_prefix": "过去 48 个月获得过 ",
       "evidence_suffix": " 的开户优惠"
+    },
+    "bofa_approved_2m": {
+      "type": "number",
+      "title": "过去 2 个月，你获批了几张 BofA 信用卡？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "window": {
+        "unit": "month",
+        "value": 2
+      }
+    },
+    "bofa_approved_12m": {
+      "type": "number",
+      "title": "过去 12 个月，你获批了几张 BofA 信用卡？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "window": {
+        "unit": "month",
+        "value": 12
+      }
+    },
+    "bofa_approved_24m": {
+      "type": "number",
+      "title": "过去 24 个月，你获批了几张 BofA 信用卡？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近在 BofA 获批的信用卡数量",
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
+    },
+    "F03_HELD_WITHIN_24M": {
+      "type": "multi",
+      "title": "下面这些卡，你现在持有，或者过去 24 个月曾经持有过哪些？",
+      "description": "即使已经关卡，也要计算过去 24 个月内持有过的账户。Atmos Ascent 只计已确认是同一产品沿革的账户。",
+      "window": {
+        "unit": "month",
+        "value": 24
+      },
+      "evidence_prefix": "现在或过去 24 个月持有过 "
+    },
+    "bofa_business_held_24m": {
+      "type": "single",
+      "title": "你现在有，或过去 24 个月曾经持有过 BofA 商业信用卡吗？",
+      "description": "任意一张 BofA 商业信用卡都算。",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "month",
+        "value": 24
+      }
+    },
+    "cap1_application_or_approval_lt_6m": {
+      "type": "single",
+      "title": "过去不足 6 个月，你申请过或获批过 Capital One 信用卡吗？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Capital One 的情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "month",
+        "value": 6
+      }
+    },
+    "cap1_applications_30d": {
+      "type": "number",
+      "title": "过去 30 天，你提交了几次 Capital One 信用卡申请？（包括被拒）",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近申请 Capital One 的情况",
+      "window": {
+        "unit": "day",
+        "value": 30
+      },
+      "count_unit": "次"
+    },
+    "F04_BONUS_RECEIVED_48M": {
+      "type": "multi",
+      "title": "过去 48 个月，你拿到过下面哪些卡的新卡开卡奖励？",
+      "description": "以奖励实际到账日期为准。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "过去 48 个月拿过 "
+    },
+    "cap1_business_ever_held": {
+      "type": "single",
+      "title": "你现在持有或以前持有过任何 Capital One 商业信用卡吗？",
+      "description": "即使已经关闭账户也算。",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "cap1_open_accounts": {
+      "type": "number",
+      "title": "你现在有多少个 Capital One 信用卡账户？",
+      "count_unit": "个"
+    },
+    "wf_consumer_opened_lt_4m": {
+      "type": "single",
+      "title": "过去不足 4 个月，你新开过 Wells Fargo 品牌的个人信用卡吗？",
+      "group": "F02_ISSUER_APPLICATION_HISTORY",
+      "group_title": "你最近在 Wells Fargo 的开户情况",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "month",
+        "value": 4
+      }
+    },
+    "F03_HELD_OR_OPENED_48M": {
+      "type": "multi",
+      "title": "下面这些卡，你现在持有，或者过去 48 个月新开过哪些？",
+      "description": "已关卡或余额为零也算过去 48 个月内的新开户。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "现在持有或过去 48 个月开过 "
+    },
+    "F03_OPENED_AND_RECEIVED_BONUS_15M": {
+      "type": "multi",
+      "title": "过去 15 个月，你开过下面哪些卡，并且拿到该账户的开卡奖励？",
+      "description": "必须是同一个账户：在过去 15 个月开户，且已经收到开卡奖励。",
+      "window": {
+        "unit": "month",
+        "value": 15
+      },
+      "evidence_prefix": "过去 15 个月开户并获得过奖励 "
+    },
+    "F03_OPENED_WITHIN_48M": {
+      "type": "multi",
+      "title": "过去 48 个月，你新开过下面哪些卡？",
+      "description": "看账户开立日期，不看奖励到账或关卡日期。",
+      "window": {
+        "unit": "month",
+        "value": 48
+      },
+      "evidence_prefix": "过去 48 个月开过 "
+    },
+    "discover_current_cards": {
+      "type": "number",
+      "title": "你现在还持有几张 Discover 信用卡？"
+    },
+    "recent_new_accounts_6m": {
+      "type": "number",
+      "title": "过去 6 个月，你新开了几张信用卡？",
+      "window": {
+        "unit": "month",
+        "value": 6
+      }
+    },
+    "recent_new_accounts_12m": {
+      "type": "number",
+      "title": "过去 12 个月，你新开了几张信用卡？",
+      "window": {
+        "unit": "month",
+        "value": 12
+      }
+    },
+    "F04_BONUS_RECEIVED_60M": {
+      "type": "multi",
+      "title": "过去 5 年，你拿到过下面哪些卡的新户开卡奖励？",
+      "description": "以该卡开卡奖励实际到账日期为准。",
+      "window": {
+        "unit": "month",
+        "value": 60
+      },
+      "evidence_prefix": "过去 5 年拿过 "
+    },
+    "usb_cashplus_upgrade": {
+      "type": "single",
+      "title": "你是通过现有 U.S. Bank 账户升级获得 Cash+ 吗？",
+      "description": "如果是直接申请新卡，请选没有。",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ]
+    },
+    "bilt_decline_lt_45d": {
+      "type": "single",
+      "title": "你最近一次 Bilt 申请是否在不足 45 天前被拒？",
+      "description": "仍在人工审核的申请不算被拒。",
+      "options": [
+        {
+          "value": "NO",
+          "label": "没有"
+        },
+        {
+          "value": "YES",
+          "label": "有"
+        }
+      ],
+      "window": {
+        "unit": "day",
+        "value": 45
+      }
     }
   },
   "labels": {
