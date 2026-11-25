@@ -1,3 +1,5 @@
+> Historical design record. The v1 dynamic questionnaire described below was retired in favor of [Bank Rules](../bank-rules/README.md). File paths and behavior below are not current implementation guidance.
+
 # AMEX dynamic questionnaire · formal NextBonus catalog coverage
 
 This work extends **only** the independent `ymlulu/nextbonus-assessment-test` project. It does not import Discover code, alter its data or modify the production NextBonus repository.

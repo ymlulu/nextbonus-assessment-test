@@ -1,3 +1,5 @@
+> Historical design record. The v1 dynamic questionnaire described below was retired in favor of [Bank Rules](../bank-rules/README.md). File paths and behavior below are not current implementation guidance.
+
 # Dynamic questionnaire prototype · standalone API contract v1
 
 This is an **isolated prototype in nextbonus-assessment-test**, not Discover application code. Open `dynamic-questionnaire.html` (or its GitHub Pages URL) to try the questionnaire planner without changing the existing Assessment QA page.

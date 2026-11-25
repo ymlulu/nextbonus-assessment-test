@@ -1,3 +1,5 @@
+> Historical design record. The v1 dynamic questionnaire described below was retired in favor of [Bank Rules](../bank-rules/README.md). File paths and behavior below are not current implementation guidance.
+
 # Marriott cross-issuer matrix with minimal follow-up
 
 Independent Assessment project only; no Discover or production NextBonus changes.
