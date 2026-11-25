@@ -24,43 +24,121 @@ function targetState(target,p){
  }
  return unknown?null:true;
 }
+const isObject=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const nonempty=x=>typeof x==='string'&&x.trim().length>0;
+const uniqueStrings=x=>Array.isArray(x)&&x.length>0&&x.every(nonempty)&&new Set(x).size===x.length;
+const allowedKeys=(obj,keys)=>isObject(obj)&&Object.keys(obj).every(k=>keys.includes(k));
+const TARGET_FIELDS=['issuer','approval_issuer','product_type','customer_type','card_form','product_name','product_lineage','product_id','brand','generation'];
 function validate({rulebook,factbook,products,approval}){
- if(!rulebook?.version||!Array.isArray(rulebook.supported_issuers)||!rulebook.supported_issuers.length||!Array.isArray(rulebook.rules)||!factbook?.facts||
-    !products?.overrides||!approval?.base_matrix)throw Error('BANK_RULES_DATA_REQUIRED');
- const defs=factbook.facts,ids=new Set();
- function effect(e){
-  if(!e||!validImpact(e.application)||!validImpact(e.bonus)||!(e.application||e.bonus))
-   throw Error('RULE_REQUIRES_NONZERO_IMPACT');
-  for(const [dim,key] of [['application','application_action'],['bonus','bonus_action']])
-   if(e[key]&&(!ACTIONS.has(e[key])||e[dim]!==3))throw Error('INVALID_HARD_ACTION');
-  if(e.product_gate&&e.application!==3)throw Error('PRODUCT_GATE_REQUIRES_HARD_APPLICATION');
- }
- function condition(node,r){
-  if(node?.any||node?.all){
-   const children=node.any||node.all;
-   if(!Array.isArray(children)||!children.length||node.any&&node.all)throw Error('INVALID_COMPOUND_CONDITION '+r.id);
-   children.forEach(n=>condition(n,r));return;
+ if(!nonempty(rulebook?.version)||!uniqueStrings(rulebook.supported_issuers)||!Array.isArray(rulebook.rules)||!isObject(factbook?.facts)||
+    !isObject(products?.overrides)||!isObject(approval?.base_matrix)||!Array.isArray(approval.questions))
+  throw Error('BANK_RULES_DATA_REQUIRED');
+ const defs=factbook.facts,ids=new Set(),answerKeys=new Set(),groupTitles=new Map();
+ const allowedTypes=['number','single','multi','grouped_multi'];
+ const fail=(code,id)=>{throw Error(code+' '+id)};
+ for(const [id,f] of Object.entries(defs)){
+  if(!nonempty(id)||!isObject(f)||!allowedTypes.includes(f.type)||!nonempty(f.title))
+   fail('INVALID_FACT_DEFINITION',id);
+  if(f.window&&(!allowedKeys(f.window,['unit','value'])||!['day','month','year'].includes(f.window.unit)||!Number.isSafeInteger(f.window.value)||f.window.value<1))
+   fail('INVALID_FACT_WINDOW',id);
+  if(f.type==='single'){
+   if(!Array.isArray(f.options)||!f.options.length||f.options.some(o=>!nonempty(o.value)||!nonempty(o.label))||new Set(f.options.map(o=>o.value)).size!==f.options.length)
+    fail('INVALID_FACT_OPTIONS',id);
   }
-  const f=defs[node?.fact];
-  if(!f||!OPS.has(node.op))throw Error('UNKNOWN_CONDITION '+r.id);
-  if(node.action&&!ACTIONS.has(node.action))throw Error('INVALID_ACTION '+r.id);
-  if(f.type==='grouped_multi'&&(!node.prior||!Object.values(defs[f.history_id]?.options_by_value||{}).some(o=>o.prior_id===node.prior)))throw Error('UNKNOWN_GROUPED_PRIOR '+r.id);
+  if(f.group){
+   if(!['number','single'].includes(f.type)||!nonempty(f.group)||!nonempty(f.group_title)||f.answer_key)
+    fail('INVALID_FACT_GROUP',id);
+   const previous=groupTitles.get(f.group)||new Set();previous.add(f.group_title);groupTitles.set(f.group,previous);
+  }
+  if(f.type==='grouped_multi'){
+   const h=defs[f.history_id];
+   if(!nonempty(f.details_id)||!nonempty(f.group_prefix)||h?.type!=='multi'||h.details_id!==f.details_id||!isObject(h.options_by_value))
+    fail('INVALID_GROUPED_FACT',id);
+   if(f.clear_when_not_no&&(!uniqueStrings(f.clear_when_not_no)||f.clear_when_not_no.some(k=>k===id||defs[k]?.details_id!==f.details_id||defs[k]?.type!=='grouped_multi')))
+    fail('INVALID_GROUPED_DEPENDENCY',id);
+  }else if(f.options_by_value){
+   if(f.type!=='multi'||!isObject(f.options_by_value)||Object.entries(f.options_by_value).some(([v,o])=>!nonempty(v)||!nonempty(o.label)||!nonempty(o.prior_id))||
+      new Set(Object.values(f.options_by_value).map(o=>o.prior_id)).size!==Object.keys(f.options_by_value).length)
+    fail('INVALID_HISTORY_OPTIONS',id);
+  }
+  const key=f.type==='grouped_multi'?f.details_id+'.'+id:f.group?f.group+'.'+id:f.answer_key||id;
+  if(!nonempty(key)||answerKeys.has(key))fail('DUPLICATE_FACT_ANSWER_KEY',id);
+  answerKeys.add(key);
+ }
+ function scope(s,id,{requireIssuer=false,allowArrays=true}={}){
+  if(!allowedKeys(s,TARGET_FIELDS)||!Object.keys(s).length||requireIssuer&&!nonempty(s.issuer)&&!uniqueStrings(s.issuer))
+   fail('INVALID_TARGET_SCOPE',id);
+  for(const [key,value] of Object.entries(s)){
+   if(!nonempty(value)&&!(allowArrays&&uniqueStrings(value)))fail('INVALID_TARGET_VALUE',id+':'+key);
+  }
+  if(s.issuer&&![s.issuer].flat().every(i=>rulebook.supported_issuers.includes(i)))fail('UNKNOWN_TARGET_ISSUER',id);
+ }
+ function effect(e,id){
+  if(!allowedKeys(e,['application','bonus','application_action','bonus_action','product_gate'])||!validImpact(e.application)||!validImpact(e.bonus)||!(e.application||e.bonus))
+   fail('RULE_REQUIRES_NONZERO_IMPACT',id);
+  for(const [dim,key] of [['application','application_action'],['bonus','bonus_action']])
+   if(own(e,key)&&(!ACTIONS.has(e[key])||e[dim]!==3))fail('INVALID_HARD_ACTION',id);
+  if(own(e,'product_gate')&&(typeof e.product_gate!=='boolean'||e.product_gate&&e.application!==3))fail('PRODUCT_GATE_REQUIRES_HARD_APPLICATION',id);
+ }
+ function condition(node,r,depth=0){
+  if(depth>32||!isObject(node))fail('INVALID_CONDITION',r.id);
+  if(own(node,'any')||own(node,'all')){
+   const children=node.any||node.all;
+   if(!allowedKeys(node,['any','all'])||Object.keys(node).length!==1||!Array.isArray(children)||!children.length)
+    fail('INVALID_COMPOUND_CONDITION',r.id);
+   children.forEach(n=>condition(n,r,depth+1));return;
+  }
+  if(!allowedKeys(node,['fact','op','value','values','value_from','action','prior','legacy']))
+   fail('UNKNOWN_CONDITION_FIELD',r.id);
+  const f=defs[node.fact];
+  if(!f||!OPS.has(node.op))fail('UNKNOWN_CONDITION',r.id);
+  if(own(node,'action')&&!ACTIONS.has(node.action))fail('INVALID_ACTION',r.id);
+  if(f.type==='grouped_multi'){
+   if(!nonempty(node.prior)||!Object.values(defs[f.history_id].options_by_value).some(o=>o.prior_id===node.prior))
+    fail('UNKNOWN_GROUPED_PRIOR',r.id);
+  }else if(own(node,'prior'))fail('UNEXPECTED_GROUPED_PRIOR',r.id);
   if(node.op==='includes_any'){
-   if(f.type!=='multi'||!Array.isArray(node.values)||!node.values.length||node.values.some(v=>typeof v!=='string'))
-    throw Error('INVALID_HISTORY_SCOPE '+r.id);
+   if(f.type!=='multi'||!uniqueStrings(node.values)||node.values.some(v=>['NONE','UNKNOWN'].includes(v))||own(node,'value')||own(node,'value_from'))
+    fail('INVALID_HISTORY_SCOPE',r.id);
+   if(f.options_by_value&&node.values.some(v=>!own(f.options_by_value,v)))fail('UNKNOWN_HISTORY_OPTION',r.id);
+   if(own(node,'legacy')&&(!uniqueStrings(node.legacy)||node.legacy.some(v=>!node.values.includes(v))))fail('INVALID_LEGACY_SCOPE',r.id);
   }else if(f.type==='number'){
+   if(own(node,'values')||own(node,'legacy')||(own(node,'value')===own(node,'value_from')))
+    fail('INVALID_THRESHOLD',r.id);
    const v=node.value_from==='condition.value'?r.condition?.value:node.value;
-   if(!validCount(v)||node.value_from&&node.value_from!=='condition.value')throw Error('INVALID_THRESHOLD '+r.id);
-  }else if(node.op!=='eq'||(f.type==='grouped_multi'?!['YES','NO'].includes(node.value):!f.options?.some(o=>o.value===node.value)))throw Error('INVALID_CHOICE '+r.id);
+   if(!validCount(v)||v>=Number.MAX_SAFE_INTEGER||own(node,'value_from')&&node.value_from!=='condition.value')
+    fail('INVALID_THRESHOLD',r.id);
+  }else if(own(node,'values')||own(node,'value_from')||own(node,'legacy')||node.op!=='eq'||
+    (f.type==='grouped_multi'?!['YES','NO'].includes(node.value):!f.options?.some(o=>o.value===node.value)))
+   fail('INVALID_CHOICE',r.id);
  }
  for(const r of rulebook.rules){
-  if(!r.id||ids.has(r.id)||!r.target?.issuer||![r.target.issuer].flat().every(i=>rulebook.supported_issuers.includes(i)))throw Error('DUPLICATE_OR_INVALID_RULE '+r.id);
-  ids.add(r.id);effect(r.effect);condition(r.condition,r);
-  if(r.when)condition(r.when,r);
-  if(r.review)condition(r.review.condition,r);
-  for(const o of r.overrides||[]){if(!o.target||!Object.keys(o.target).length)throw Error('INVALID_OVERRIDE');if(o.effect)effect(o.effect);if(o.condition)condition(o.condition,{...r,condition:o.condition});}
-  if(r.offer_clause&&r.offer_scenarios&&Object.values(r.offer_scenarios).some(x=>!['PRESENT','ABSENT'].includes(x)))throw Error('INVALID_OFFER_SCENARIO');
+  if(!allowedKeys(r,['id','target','effect','condition','offer_clause','offer_scenarios','label','overrides','review','when'])||!nonempty(r.id)||ids.has(r.id))
+   fail('DUPLICATE_OR_INVALID_RULE',r?.id);
+  ids.add(r.id);scope(r.target,r.id,{requireIssuer:true});effect(r.effect,r.id);condition(r.condition,r);
+  if(own(r,'when'))condition(r.when,r);
+  if(own(r,'review')){
+   if(!allowedKeys(r.review,['condition','label','show_with_primary'])||!nonempty(r.review.label)||own(r.review,'show_with_primary')&&typeof r.review.show_with_primary!=='boolean')
+    fail('INVALID_REVIEW',r.id);
+   condition(r.review.condition,r);
+  }
+  if(own(r,'overrides')&&!Array.isArray(r.overrides))fail('INVALID_OVERRIDE',r.id);
+  for(const o of r.overrides||[]){
+   if(!allowedKeys(o,['target','effect','condition','label'])||!o.effect&&!o.condition)fail('INVALID_OVERRIDE',r.id);
+   scope(o.target,r.id);
+   if(o.effect)effect(o.effect,r.id);
+   if(o.condition)condition(o.condition,{...r,condition:o.condition});
+  }
+  if(own(r,'offer_clause')&&!nonempty(r.offer_clause))fail('INVALID_OFFER_CLAUSE',r.id);
+  if(own(r,'offer_scenarios')&&(!r.offer_clause||!isObject(r.offer_scenarios)||!Object.keys(r.offer_scenarios).length||Object.values(r.offer_scenarios).some(x=>!['PRESENT','ABSENT'].includes(x))))
+   fail('INVALID_OFFER_SCENARIO',r.id);
  }
+ for(const [id,p] of Object.entries(products.overrides)){
+  if(!nonempty(id))fail('INVALID_PRODUCT_MAPPING',id);
+  scope(p,id,{allowArrays:false});
+ }
+ if(!Array.isArray(products.unlisted_targets||[]))fail('INVALID_UNLISTED_TARGETS','products');
+ for(const p of products.unlisted_targets||[])scope(p,'unlisted_targets',{requireIssuer:true,allowArrays:false});
  return true;
 }
 function countBands(cuts){
@@ -102,7 +180,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   for(const [id,state] of Object.entries(offer_rule_overrides)){
    if(!clauses.has(id)||!['PRESENT','ABSENT'].includes(state))throw Error('INVALID_OFFER_RULE_OVERRIDE');
   }
-  const titleByFact=new Map();
+  
   function record(node,r,values,threshold,raw){
    const id=node.fact,f=defs[id],qid=f.type==='grouped_multi'?groupKey(f,id):f.group||key(id,f);
    let entry=groups.get(qid);
@@ -138,7 +216,6 @@ function createRuntime({rulebook,factbook,products,approval}){
     const label=option(f.history_id,history,v,p).label,old=e.options.get(node.prior);
     e.options.set(node.prior,{value:node.prior,label,answered:!missing,pending:missing,rule_ids:uniq([...(old?.rule_ids||[]),r.id])});
    }else for(const o of f.options||[])e.options.set(o.value,o);
-   titleByFact.set(id,f.title);
    return qid;
   }
   function leaf(node,r){
@@ -296,8 +373,23 @@ function createRuntime({rulebook,factbook,products,approval}){
    offer_context:clauses.size?{variant:offer_variant,assumed_standard_rules:assumed,explicitly_overridden_rules:explicit,assumption:offer_facts===undefined?'UNVERIFIED_STANDARD_OFFER_MODEL':'FROZEN_OFFER_FACTS'}:null};
  }
  function createFacade(lookup){
+  if(!lookup?.findById||!lookup?.resolve||!lookup?.list)throw Error('IDENTITY_LOOKUP_REQUIRED');
+  const catalog=lookup.list().map(x=>canonical(lookup.findById(x.product_id)));
+  const knownIds=new Set(catalog.map(p=>p.product_id));
+  for(const id of Object.keys(products.overrides))if(!knownIds.has(id))throw Error('UNKNOWN_PRODUCT_MAPPING '+id);
+  const targets=[...catalog,...(products.unlisted_targets||[])];
+  for(const r of rules){
+   if(!targets.some(p=>targetState(r.target,p)===true))throw Error('RULE_TARGET_NOT_FOUND '+r.id);
+   if(Array.isArray(r.target.product_name))for(const name of r.target.product_name)
+    if(!targets.some(p=>targetState({...r.target,product_name:name},p)===true))throw Error('RULE_PRODUCT_NOT_FOUND '+r.id+' '+name);
+   for(const o of r.overrides||[])if(!targets.some(p=>targetState(r.target,p)===true&&targetState(o.target,p)===true))
+    throw Error('OVERRIDE_TARGET_NOT_FOUND '+r.id);
+  }
   function plan({product_id,input,issuer,customer_type,confirm_product_id,known_facts={},offer_variant='STANDARD',offer_facts,offer_rule_overrides={}}={}){
    const identity=product_id?{status:lookup.findById(product_id)?'MATCHED':'UNKNOWN_PRODUCT',product:{product_id}}:lookup.resolve({input,issuer});
+   if(confirm_product_id&&identity.product?.product_id!==confirm_product_id&&
+      ![...(identity.candidates||[]),...(identity.suggestions||[])].some(x=>x.product_id===confirm_product_id))
+    return {status:'INVALID_CONFIRMATION',identity,questionnaire:null};
    const resolvedId=identity.status==='MATCHED'?identity.product.product_id:
     confirm_product_id&&[...(identity.candidates||[]),...(identity.suggestions||[])].some(x=>x.product_id===confirm_product_id)?confirm_product_id:null;
    if(!resolvedId)return {status:identity.status,identity,questionnaire:null};
@@ -310,7 +402,7 @@ function createRuntime({rulebook,factbook,products,approval}){
      formal_nb_card_id:p.formal_nb_card_id||null},
     questionnaire:{product_id:p.product_id,questionnaire:model.questionnaire,diagnostics:model.diagnostics},
     evaluation:model.evaluation,marriott_matrix:model.marriott_matrix,offer_context:model.offer_context,
-    limitations:{user_answers_uploaded:false,offer_terms_verified:offer_facts!==undefined,application_availability_verified:false}};
+    limitations:{user_answers_uploaded:false,offer_terms_verified:offer_facts!==undefined&&model.diagnostics.unresolved_system_gates.length===0,application_availability_verified:false}};
   }
   return Object.freeze({plan,listCards:()=>lookup.list().filter(p=>supported.has(p.issuer)),
    getVersion:()=>({source_count:lookup.getVersion().count,rules_indexed:rules.length,release_id:rulebook.version})});
