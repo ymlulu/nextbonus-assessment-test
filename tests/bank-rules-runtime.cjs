@@ -155,4 +155,34 @@ assert.equal(evt(ask(combined,smart,{...base,recent_new_accounts_12m:{min:2,max:
 unified.rules=unified.rules.filter(r=>r.id!=='TEST-SHARED');
 assert.deepEqual(cuts(q(ask(runtime(unified),smart,{}),'recent_new_accounts_12m')),[0,2,4,6]);
 
+
+const adviceOf=(id,patch={},opts={})=>ask(rt,id,{...base,...patch},opts).evaluation.decision;
+const five=adviceOf('chase_sapphire_preferred',{F01_RECENT_NEW_ACCOUNTS:5});
+assert.equal(five.code,'WAIT');
+assert.equal(five.label,'建议等一等再申请');
+assert.ok(five.reasons.some(r=>r.text.includes('过去24个月')&&r.text.includes('至少5张')&&r.text.includes('申请限制')));
+assert.ok(five.reasons.every(r=>!r.text.includes('CHASE-001')));
+const goldAdvice=adviceOf('amex_gold',{F03_CARD_HISTORY:['The Platinum Card']});
+assert.equal(goldAdvice.code,'BLOCK');
+assert.ok(goldAdvice.reasons.some(r=>r.text.includes('Platinum')&&r.text.includes('拿不到开卡奖励')));
+assert.ok(!goldAdvice.reasons.some(r=>r.text.includes('不符合申请条件')));
+const biltAdvice=adviceOf('bilt_palladium',{F03_CARD_HISTORY:['Bilt Blue'],F04_EVER_BONUS_HISTORY:['NONE']});
+assert.equal(biltAdvice.code,'BLOCK');
+assert.ok(biltAdvice.reasons.some(r=>r.text.includes('Bilt Blue')&&r.text.includes('开卡奖励')));
+const usbAdvice=adviceOf('history_ot_u_s_bank_058',{recent_new_accounts_6m:1,recent_new_accounts_12m:2});
+assert.equal(usbAdvice.code,'REVIEW'); // known soft risk, unknown Smartly bonus terms
+assert.ok(usbAdvice.reasons.some(r=>r.text.includes('过去6个月')&&r.text.includes('至少1张')&&r.text.includes('可能影响获批')));
+assert.ok(usbAdvice.reasons.some(r=>r.kind==='REVIEW'));
+const lowCredit=adviceOf('chase_sapphire_preferred',{a1:'LT_6M'});
+assert.equal(lowCredit.code,'RISK');
+assert.ok(lowCredit.reasons.some(r=>r.text.includes('信用卡历史')&&r.text.includes('获批把握偏低')));
+const clearAdvice=adviceOf('chase_sapphire_preferred');
+assert.equal(clearAdvice.code,'CLEAR');
+assert.equal(clearAdvice.reasons.length,0);
+assert.ok(clearAdvice.note.includes('不保证'));
+for(const p of ids.products.filter(p=>rulebook.supported_issuers.includes(p.issuer))){
+ const d=rt.assess({product:p,answers:{}}).evaluation.decision;
+ assert.equal(d.code,'REVIEW');assert.ok(d.reasons.length);
+}
+
 console.log(JSON.stringify({suite:'bank-rules-runtime',rules:rulebook.rules.length,cards:ids.products.filter(p=>rulebook.supported_issuers.includes(p.issuer)).length,mutations:'add/remove/threshold/scope/impact',matrix:'grouped',status:'PASS'}));

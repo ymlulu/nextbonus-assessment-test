@@ -77,6 +77,14 @@ function validate({rulebook,factbook,products,approval}){
       new Set(Object.values(f.options_by_value).map(o=>o.prior_id)).size!==Object.keys(f.options_by_value).length)
     fail('INVALID_HISTORY_OPTIONS',id);
   }
+  if(own(f,'result_reason')){
+   const t=f.result_reason;
+   if(f.type==='number'||f.type==='multi'){
+    if(!nonempty(t)||!t.includes(f.type==='number'?'{count}':'{card}'))fail('INVALID_RESULT_REASON',id);
+   }else if(!isObject(t)||!Object.keys(t).length||Object.entries(t).some(([v,s])=>!nonempty(s)||
+    (f.type==='grouped_multi'?(!['YES','NO'].includes(v)||!s.includes('{card}')):!f.options.some(o=>o.value===v))))
+    fail('INVALID_RESULT_REASON',id);
+  }
   const key=f.type==='grouped_multi'?f.details_id+'.'+id:f.group?f.group+'.'+id:f.answer_key||id;
   if(!nonempty(key)||answerKeys.has(key))fail('DUPLICATE_FACT_ANSWER_KEY',id);
   answerKeys.add(key);
@@ -229,7 +237,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   const levels=[low];
   const activity=approval.activity_levels[Math.max(...levels)],base=approval.base_matrix[age]?.[score]||'INSUFFICIENT_DATA';
   const i=approval.risk_levels.indexOf(base),adjustment=approval.activity_adjustment[activity]?.[approval.issuer_sensitivity[issuer]]||0;
-  return {rating:i<0?base:approval.risk_levels[Math.min(approval.risk_levels.length-1,i+adjustment)],activity};
+  return {rating:i<0?base:approval.risk_levels[Math.min(approval.risk_levels.length-1,i+adjustment)],activity,original_rating:base,adjustment,age,score};
  }
  function assessCore({product,answers={},offer_variant='STANDARD',offer_facts,offer_rule_overrides={}}={}){
   const p=canonical(product||{});
@@ -288,6 +296,24 @@ function createRuntime({rulebook,factbook,products,approval}){
     for(const band of approval.activity_bands)record({fact:id,op:'gte'},null,[],band.min,raw);
    }else record({fact:id,op:'eq'},null,[],undefined,raw);
   }
+  function readableEvidence(node,f,threshold,raw,value){
+   if(f.type==='number'){
+    const count=({gte:'至少',gt:'超过',lt:'不到',lte:'不超过',eq:'正好'}[node.op]||'')+threshold;
+    return typeof f.result_reason==='string'?f.result_reason.replace('{count}',count):
+      f.title.replace(/[？?]/g,'')+'：'+count+(f.count_unit||'张');
+   }
+   if(f.type==='multi'){
+    const name=option(node.fact,f,value,p).label;
+    return typeof f.result_reason==='string'?f.result_reason.replace('{card}',name):
+      '你'+(f.evidence_prefix||'选择了')+name+(f.evidence_suffix||'');
+   }
+   if(f.type==='grouped_multi'){
+    const h=defs[f.history_id],v=Object.keys(h.options_by_value).find(k=>h.options_by_value[k].prior_id===node.prior);
+    const name=option(f.history_id,h,v,p).label;
+    return f.result_reason?.[raw]?.replace('{card}',name)||name+'：'+f.title.replace(/[？?]/g,'')+'（'+(raw==='YES'?'是':'否')+'）';
+   }
+   return f.result_reason?.[raw]||f.title.replace(/[？?]/g,'')+'：'+(f.options.find(o=>o.value===raw)?.label||raw);
+  }
   function leaf(node,r){
    const f=defs[node.fact],raw=factValue(node.fact,node,a);
    const values=node.op==='includes_any'?resolved(node.values,p):[];
@@ -313,8 +339,8 @@ function createRuntime({rulebook,factbook,products,approval}){
      }else reason=f.title.replace(/[？?]$/,'')+'：'+(f.type==='grouped_multi'?(raw==='YES'?'是':'否'):(f.options.find(o=>o.value===raw)?.label||raw));
     }
    }
-   const evidence=state===true?(node.op==='includes_any'?hits.map(value=>({question_id:qid,value,reason:(f.evidence_prefix||'已选择 ')+value+(f.evidence_suffix||'')})):
-    [{question_id:qid,...(f.type==='grouped_multi'?{value:node.prior}:f.group?{field:node.fact}:{}),reason}]):[];
+   const evidence=state===true?(node.op==='includes_any'?hits.map(value=>({question_id:qid,value,reason:(f.evidence_prefix||'已选择 ')+value+(f.evidence_suffix||''),display_reason:readableEvidence(node,f,threshold,raw,value)})):
+    [{question_id:qid,...(f.type==='grouped_multi'?{value:node.prior}:f.group?{field:node.fact}:{}),reason,display_reason:readableEvidence(node,f,threshold,raw)}]):[];
    return {state,hits:evidence,actions:state===true&&node.action?[node.action]:[],reason,pending:state===null};
   }
   function evaluate(node,r){
@@ -450,11 +476,56 @@ function createRuntime({rulebook,factbook,products,approval}){
   const bonusResult={...result(bonus,'bonus',bonusStatus,bonusImpact,bonusAction,messageBonus),product_blocking_rules:blockIds};
   // Overall advice consumes the two aggregated dimensions, never evaluates bank facts again.
   const actions=[application.action,bonusResult.action];
-  const decision=actions.includes('BLOCK')?{code:'BLOCK',label:'暂不建议申请',summary:'存在不符合申请或开卡奖励条件的情况。'}:
-   actions.includes('WAIT')?{code:'WAIT',label:'建议等待',summary:'存在需要等待解除的申请或开卡奖励限制。'}:
-   !application.complete||!bonusResult.complete?{code:'REVIEW',label:'还需要确认',summary:'部分信用情况、持卡历史或优惠条款尚未确认。'}:
-   actions.includes('RISK')||application.base_risk==='HIGH_RISK'?{code:'RISK',label:'谨慎考虑申请',summary:'有可能影响获批或开卡奖励的情况。'}:
-   {code:'CLEAR',label:'可以考虑申请',summary:'按已填信息及参考条款，暂未发现明显限制；实际结果以银行为准。'};
+  const decision=actions.includes('BLOCK')?{code:'BLOCK',label:'现在不建议申请',summary:'先解决下面的问题，再考虑这张卡。'}:
+   actions.includes('WAIT')?{code:'WAIT',label:'建议等一等再申请',summary:'等相关限制解除后再申请。'}:
+   !application.complete||!bonusResult.complete?{code:'REVIEW',label:'建议先确认，再申请',summary:'目前还不能确定是否适合申请。'}:
+   actions.includes('RISK')||application.base_risk==='HIGH_RISK'?{code:'RISK',label:'可以考虑申请，但有风险',summary:'申请前请留意下面的情况。'}:
+   {code:'CLEAR',label:'现在可以考虑申请',summary:'根据你填写的信息，暂未发现明显的申请或开卡奖励限制。'};
+  // Explanations consume already-evaluated rule events, not another set of bank rules.
+  // Preserve rule IDs for audit, deduplicate overlapping facts in the user-facing summary.
+  const reasons=[];
+  const severity={BLOCK:0,WAIT:1,REVIEW:2,RISK:3};
+  function addReason(kind,causes,consequence,ids=[]){
+   const c=uniq(causes.filter(Boolean));
+   if(!c.length)return;
+   const same=reasons.find(x=>x.kind===kind&&x.consequence===consequence&&x.causes.length===c.length&&c.every(v=>x.causes.includes(v)));
+   if(same){same.rule_ids=uniq([...same.rule_ids,...ids]);return;}
+   reasons.push({kind,causes:c,consequence,rule_ids:ids,text:c.join('；')+'。'+(consequence?consequence+'。':'')});
+  }
+  for(const event of triggered(events)){
+   const causes=uniq((event.trigger_sources||[]).map(x=>x.display_reason||x.reason).filter(Boolean));
+   if(!causes.length)causes.push(event.label);
+   if(event.product_eligibility){
+    const action=event.application_action;
+    addReason(action,causes,action==='WAIT'?'目前不符合这张卡的申请条件，需要等限制解除':'目前不符合这张卡的申请条件，因而也无法通过新卡申请拿到奖励',[event.rule_id]);
+   }else{
+    for(const [dim,action] of [['application',event.application_action],['bonus',event.bonus_action]]){
+     if(action==='CLEAR')continue;
+     const consequence=dim==='application'?
+      ({BLOCK:'目前不符合申请条件',WAIT:'触发了申请限制，建议等限制解除',RISK:'可能影响获批'})[action]:
+      ({BLOCK:'按参考条款，这次拿不到开卡奖励',WAIT:'目前不符合开卡奖励条件，需要等限制期结束',RISK:'这次可能拿不到开卡奖励'})[action];
+     if(consequence)addReason(action,causes,consequence,[event.rule_id]);
+    }
+   }
+  }
+  if(base.rating==='HIGH_RISK'){
+   const age=defs[approval.age_fact].options.find(o=>o.value===factValue(approval.age_fact,{},a))?.label;
+   const score=defs[approval.score_fact].options.find(o=>o.value===factValue(approval.score_fact,{},a))?.label;
+   if(base.original_rating==='HIGH_RISK')addReason('RISK',['你的美国信用卡历史：'+age+'；信用分：'+score],'按当前信用评估模型，获批把握偏低');
+   else if(base.adjustment)addReason('RISK',['你近期申请或新开的信用卡较多'],'按当前信用评估模型，获批把握偏低');
+  }
+  if(decision.code==='REVIEW'){
+   if(!application.base_completed||pending.length)addReason('REVIEW',['还有信用情况或持卡记录的问题需要回答'],'请先补齐这些答案');
+   if(gated.length||unresolved.length||events.some(x=>x.status==='REVIEW'))addReason('REVIEW',['这张卡的部分申请条件或开卡奖励条款还需要核实'],'请以当前申请页面的条款为准');
+  }
+  // If a broader overlapping rule already explains the same facts, suppress
+  // the duplicate subset, but keep its source IDs in the broader explanation.
+  for(let i=reasons.length-1;i>=0;i--){
+   const x=reasons[i],broader=reasons.find(y=>y!==x&&y.kind===x.kind&&y.consequence===x.consequence&&y.causes.length>x.causes.length&&x.causes.every(c=>y.causes.includes(c)));
+   if(broader){broader.rule_ids=uniq([...broader.rule_ids,...x.rule_ids]);reasons.splice(i,1);}
+  }
+  decision.reasons=reasons.sort((a,b)=>(severity[a.kind]??9)-(severity[b.kind]??9)).map(({kind,text,rule_ids})=>({kind,text,rule_ids}));
+  decision.note='按参考规则和你填写的信息判断，不保证银行获批或发放奖励。';
   const matrixEvents=events.filter(x=>rules.find(r=>r.id===x.rule_id)?.when?.fact&&defs[rules.find(r=>r.id===x.rule_id).when.fact]?.details_id);
   return {questionnaire:{common:pending.filter(q=>q.section==='common'),specific:pending.filter(q=>q.section==='specific'),editable:questions,benefits:null},
    diagnostics:{applicable_rule_ids:active,unresolved_system_gates:gated,unresolved_target_mappings:unresolved,answer_conflicts:[]},
@@ -496,6 +567,7 @@ function createRuntime({rulebook,factbook,products,approval}){
   }
   const result=assessCore({...request,answers:clean});
   result.diagnostics.answer_conflicts=conflicts;
+  if(result.evaluation.decision.code==='REVIEW')result.evaluation.decision.reasons.unshift(...conflicts.map(c=>({kind:'REVIEW',text:c.message,rule_ids:[]})));
   return result;
  }
  function createFacade(lookup){

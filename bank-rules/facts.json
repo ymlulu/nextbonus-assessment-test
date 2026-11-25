@@ -7,7 +7,8 @@
       "window": {
         "unit": "month",
         "value": 24
-      }
+      },
+      "result_reason": "过去24个月，你本人新开并上报个人信用报告的信用卡账户有{count}张"
     },
     "F06_REPORTED_NEW_ACCOUNTS": {
       "type": "number",
@@ -15,7 +16,8 @@
       "window": {
         "unit": "month",
         "value": 24
-      }
+      },
+      "result_reason": "过去24个月，你的信用报告上新增了{count}张信用卡账户（含副卡）"
     },
     "approved_chase_30d": {
       "type": "number",
@@ -25,7 +27,8 @@
       "window": {
         "unit": "day",
         "value": 30
-      }
+      },
+      "result_reason": "过去30天，你已获批{count}张 Chase 信用卡"
     },
     "approved_chase_business_30d": {
       "type": "single",
@@ -45,6 +48,9 @@
       "window": {
         "unit": "day",
         "value": 30
+      },
+      "result_reason": {
+        "YES": "过去30天，你已经获批过 Chase 商业信用卡"
       }
     },
     "approved_revolving_90d": {
@@ -55,7 +61,8 @@
       "window": {
         "unit": "day",
         "value": 90
-      }
+      },
+      "result_reason": "过去90天，你已获批{count}张 Amex 普通信用卡"
     },
     "same_product_applied_or_approved_90d": {
       "type": "single",
@@ -75,31 +82,38 @@
       "window": {
         "unit": "day",
         "value": 90
+      },
+      "result_reason": {
+        "YES": "过去90天，你已经申请过这张 Amex 卡"
       }
     },
     "amex_revolving_count": {
       "type": "number",
       "title": "你现在有几张 Amex 普通信用卡？（个人卡、商业卡都算）",
       "description": "只算主卡，不算副卡。",
-      "answer_key": "F10_ISSUER_PORTFOLIO_COUNT"
+      "answer_key": "F10_ISSUER_PORTFOLIO_COUNT",
+      "result_reason": "你目前持有{count}张 Amex 普通信用卡"
     },
     "amex_charge_count": {
       "type": "number",
       "title": "你现在有几张 Amex Platinum、Gold 这类签账卡？",
       "description": "只算主卡，不算副卡。",
-      "answer_key": "F10_CHARGE_PORTFOLIO_COUNT"
+      "answer_key": "F10_CHARGE_PORTFOLIO_COUNT",
+      "result_reason": "你目前持有{count}张 Amex 签账卡"
     },
     "F03_CARD_HISTORY": {
       "type": "multi",
       "title": "下面这些卡，你现在有或者以前办过哪些？",
       "description": "以前办过、后来关掉的也算；即使当时没拿到开卡奖励，也请选上。",
-      "evidence_prefix": "以前办过 "
+      "evidence_prefix": "以前办过 ",
+      "result_reason": "你以前办过{card}"
     },
     "F03_CURRENT_CARD_HISTORY": {
       "type": "multi",
       "title": "下面这些卡，你现在还持有哪些？",
       "description": "只选现在还没有关掉的卡。",
-      "evidence_prefix": "目前持有 "
+      "evidence_prefix": "目前持有 ",
+      "result_reason": "你目前还持有{card}"
     },
     "F04_BONUS_HISTORY": {
       "type": "multi",
@@ -110,14 +124,16 @@
       "window": {
         "unit": "month",
         "value": 24
-      }
+      },
+      "result_reason": "过去24个月，你拿过{card}的开卡奖励"
     },
     "F04_EVER_BONUS_HISTORY": {
       "type": "multi",
       "title": "你以前拿过下面哪些卡的新卡开卡奖励？",
       "description": "不管是几年前拿到的，都请选上。",
       "evidence_prefix": "以前拿过 ",
-      "evidence_suffix": " 的开卡奖励"
+      "evidence_suffix": " 的开卡奖励",
+      "result_reason": "你以前拿过{card}的开卡奖励"
     },
     "schwab_relationship": {
       "type": "single",
@@ -131,7 +147,10 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "result_reason": {
+        "NO": "你没有符合要求的 Schwab 账户"
+      }
     },
     "morgan_stanley_relationship": {
       "type": "single",
@@ -145,7 +164,10 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "result_reason": {
+        "NO": "你没有符合要求的 Morgan Stanley 或 E*TRADE 账户"
+      }
     },
     "F07_MARRIOTT_HISTORY": {
       "type": "multi",
@@ -210,7 +232,8 @@
         }
       },
       "details_id": "F07_MARRIOTT_DETAILS",
-      "evidence_prefix": "办过 "
+      "evidence_prefix": "办过 ",
+      "result_reason": "你以前办过{card}"
     },
     "held_now": {
       "type": "grouped_multi",
@@ -220,7 +243,11 @@
       "group_prefix": "F07_MARRIOTT_GROUP",
       "clear_when_not_no": [
         "closed_within_30d"
-      ]
+      ],
+      "result_reason": {
+        "YES": "你目前还持有{card}",
+        "NO": "你已不再持有{card}"
+      }
     },
     "closed_within_30d": {
       "type": "grouped_multi",
@@ -231,6 +258,9 @@
       "window": {
         "unit": "day",
         "value": 30
+      },
+      "result_reason": {
+        "YES": "你在过去30天内仍持有过{card}"
       }
     },
     "approved_within_90d": {
@@ -242,6 +272,9 @@
       "window": {
         "unit": "day",
         "value": 90
+      },
+      "result_reason": {
+        "YES": "过去90天，你申请并获批过{card}"
       }
     },
     "new_card_bonus_within_24m": {
@@ -253,6 +286,9 @@
       "window": {
         "unit": "month",
         "value": 24
+      },
+      "result_reason": {
+        "YES": "过去24个月，你拿过{card}的开卡奖励"
       }
     },
     "bonus_or_upgrade_within_24m": {
@@ -264,6 +300,9 @@
       "window": {
         "unit": "month",
         "value": 24
+      },
+      "result_reason": {
+        "YES": "过去24个月，你拿过{card}的开卡奖励或升级奖励"
       }
     },
     "citi_personal_application_lt_8d": {
@@ -284,6 +323,9 @@
       "window": {
         "unit": "day",
         "value": 8
+      },
+      "result_reason": {
+        "YES": "距离你上次申请 Citi 个人信用卡还不到8天"
       }
     },
     "citi_applications_65d": {
@@ -296,7 +338,8 @@
         "unit": "day",
         "value": 65
       },
-      "count_unit": "次"
+      "count_unit": "次",
+      "result_reason": "过去65天，你已提交{count}次 Citi 信用卡申请"
     },
     "citi_business_application_lt_90d": {
       "type": "single",
@@ -316,6 +359,9 @@
       "window": {
         "unit": "day",
         "value": 90
+      },
+      "result_reason": {
+        "YES": "距离你上次申请 Citi 商业信用卡还不到90天"
       }
     },
     "F04_CITI_BONUS_48M": {
@@ -327,7 +373,8 @@
         "value": 48
       },
       "evidence_prefix": "过去 48 个月拿过 ",
-      "evidence_suffix": " 的开卡奖励"
+      "evidence_suffix": " 的开卡奖励",
+      "result_reason": "过去48个月，你拿过{card}的开卡奖励"
     },
     "F05_CITI_CONVERSION_48M": {
       "type": "multi",
@@ -337,7 +384,8 @@
         "unit": "month",
         "value": 48
       },
-      "evidence_prefix": "近 48 个月获奖的 Citi 账户后来转为 "
+      "evidence_prefix": "近 48 个月获奖的 Citi 账户后来转为 ",
+      "result_reason": "你曾将一个在过去48个月拿到开卡奖励的 Citi 账户转为{card}"
     },
     "costco_active_membership": {
       "type": "single",
@@ -351,7 +399,10 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "result_reason": {
+        "NO": "你没有本人名下的有效 Costco 会员资格"
+      }
     },
     "F12_CITI_OPENING_OFFER_48M": {
       "type": "multi",
@@ -362,7 +413,8 @@
         "value": 48
       },
       "evidence_prefix": "过去 48 个月获得过 ",
-      "evidence_suffix": " 的开户优惠"
+      "evidence_suffix": " 的开户优惠",
+      "result_reason": "过去48个月，你已经获得过{card}的开户优惠"
     },
     "bofa_approved_2m": {
       "type": "number",
@@ -374,7 +426,8 @@
         "value": 2
       },
       "metric": "APPROVALS",
-      "population": "BOFA_CREDIT_CARDS_SELF"
+      "population": "BOFA_CREDIT_CARDS_SELF",
+      "result_reason": "过去2个月，你已获批{count}张 BofA 信用卡"
     },
     "bofa_approved_12m": {
       "type": "number",
@@ -386,7 +439,8 @@
         "value": 12
       },
       "metric": "APPROVALS",
-      "population": "BOFA_CREDIT_CARDS_SELF"
+      "population": "BOFA_CREDIT_CARDS_SELF",
+      "result_reason": "过去12个月，你已获批{count}张 BofA 信用卡"
     },
     "bofa_approved_24m": {
       "type": "number",
@@ -398,7 +452,8 @@
         "value": 24
       },
       "metric": "APPROVALS",
-      "population": "BOFA_CREDIT_CARDS_SELF"
+      "population": "BOFA_CREDIT_CARDS_SELF",
+      "result_reason": "过去24个月，你已获批{count}张 BofA 信用卡"
     },
     "F03_HELD_WITHIN_24M": {
       "type": "multi",
@@ -408,7 +463,8 @@
         "unit": "month",
         "value": 24
       },
-      "evidence_prefix": "现在或过去 24 个月持有过 "
+      "evidence_prefix": "现在或过去 24 个月持有过 ",
+      "result_reason": "你目前持有或过去24个月持有过{card}"
     },
     "bofa_business_held_24m": {
       "type": "single",
@@ -427,6 +483,9 @@
       "window": {
         "unit": "month",
         "value": 24
+      },
+      "result_reason": {
+        "YES": "你现在持有或过去24个月持有过 BofA 商业信用卡"
       }
     },
     "cap1_application_or_approval_lt_6m": {
@@ -447,6 +506,9 @@
       "window": {
         "unit": "month",
         "value": 6
+      },
+      "result_reason": {
+        "YES": "过去6个月，你申请过或获批过 Capital One 信用卡"
       }
     },
     "cap1_applications_30d": {
@@ -458,7 +520,8 @@
         "unit": "day",
         "value": 30
       },
-      "count_unit": "次"
+      "count_unit": "次",
+      "result_reason": "过去30天，你已提交{count}次 Capital One 信用卡申请"
     },
     "F04_BONUS_RECEIVED_48M": {
       "type": "multi",
@@ -468,7 +531,8 @@
         "unit": "month",
         "value": 48
       },
-      "evidence_prefix": "过去 48 个月拿过 "
+      "evidence_prefix": "过去 48 个月拿过 ",
+      "result_reason": "过去48个月，你拿过{card}的开卡奖励"
     },
     "cap1_business_ever_held": {
       "type": "single",
@@ -483,12 +547,16 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "result_reason": {
+        "YES": "你现在持有或以前持有过 Capital One 商业信用卡"
+      }
     },
     "cap1_open_accounts": {
       "type": "number",
       "title": "你现在有多少个 Capital One 信用卡账户？",
-      "count_unit": "个"
+      "count_unit": "个",
+      "result_reason": "你目前持有{count}个 Capital One 信用卡账户"
     },
     "wf_consumer_opened_lt_4m": {
       "type": "single",
@@ -508,6 +576,9 @@
       "window": {
         "unit": "month",
         "value": 4
+      },
+      "result_reason": {
+        "YES": "过去4个月，你已经开过 Wells Fargo 品牌个人信用卡"
       }
     },
     "F03_HELD_OR_OPENED_48M": {
@@ -518,7 +589,8 @@
         "unit": "month",
         "value": 48
       },
-      "evidence_prefix": "现在持有或过去 48 个月开过 "
+      "evidence_prefix": "现在持有或过去 48 个月开过 ",
+      "result_reason": "你目前持有或过去48个月新开过{card}"
     },
     "F03_OPENED_AND_RECEIVED_BONUS_15M": {
       "type": "multi",
@@ -528,7 +600,8 @@
         "unit": "month",
         "value": 15
       },
-      "evidence_prefix": "过去 15 个月开户并获得过奖励 "
+      "evidence_prefix": "过去 15 个月开户并获得过奖励 ",
+      "result_reason": "过去15个月，你开过{card}并拿到了该账户的开卡奖励"
     },
     "F03_OPENED_WITHIN_48M": {
       "type": "multi",
@@ -538,11 +611,13 @@
         "unit": "month",
         "value": 48
       },
-      "evidence_prefix": "过去 48 个月开过 "
+      "evidence_prefix": "过去 48 个月开过 ",
+      "result_reason": "过去48个月，你新开过{card}"
     },
     "discover_current_cards": {
       "type": "number",
-      "title": "你现在还持有几张 Discover 信用卡？"
+      "title": "你现在还持有几张 Discover 信用卡？",
+      "result_reason": "你目前持有{count}张 Discover 信用卡"
     },
     "recent_new_accounts_6m": {
       "type": "number",
@@ -553,7 +628,8 @@
       },
       "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
       "metric": "OPENED_ACCOUNTS",
-      "population": "US_CREDIT_CARDS_SELF"
+      "population": "US_CREDIT_CARDS_SELF",
+      "result_reason": "过去6个月，你新开了{count}张美国信用卡"
     },
     "recent_new_accounts_12m": {
       "type": "number",
@@ -564,7 +640,8 @@
       },
       "description": "只统计以你本人名义新开的信用卡账户，不计仅作为副卡人的账户。",
       "metric": "OPENED_ACCOUNTS",
-      "population": "US_CREDIT_CARDS_SELF"
+      "population": "US_CREDIT_CARDS_SELF",
+      "result_reason": "过去12个月，你新开了{count}张美国信用卡"
     },
     "F04_BONUS_RECEIVED_60M": {
       "type": "multi",
@@ -574,7 +651,8 @@
         "unit": "month",
         "value": 60
       },
-      "evidence_prefix": "过去 5 年拿过 "
+      "evidence_prefix": "过去 5 年拿过 ",
+      "result_reason": "过去5年，你拿过{card}的新户开卡奖励"
     },
     "usb_cashplus_upgrade": {
       "type": "single",
@@ -589,7 +667,10 @@
           "value": "YES",
           "label": "有"
         }
-      ]
+      ],
+      "result_reason": {
+        "YES": "你是通过已有 U.S. Bank 账户升级获得 Cash+ 的"
+      }
     },
     "bilt_decline_lt_45d": {
       "type": "single",
@@ -608,6 +689,9 @@
       "window": {
         "unit": "day",
         "value": 45
+      },
+      "result_reason": {
+        "YES": "距离你上次 Bilt 信用卡申请被拒还不到45天"
       }
     },
     "a1": {
@@ -676,7 +760,8 @@
         "value": 6
       },
       "metric": "APPLICATIONS",
-      "population": "US_CREDIT_CARDS_SELF"
+      "population": "US_CREDIT_CARDS_SELF",
+      "result_reason": "过去6个月，你提交了{count}次美国信用卡申请"
     }
   },
   "labels": {

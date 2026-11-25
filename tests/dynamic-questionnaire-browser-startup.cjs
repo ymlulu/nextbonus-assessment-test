@@ -153,6 +153,7 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.equal(get('amex-offer-settings').hidden,true,'NLL control hidden for Chase');
  assert.ok(get('assessment-result').children.length>0,
    'Chase now reuses Amex two-panel application/bonus decision UI');
+ assert.ok(walk(get('assessment-result')).some(n=>n.className==='decision-title decision-review'&&n.textContent==='建议先确认，再申请'));
  assert.ok(walk(get('assessment-result')).some(n=>/Chase 卡适不适合现在申请/.test(n.textContent)),
    'issuer label changes without a second UI');
  const five24=selectValues(['','0','5']);

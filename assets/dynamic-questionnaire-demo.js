@@ -454,8 +454,16 @@
       const full=result.report,d={issuer:full.product.issuer,offer_variant:full.offer_variant,...full.dimensions,rule_results:full.rule_results};
       const issuerLabel=ISSUER_LABELS[d.issuer]||d.issuer;
       report.append(el('h2','','这张 '+issuerLabel+' 卡适不适合现在申请？'));
-      const decision=el('div','assessment-panel');
-      decision.append(el('strong',['BLOCK','WAIT','RISK'].includes(full.decision.code)?'rule-delta':'',full.decision.label),el('p','small',full.decision.summary));
+      const decision=el('section','assessment-panel decision-card');
+      decision.append(el('h3','decision-title decision-'+full.decision.code.toLowerCase(),full.decision.label));
+      if(full.decision.code==='CLEAR'||!full.decision.reasons?.length)decision.append(el('p','decision-summary',full.decision.summary));
+      if(full.decision.reasons?.length){
+        decision.append(el('strong','decision-why',full.decision.code==='REVIEW'?'需要确认的情况':'原因'));
+        const why=el('ul','decision-reasons');
+        for(const reason of full.decision.reasons)why.append(el('li','',reason.text));
+        decision.append(why);
+      }
+      decision.append(el('p','small',full.decision.note));
       report.append(decision);
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
@@ -487,9 +495,9 @@
       bonus.append(el('p','small','奖励影响：'+d.bonus.impact+'/3 · '+({WAIT:'等待',BLOCK:'受限',RISK:'风险提示',UNKNOWN:'待确认',CLEAR:'未触发'}[d.bonus.action]||d.bonus.action)));
       if(!d.bonus.complete)bonus.append(el('p','small','还有奖励相关事实或条款需要确认。'));
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
-      summary.append(app,bonus);report.append(summary);
+      summary.append(app,bonus);
       const itemized=el('details','rule-report');
-      itemized.append(el('summary','','查看完整报告（'+d.rule_results.length+' 条规则）'));
+      itemized.append(el('summary','','查看完整报告（'+d.rule_results.length+' 条规则）'),summary);
       for(const rule of d.rule_results){
         const desc=el('p','small',
           ruleLabel(rule.rule_id)+' · '+({TRIGGERED:rule.product_eligibility?'不符合产品申请条件':rule.hard_bonus_eligibility?'不符合开卡奖励条件':'可能受限',CLEAR:'没有触发',
@@ -516,10 +524,11 @@
       });
       history.append(historyButton,historyContent);itemized.append(history);
       itemized.append(el('p','small','本评估不包含长期持卡福利价值。'));
-      report.append(itemized,el('p','small',full.caveat));
+      itemized.append(el('p','small',full.caveat));
+      report.append(itemized);
       if(full.marriott_matrix){
         const pending=full.marriott_matrix;
-        report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
+        itemized.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
           ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'已触发持卡历史限制',
              MISSING:'还需要补充相关持卡时间',
              SKIPPED_AFTER_BONUS_BLOCK:'已经发现其他奖励限制，不再重复追问',

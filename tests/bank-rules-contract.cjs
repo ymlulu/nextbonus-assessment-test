@@ -93,10 +93,11 @@ rejects(d=>{find(d,'CAP1-007').offer_clause=undefined;},/INVALID_OFFER_THRESHOLD
 rejects(d=>{d.approval.activity_facts.push('unknown_fact');},/INVALID_APPROVAL_FACTS/);
 rejects(d=>{d.approval.activity_bands[1].min=0;},/INVALID_APPROVAL_BANDS/);
 rejects(d=>{d.factbook.count_relations[0].shorter='recent_applications_6m';},/INVALID_COUNT_RELATION/);
+rejects(d=>{d.factbook.facts.recent_new_accounts_12m.result_reason='no threshold placeholder';},/INVALID_RESULT_REASON/);
 const html=source('dynamic-questionnaire.html'),ui=source('assets/dynamic-questionnaire-demo.js'),engine=source('engines/bank-rules-runtime.js');
 assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]),['adapters/card-identity-v1.js','engines/bank-rules-runtime.js','adapters/assessment-api-v2.js','assets/assessment-loader-v2.js','assets/dynamic-questionnaire-demo.js']);
 for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE|CITI|BOFA|CAP1|WF|DISC|BARC|USB|BILT)-(?:PROD-|FL-|REL-|BIZ-)?\d{3}\b/);
 for(const s of [engine,source('adapters/card-identity-v1.js')])assert.doesNotMatch(s,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
 const retired=["adapters/amex-offer-context-v1.js","adapters/amex-questionnaire-v1.js","adapters/card-questionnaire-facade-v1.js","adapters/chase-questionnaire-v1.js","adapters/dynamic-questionnaire-v1.js","engines/amex-decision-v1.js","engines/chase-decision-v1.js","engines/marriott-matrix-v1.js","data/amex-questionnaire-policy.json","data/chase-questionnaire-policy.json","data/dynamic-questionnaire-rule-index.json","data/marriott-eligibility-matrix.json"];
 for(const p of retired){assert.ok(!fs.existsSync(path.join(root,p)),'retired duplicate still exists: '+p);assert.ok(!ui.includes(p),'old source loaded: '+p);}
-console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:24,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));
+console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:25,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));

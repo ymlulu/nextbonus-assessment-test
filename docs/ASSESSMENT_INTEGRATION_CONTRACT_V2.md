@@ -24,3 +24,7 @@ The old v1 contract remains a frozen regression baseline in git, no longer part 
 ### Unified fact inputs (release 2026-11-25.4)
 
 The editable schema includes all common and bank-specific questions; use section and base_credit, not a separate commonQuestions array. Pending common/specific are disjoint subsets of editable. Use recent_new_accounts_12m and recent_applications_6m (numeric) in place of a3/a4 (legacy categorical keys are not accepted as new facts). The first now measures actual opened accounts rather than approvals. Numeric answers are exact nonnegative integers or ranges {min,max}, where max:null means no upper bound. A condition spanning an unresolved threshold is MISSING. Compare only configured comparable count_relations. diagnostics.answer_conflicts describes impossible count combinations; affected facts are excluded until corrected. No user answers transmitted.
+
+### User-facing decision
+
+`evaluation.decision` (also `report.decision`) contains `code`, `label`, `summary`, `reasons` (`kind`, `text`, `rule_ids`), and `note`. Reasons are generated from the actual triggered evidence and base credit calculation, with overlapping explanations deduplicated. The main UI renders the label and readable reasons only; scores, rule IDs and full evaluation remain in a collapsed report. Decision codes and rule effects are unchanged. `facts.json.result_reason` is optional presentation metadata; numeric `{count}` comes from the actual predicate and `{card}` from the selected product/history label.
