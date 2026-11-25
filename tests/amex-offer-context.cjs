@@ -104,7 +104,8 @@ for(const f of ['adapters/amex-offer-context-v1.js','adapters/card-questionnaire
 }
 const page=fs.readFileSync(path.join(root,'dynamic-questionnaire.html'),'utf8');
 assert.match(page,/id="offer-variant"/);
-assert.match(page,/adapters\/amex-offer-context-v1\.js/);
+assert.match(page,/engines\/bank-rules-runtime\.js/);
+assert.doesNotMatch(page,/adapters\/amex-offer-context-v1\.js/,'the live questionnaire must not load the retired per-issuer offer adapter');
 console.log(JSON.stringify({suite:'amex-standard-offer-nll',
   formalAmexCount:amex.length,standardDefault:true,nllSeparate:true,
   familyPreservedUnlessOverridden:true,answersLocal:true,status:'PASS'}));

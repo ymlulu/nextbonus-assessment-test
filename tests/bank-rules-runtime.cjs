@@ -51,6 +51,17 @@ assert.equal(family.evaluation.bonus.action,'BLOCK');
 assert.equal(ask(rt,gold,{...base,F03_CARD_HISTORY:['The Platinum Card']},{offer_variant:'NLL'}).evaluation.bonus.impact,3);
 assert.equal(ask(rt,gold,{...base,F03_CARD_HISTORY:['The Platinum Card']},{offer_variant:'NLL',offer_rule_overrides:{'AMEX-FL-004':'ABSENT'}}).evaluation.bonus.impact,0);
 assert.equal(ask(rt,gold,base,{offer_facts:{}}).evaluation.bonus.status,'NEEDS_REVIEW');
+for(const p of ids.products.filter(p=>p.issuer==='AMEX')){
+ const standard=rt.assess({product:p,answers:base}),nll=rt.assess({product:p,answers:base,offer_variant:'NLL'});
+ assert.ok(standard.diagnostics.applicable_rule_ids.includes('AMEX-001'),p.product_id);
+ assert.ok(!nll.diagnostics.applicable_rule_ids.includes('AMEX-001'),p.product_id);
+ assert.deepEqual(nll.diagnostics.applicable_rule_ids,standard.diagnostics.applicable_rule_ids.filter(id=>id!=='AMEX-001'),p.product_id+' NLL must preserve every other applicable rule');
+}
+assert.equal(ask(rt,csp,base,{offer_variant:'NLL'}).offer_context,null);
+assert.deepEqual(ask(rt,csp,base,{offer_variant:'NLL'}).diagnostics,ask(rt,csp,base).diagnostics);
+const runtimeSource=fs.readFileSync(path.join(root,'engines/bank-rules-runtime.js'),'utf8');
+assert.doesNotMatch(runtimeSource,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\\(/,'live rule engine performs no network or storage operations');
+
 assert.equal(ask(rt,'chase_ink_business_premier',{...base,F03_CARD_HISTORY:['Ink Business Premier']}).evaluation.bonus.impact,2);
 const history=['AMEX Marriott Bonvoy Business / Legacy SPG Business','AMEX Marriott Bonvoy Bevy','AMEX Marriott Bonvoy Brilliant'];
 const m=ask(rt,bound,{...base,F07_MARRIOTT_HISTORY:history});
