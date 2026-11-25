@@ -197,20 +197,6 @@
     },
     {
       "issuer": "CHASE",
-      "product_name": "Iberia Visa",
-      "product_type": "CREDIT_CARD",
-      "customer_type": "PERSONAL",
-      "product_lineage": "NOT_UNITED_CLUB"
-    },
-    {
-      "issuer": "CHASE",
-      "product_name": "Aer Lingus Visa",
-      "product_type": "CREDIT_CARD",
-      "customer_type": "PERSONAL",
-      "product_lineage": "NOT_UNITED_CLUB"
-    },
-    {
-      "issuer": "CHASE",
       "product_name": "Southwest Premier Business",
       "product_type": "CREDIT_CARD",
       "customer_type": "BUSINESS",

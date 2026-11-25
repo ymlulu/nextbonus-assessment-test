@@ -13,7 +13,7 @@ const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_applications_6m:0,F01_RECENT
  F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES',F03_HELD_WITHIN_24M:['NONE'],bofa_business_held_24m:'NO',F04_BONUS_RECEIVED_48M:['NONE'],cap1_business_ever_held:'NO',cap1_open_accounts:0,F03_HELD_OR_OPENED_48M:['NONE'],F03_OPENED_AND_RECEIVED_BONUS_15M:['NONE'],F03_OPENED_WITHIN_48M:['NONE'],discover_current_cards:0,recent_new_accounts_6m:0,recent_new_accounts_12m:0,F04_BONUS_RECEIVED_60M:['NONE'],usb_cashplus_upgrade:'NO',bilt_decline_lt_45d:'NO'};
 const catalog=ids.products.map(p=>({...p,...products.overrides[p.product_id]}));
 const virtual=(name,business=false,lineage='NOT_UNITED_CLUB')=>({product_id:'fixture_'+name,product_name:name,issuer:'CHASE',product_type:'CREDIT_CARD',customer_type:business?'BUSINESS':'PERSONAL',product_lineage:lineage,card_form:'REVOLVING_CREDIT'});
-const fixtures=[virtual('United Club',false,'UNITED_CLUB'),virtual('Iberia Visa'),virtual('Aer Lingus Visa'),virtual('Southwest Premier Business',true)];
+const fixtures=[virtual('United Club',false,'UNITED_CLUB'),virtual('Southwest Premier Business',true)];
 const card=name=>[...catalog,...fixtures].find(p=>p.product_name===name);
 const assess=(p,patch={},opts={})=>runtime.assess({product:p,answers:{...base,...patch},...opts});
 const event=(res,id)=>res.evaluation.rule_results.find(r=>r.rule_id===id);

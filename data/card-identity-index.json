@@ -20,9 +20,27 @@
         "chase_ink_business_premier"
       ],
       "note": "Issuer official product identity only; no offer history invented."
+    },
+    "discover_identity_additions": {
+      "repository": "ymlulu/nextbonus-preview",
+      "commit": "f0ba3c159525edf32a37b8a84b1d67aa53f6bf2e",
+      "path": "data/discover/credit-card-details.json",
+      "catalog_path": "data/discover/catalog.json",
+      "reviewed_on": "2026-11-25",
+      "product_ids": [
+        "barclays_aarp_essential",
+        "barclays_aarp_travel",
+        "barclays_frontier",
+        "barclays_jetblue_business",
+        "barclays_miles_and_more",
+        "barclays_upromise",
+        "chase_aer_lingus",
+        "chase_iberia"
+      ],
+      "note": "Product identities from existing Discover card catalog and article references only; no new bank terms, current issuance assertion or invented offer history."
     }
   },
-  "count": 118,
+  "count": 126,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -2447,6 +2465,172 @@
         "Choice Privileges Select Mastercard",
         "Wells Fargo Choice Privileges Select Mastercard"
       ]
+    },
+    {
+      "product_id": "barclays_aarp_essential",
+      "name": "Barclays AARP Essential",
+      "product_name": "AARP Essential Rewards",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays AARP Essential",
+        "AARP Essential Rewards",
+        "AARP Essential",
+        "AARP Essential Rewards Mastercard"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclays-aarp-essential-card-review/"
+    },
+    {
+      "product_id": "barclays_aarp_travel",
+      "name": "Barclays AARP Travel",
+      "product_name": "AARP Travel Rewards",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays AARP Travel",
+        "AARP Travel Rewards",
+        "AARP Travel",
+        "AARP Travel Rewards Mastercard"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclays-aarp-travl-card-review/"
+    },
+    {
+      "product_id": "barclays_frontier",
+      "name": "Barclays Frontier",
+      "product_name": "Frontier Airlines World Mastercard",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays Frontier",
+        "Frontier Airlines World Mastercard",
+        "Frontier Airlines"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclays-frontier-card-review/"
+    },
+    {
+      "product_id": "barclays_jetblue_business",
+      "name": "Barclays JetBlue Business",
+      "product_name": "JetBlue Business",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays JetBlue Business",
+        "JetBlue Business",
+        "JetBlue Business Card"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclays-jetblue-business-card-review/"
+    },
+    {
+      "product_id": "barclays_miles_and_more",
+      "name": "Barclays Miles & More",
+      "product_name": "Miles & More",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays Miles & More",
+        "Miles & More",
+        "Miles & More World Elite Mastercard"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclaycard-miles-and-more/"
+    },
+    {
+      "product_id": "barclays_upromise",
+      "name": "Barclays Upromise",
+      "product_name": "Upromise",
+      "issuer": "BARCLAYS",
+      "approval_issuer": "BARCLAYS",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Barclays Upromise",
+        "Upromise",
+        "Upromise Mastercard"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/barclays-upromise-card-review/"
+    },
+    {
+      "product_id": "chase_aer_lingus",
+      "name": "Chase Aer Lingus",
+      "product_name": "Aer Lingus Visa",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase Aer Lingus",
+        "Aer Lingus Visa",
+        "Aer Lingus Visa Signature",
+        "Chase Aer Lingus Visa Signature"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-aer-lingus-credit-card-review/",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    {
+      "product_id": "chase_iberia",
+      "name": "Chase Iberia",
+      "product_name": "Iberia Visa",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase Iberia",
+        "Iberia Visa",
+        "Iberia Visa Signature",
+        "Chase Iberia Visa Signature"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-iberia-credit-card-review/",
+      "product_lineage": "NOT_UNITED_CLUB"
     }
   ]
 }
