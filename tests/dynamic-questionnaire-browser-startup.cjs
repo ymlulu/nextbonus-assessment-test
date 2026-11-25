@@ -186,6 +186,37 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(walk(get('assessment-result')).some(n=>/你不符合这次开卡奖励条件/.test(n.textContent)));
  toggleHistory(1,false);
  assert.ok(!walk(get('assessment-result')).some(n=>/你不符合这次开卡奖励条件/.test(n.textContent)));
+ // Chase Marriott matrix is rendered by the shared browser UI, including
+ // separate hard product and hard bonus results.
+ const boundless=get('card-select').options.find(x=>/Marriott.*Boundless/i.test(x.textContent));
+ assert.ok(boundless);get('card-select').value=boundless.value;get('card-select').fire('change');
+ function selectHistory(value){
+  const checkbox=walk(get('questions')).find(n=>n.tag==='input'&&n.value===value);
+  assert.ok(checkbox,'history option '+value);
+  checkbox.checked=true;checkbox.fire('change');
+ }
+ selectHistory('Chase Marriott Bonvoy Bold / Boundless');
+ selectHistory('AMEX Marriott Bonvoy Brilliant');
+ const sections=()=>walk(get('questions')).filter(n=>n.tag==='section'&&n.className==='question');
+ const sectionByTitle=pattern=>sections().find(n=>walk(n).some(x=>x.tag==='strong'&&pattern.test(x.textContent)));
+ function chooseFirst(pattern,value){
+  const q=sectionByTitle(pattern);
+  assert.ok(q,'matrix follow-up '+pattern);
+  const sel=walk(q).find(x=>x.tag==='select'&&x.options.some(o=>o.value===value)&&x.value==='');
+  assert.ok(sel,'unanswered matrix field');sel.value=value;sel.fire('change');
+ }
+ chooseFirst(/关于 Amex Marriott Brilliant/,'YES');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));
+ assert.ok(sectionByTitle(/关于 Chase Marriott Bold/),'bonus-only gate does not hide product question');
+ chooseFirst(/关于 Chase Marriott Bold/,'YES');
+ assert.ok(walk(get('assessment-result')).some(n=>/不符合这张卡的申请条件/.test(n.textContent)));
+ get('customer-type').value='BUSINESS';get('customer-type').fire('change');
+ const premier=get('card-select').options.find(x=>/Ink Business Premier/i.test(x.textContent));
+ assert.ok(premier,'Ink Premier identity appears in selector');
+ get('card-select').value=premier.value;get('card-select').fire('change');
+ selectHistory('Ink Business Premier');
+ assert.ok(walk(get('assessment-result')).some(n=>/可能拿不到开卡奖励/.test(n.textContent)));
+ assert.ok(!walk(get('assessment-result')).some(n=>/不符合这张卡的申请条件/.test(n.textContent)));
  assert.ok(requestLog.some(x=>x.includes('amex-formal-product-identities.json')));
  assert.ok(!requestLog.some(x=>!x.startsWith('data/')),'only static data requests');
  // Exercise the transient failure branch and successful retry on a fresh page.

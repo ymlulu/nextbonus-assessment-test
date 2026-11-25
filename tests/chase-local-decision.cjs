@@ -14,11 +14,11 @@ const policy=data('chase-questionnaire-policy.json');
 const index=data('dynamic-questionnaire-rule-index.json');
 const identities=data('card-identity-index.json');
 const chase=identities.products.filter(p=>p.issuer==='CHASE');
-assert.equal(chase.length,29);
+assert.equal(chase.length,30);
 const active=index.rules.filter(r=>r.id.startsWith('CHASE')&&r.runtime_class==='EXECUTABLE_RULE');
 assert.equal(active.length,21);
 assert.deepEqual(new Set(Object.keys(policy.rules)),new Set(active.map(x=>x.id)));
-assert.equal(Object.keys(policy.canonical_target_names).length,29);
+assert.equal(Object.keys(policy.canonical_target_names).length,30);
 const facade=createFacade({
  planner:makePlanner({ruleIndex:index,products:data('products.json'),
   baseQuestions:data('questions.json').common,frozenOfferFacts:data('frozen-offer-facts.json')}),
@@ -33,7 +33,7 @@ const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',
  F01_RECENT_NEW_ACCOUNTS:0,F06_AU_BREAKDOWN:0,
  F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,
   approved_chase_business_30d:'NO'},
- F03_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE']};
+ F03_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE']};
 function run(product_id,changes={}){
  return facade.plan({product_id,known_facts:{...base,...changes}});
 }
@@ -210,6 +210,90 @@ for(const changes of [{F01_RECENT_NEW_ACCOUNTS:5},{F02_ISSUER_APPLICATION_HISTOR
  assert.equal(v.bonus.status,'NO_TRIGGER_FOUND');
  assert.deepEqual(v.bonus.product_blocking_rules,[]);
 }
+// Marriott target coverage is independent of the 21 indexed Chase rules.
+const marriottTargets=[
+ ['chase_marriott_bonvoy_boundless','Chase Marriott Bonvoy Bold / Boundless','chase_bold_boundless'],
+ ['history_ot_chase_045','Chase Marriott Bonvoy Bold / Boundless','chase_bold_boundless'],
+ ['history_ot_chase_046','Chase Marriott Bonvoy Bountiful','chase_bountiful']
+];
+const crossHistories=[
+ ['AMEX Marriott / Legacy SPG Personal','amex_marriott_legacy_personal'],
+ ['AMEX Marriott Bonvoy Business / Legacy SPG Business','amex_marriott_business'],
+ ['AMEX Marriott Bonvoy Bevy','amex_marriott_bevy'],
+ ['AMEX Marriott Bonvoy Brilliant','amex_marriott_brilliant']
+];
+function matrixRun(pid,history,details={}){
+ return run(pid,{F07_MARRIOTT_HISTORY:history,F07_MARRIOTT_DETAILS:details});
+}
+const ruleEvent=(v,id)=>v.evaluation.rule_results.find(x=>x.rule_id==='MARRIOTT-MATRIX:'+id);
+for(const [pid,name,id] of marriottTargets){
+ let v=matrixRun(pid,undefined);
+ assert.equal(v.evaluation.bonus.status,'NEEDS_REVIEW');
+ assert.equal(v.evaluation.application.status,'INSUFFICIENT_DATA');
+ const history=v.questionnaire.questionnaire.specific.find(q=>q.id==='F07_MARRIOTT_HISTORY');
+ assert.ok(history);
+ assert.equal(history.options.length,5,'exact target history group plus four Amex groups');
+ assert.ok(history.options.some(x=>x.value===name));
+ if(id==='chase_bold_boundless')assert.match(history.options.find(x=>x.value===name).label,/Premier Plus/);
+ for(const [held,award] of [['NO','NO'],['YES','NO'],['NO','YES'],['YES','YES']]){
+  v=matrixRun(pid,[name],{[id]:{held_now:held,new_card_bonus_within_24m:award}});
+  const block=held==='YES'||award==='YES';
+  assert.equal(v.evaluation.application.status,block?'PRODUCT_INELIGIBLE':'MODEL_ONLY');
+  assert.equal(v.evaluation.bonus.status,block?'PRODUCT_INELIGIBLE':'NO_TRIGGER_FOUND');
+  assert.equal(ruleEvent(v,id).status,block?'TRIGGERED':'CLEAR');
+ }
+ v=matrixRun(pid,[name],{[id]:{held_now:'NO',bonus_or_upgrade_within_24m:'YES'}});
+ assert.equal(v.evaluation.bonus.status,'NEEDS_REVIEW','upgrade cannot count as Chase new-card bonus');
+ const q=v.questionnaire.questionnaire.specific.find(q=>q.prior_id===id);
+ assert.deepEqual(q.fields.map(x=>x.id),['new_card_bonus_within_24m']);
+ for(const [cross,crossId] of crossHistories){
+  const allDates={held_now:'NO',closed_within_30d:'NO',approved_within_90d:'NO',bonus_or_upgrade_within_24m:'NO'};
+  const keys=id==='chase_bountiful'?Object.keys(allDates):
+    crossId==='amex_marriott_legacy_personal'?['held_now','closed_within_30d']:['approved_within_90d','bonus_or_upgrade_within_24m'];
+  for(const key of keys){
+   v=matrixRun(pid,[cross],{[crossId]:{...allDates,[key]:'YES'}});
+   assert.equal(v.evaluation.application.status,'MODEL_ONLY',pid+' '+crossId+' '+key);
+   assert.equal(v.evaluation.bonus.status,'BONUS_INELIGIBLE');
+   assert.ok(ruleEvent(v,crossId).hard_bonus_eligibility);
+  }
+  v=matrixRun(pid,[cross],{[crossId]:allDates});
+  assert.equal(v.evaluation.bonus.status,'NO_TRIGGER_FOUND');
+ }
+ const [cross,crossId]=crossHistories[0];
+ v=matrixRun(pid,[name,cross],{[crossId]:{held_now:'YES'}});
+ assert.equal(v.evaluation.bonus.status,'BONUS_INELIGIBLE');
+ assert.equal(v.evaluation.application.status,'INSUFFICIENT_DATA');
+ assert.ok(v.questionnaire.questionnaire.specific.some(q=>q.prior_id===id),
+  'bonus blocker must not suppress independent Chase product eligibility questions');
+ const other=id==='chase_bountiful'?'Chase Marriott Bonvoy Bold / Boundless':'Chase Marriott Bonvoy Bountiful';
+ v=matrixRun(pid,[other]);
+ assert.equal(v.evaluation.bonus.status,'NO_TRIGGER_FOUND');
+ assert.equal(v.evaluation.application.status,'MODEL_ONLY');
+}
+assert.equal(run('chase_aeroplan').marriott_matrix,null,'matrix stays scoped to Marriott');
+const inkTargets=[
+ ['history_ot_chase_071','Ink Business Cash','CHASE-005'],
+ ['history_ot_chase_072','Ink Business Unlimited','CHASE-005'],
+ ['history_ot_chase_082','Ink Business Preferred','CHASE-006'],
+ ['chase_ink_business_premier','Ink Business Premier','CHASE-007'],
+ ['history_ot_chase_070','Sapphire Reserve for Business','CHASE-008']
+];
+for(const [pid,value,id] of inkTargets){
+ const pending=run(pid,{F03_CARD_HISTORY:undefined});
+ const q=pending.questionnaire.questionnaire.specific.find(q=>q.id==='F03_CARD_HISTORY');
+ assert.match(q.title,/以前办过/);
+ assert.match(q.description,/没拿到开卡奖励/);
+ assert.ok(q.options.some(x=>x.value===value));
+ const v=run(pid,{F03_CARD_HISTORY:[value]}).evaluation;
+ assert.equal(v.bonus.status,'LIKELY_RESTRICTED');
+ assert.equal(v.application.status,'MODEL_ONLY');
+ assert.ok(v.bonus.triggered_rules.includes(id));
+ assert.ok(!v.application.triggered_rules.includes(id));
+ assert.deepEqual(v.bonus.product_blocking_rules,[]);
+ assert.equal(run(pid,{F03_CARD_HISTORY:['NONE']}).evaluation.bonus.status,'NO_TRIGGER_FOUND');
+}
+assert.equal(run('history_ot_chase_072',{F03_CARD_HISTORY:['Ink Business Preferred']}).evaluation.bonus.status,'NO_TRIGGER_FOUND');
+assert.equal(run('history_ot_chase_082',{F03_CARD_HISTORY:['Ink Business Cash']}).evaluation.bonus.status,'NO_TRIGGER_FOUND');
 const privateR=run(csp,{a2:'SENSITIVE_TEST_MARKER_DO_NOT_ECHO'});
 assert.ok(!JSON.stringify(privateR).includes('SENSITIVE_TEST_MARKER_DO_NOT_ECHO'));
 const amex=facade.plan({product_id:'amex_gold',known_facts:{a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0'}});

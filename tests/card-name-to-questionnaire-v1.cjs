@@ -14,7 +14,7 @@ const planner=makePlanner({products,ruleIndex:read('dynamic-questionnaire-rule-i
   baseQuestions:read('questions.json').common,
   frozenOfferFacts:read('frozen-offer-facts.json')});
 const facade=createFacade({planner,lookup});
-assert.equal(facade.getVersion().source_count,109);
+assert.equal(facade.getVersion().source_count,110);
 assert.equal(facade.getVersion().rules_indexed,129);
 
 const reviewed=facade.plan({input:'Chase Sapphire Preferred'});
@@ -119,12 +119,13 @@ assert.match(html,/id="issuer"/);
 assert.match(html,/id="customer-type"/);
 assert.match(html,/id="card-select"/);
 assert.doesNotMatch(html,/id="card-query"/);
-assert.equal(facade.listCards().length,109);
+assert.equal(facade.listCards().length,identityIndex.count);
+assert.ok(facade.listCards().some(card=>card.product_id==='chase_ink_business_premier'),'new Ink Premier identity is selectable');
 assert.equal(facade.plan({product_id:'amex_marriott_bonvoy_bevy'}).status,'MATCHED_ID');
 assert.equal(facade.plan({product_id:'does_not_exist'}).status,'UNKNOWN_PRODUCT');
 assert.match(html,/adapters\/card-identity-v1\.js/);
 assert.match(html,/adapters\/card-questionnaire-facade-v1\.js/);
 assert.doesNotMatch(html,/id="product"/);
 console.log(JSON.stringify({kind:'independent-card-to-questionnaire',
-  identities:98,reviewed:7,historyOnly:true,unknownFallback:true,
+  identities:identityIndex.count,reviewed:7,historyOnly:true,unknownFallback:true,
   urlConfirmation:true,benefits:false,answersUploaded:false,status:'PASS'}));

@@ -4,7 +4,18 @@
   "source": {
     "name": "Bank Rules.xlsx",
     "snapshot": "2026-09-12",
-    "scope": "Reviewed 37 Chase rule rows; rule evaluation is modeled from reviewed source, not live Chase offers"
+    "scope": "Reviewed 37 Chase rule rows; rule evaluation is modeled from reviewed source, not live Chase offers",
+    "ink_history_review": {
+      "reviewed_on": "2026-11-24",
+      "urls": [
+        "https://creditcards.chase.com/business-credit-cards/ink/cash",
+        "https://creditcards.chase.com/business-credit-cards/ink/unlimited",
+        "https://creditcards.chase.com/business-credit-cards/ink/preferred",
+        "https://creditcards.chase.com/business-credit-cards/ink/premier",
+        "https://creditcards.chase.com/business-credit-cards/sapphire/reserve"
+      ],
+      "note": "Prior holding is a possible bonus restriction, not a guaranteed lifetime denial. Keep existing rules CHASE-005 through 008 and separate unknown other products."
+    }
   },
   "canonical_target_names": {
     "chase_sapphire_preferred": "Chase Sapphire Preferred",
@@ -35,7 +46,8 @@
     "history_ot_chase_086": "United Business",
     "history_ot_chase_087": "United Club Business",
     "history_ot_chase_094": "IHG One Rewards Premier Business",
-    "history_ot_chase_095": "Southwest Performance Business"
+    "history_ot_chase_095": "Southwest Performance Business",
+    "chase_ink_business_premier": "Ink Business Premier"
   },
   "rules": {
     "CHASE-001": {

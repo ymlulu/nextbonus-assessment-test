@@ -22,7 +22,7 @@ assert.equal(amexRules.filter(x=>x.runtime_class==='EXECUTABLE_RULE').length,22)
 assert.deepEqual(new Set(amexPolicy.source.rule_ids),new Set(amexRules.map(r=>r.id)));
 assert.equal(formal.count,32,'read 32 AMEX profiles from NB formal catalog');
 assert.equal(formal.products.length,32);
-assert.equal(cards.count,109,'98 original historical identities + 11 new formal identities');
+assert.equal(cards.count,110,'98 historical identities + 11 formal Amex identities + 1 reviewed Chase Ink Premier identity');
 assert.equal(cards.products.filter(p=>p.issuer==='AMEX').length,33,
   '32 formally cataloged plus separately documented Schwab Platinum');
 assert.ok(!formal.products.some(p=>p.nb_card_id==='amex-amazon-business-prime'),
