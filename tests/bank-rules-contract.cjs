@@ -88,7 +88,7 @@ const generic=createRuntime(expanded),p={product_id:'test_citi',product_name:'Fi
 assert.deepEqual(generic.assess({product:p}).questionnaire.editable.find(q=>q.id==='F01_RECENT_NEW_ACCOUNTS').count_bands.map(x=>x.value),[0,3]);
 assert.equal(generic.assess({product:p,answers:{F01_RECENT_NEW_ACCOUNTS:3}}).evaluation.application.impact,2);
 const html=source('dynamic-questionnaire.html'),ui=source('assets/dynamic-questionnaire-demo.js'),engine=source('engines/bank-rules-runtime.js');
-assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]),['adapters/card-identity-v1.js','engines/bank-rules-runtime.js','assets/dynamic-questionnaire-demo.js']);
+assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]),['adapters/card-identity-v1.js','engines/bank-rules-runtime.js','adapters/assessment-api-v2.js','assets/assessment-loader-v2.js','assets/dynamic-questionnaire-demo.js']);
 for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE)-(?:PROD-|FL-|REL-|BIZ-)?\d{3}\b/);
 for(const s of [engine,source('adapters/card-identity-v1.js')])assert.doesNotMatch(s,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
 const retired=["adapters/amex-offer-context-v1.js","adapters/amex-questionnaire-v1.js","adapters/card-questionnaire-facade-v1.js","adapters/chase-questionnaire-v1.js","adapters/dynamic-questionnaire-v1.js","engines/amex-decision-v1.js","engines/chase-decision-v1.js","engines/marriott-matrix-v1.js","data/amex-questionnaire-policy.json","data/chase-questionnaire-policy.json","data/dynamic-questionnaire-rule-index.json","data/marriott-eligibility-matrix.json"];

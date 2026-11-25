@@ -1,5 +1,5 @@
 const fs=require('fs'),assert=require('assert/strict');
-const html=fs.readFileSync('bridge.html','utf8');
+const html=fs.readFileSync('legacy/bridge-v1.html','utf8');
 const bridge=fs.readFileSync('adapters/static-bridge-v1.js','utf8');
 
 for(const path of [

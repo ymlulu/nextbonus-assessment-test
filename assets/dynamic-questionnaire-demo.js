@@ -448,7 +448,7 @@
     const report=$('assessment-result');
     report.replaceChildren();
     if(result.report){
-      const full=result.report,d={...result.evaluation,...full.dimensions,decision:full.decision,rule_results:full.rule_results};
+      const full=result.report,d={issuer:full.product.issuer,offer_variant:full.offer_variant,...full.dimensions,rule_results:full.rule_results};
       const issuerLabel=ISSUER_LABELS[d.issuer]||d.issuer;
       report.append(el('h2','','这张 '+issuerLabel+' 卡适不适合现在申请？'));
       const decision=el('div','assessment-panel');
@@ -514,8 +514,8 @@
       history.append(historyButton,historyContent);itemized.append(history);
       itemized.append(el('p','small','本评估不包含长期持卡福利价值。'));
       report.append(itemized,el('p','small',full.caveat));
-      if(result.marriott_matrix){
-        const pending=result.marriott_matrix;
+      if(full.marriott_matrix){
+        const pending=full.marriott_matrix;
         report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
           ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'已触发持卡历史限制',
              MISSING:'还需要补充相关持卡时间',

@@ -16,7 +16,7 @@ function createClient({rulebook,factbook,products,approval,identityIndex}){
   if(result?.contract_version!==VERSION||result?.release_id!==version.release_id||!result.evaluation||!result.identity)return null;
   const e=result.evaluation;
   return {contract_version:VERSION,release_id:version.release_id,product:{...result.identity},
-   decision:e.decision,dimensions:{application:e.application,bonus:e.bonus},
+   offer_variant:e.offer_variant,decision:e.decision,dimensions:{application:e.application,bonus:e.bonus},
    rule_results:e.rule_results,offer_context:result.offer_context,diagnostics:result.questionnaire.diagnostics,
    marriott_matrix:result.marriott_matrix,benefits:{status:'NOT_IN_SCOPE'},
    caveat:e.caveat,answers_transmitted:false};
