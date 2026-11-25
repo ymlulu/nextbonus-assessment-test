@@ -168,24 +168,24 @@ function createRuntime({rulebook,factbook,products,approval}){
    }
    const evidence=state===true?(node.op==='includes_any'?hits.map(value=>({question_id:qid,value,reason:(f.evidence_prefix||'已选择 ')+value+(f.evidence_suffix||'')})):
     [{question_id:qid,...(f.type==='grouped_multi'?{value:node.prior}:f.group?{field:node.fact}:{}),reason}]):[];
-   return {state,hits:evidence,actions:state===true&&node.action?[node.action]:[],reason};
+   return {state,hits:evidence,actions:state===true&&node.action?[node.action]:[],reason,pending:state===null};
   }
   function evaluate(node,r){
    if(node.any){
     const parts=node.any.map(n=>evaluate(n,r)),yes=parts.filter(x=>x.state===true);
     return {state:yes.length?true:parts.some(x=>x.state===null)?null:false,
-      hits:yes.flatMap(x=>x.hits),actions:yes.flatMap(x=>x.actions)};
+      hits:yes.flatMap(x=>x.hits),actions:yes.flatMap(x=>x.actions),pending:parts.some(x=>x.pending||x.state===null)};
    }
    if(node.all){
-    const hits=[],actions=[];
+    const hits=[],actions=[];let pending=false;
     // Ordered guard semantics: do not ask a later dependent fact before
     // the earlier facts establish its relevance.
     for(const n of node.all){
      const x=evaluate(n,r);
-     if(x.state!==true)return {state:x.state,hits:[],actions:[]};
-     hits.push(...x.hits);actions.push(...x.actions);
+     if(x.state!==true)return {state:x.state,hits:[],actions:[],pending:x.pending||x.state===null};
+     hits.push(...x.hits);actions.push(...x.actions);pending||=!!x.pending;
     }
-    return {state:true,hits,actions};
+    return {state:true,hits,actions,pending};
    }
    return leaf(node,r);
   }
@@ -205,6 +205,7 @@ function createRuntime({rulebook,factbook,products,approval}){
     bonus_action:fired?actionOf(e,'bonus',x.actions):'CLEAR',
     ...(e.product_gate?{product_eligibility:true}:{}),...(bonus===3?{hard_bonus_eligibility:true}:{}),
     ...(x.hits?.length?{trigger_sources:x.hits}:{}),
+    ...(fired&&x.pending?{pending_facts:true}:{}),
     reason:reason|| (fired?(x.hits.map(h=>h.reason).filter(Boolean).join('；')||label):status==='MISSING'?'还需要补充相关信息':status==='REVIEW'?'相关条款或事实需要核实':'未触发限制')};
   }
   for(const sourceRule of rules){
@@ -226,7 +227,7 @@ function createRuntime({rulebook,factbook,products,approval}){
    const x=evaluate(r.condition,r);
    const review=r.review&&(x.state===false||r.review.show_with_primary)?evaluate(r.review.condition,r):null;
    if(x.state===true){
-    events.push(makeEvent(r,'TRIGGERED',e,label,{hits:[...gate.hits,...x.hits],actions:x.actions},r.overrides?.some(o=>targetState(o.target,p)===true)?label:undefined));
+    events.push(makeEvent(r,'TRIGGERED',e,label,{hits:[...gate.hits,...x.hits],actions:x.actions,pending:!!(gate.pending||x.pending||review?.pending)},r.overrides?.some(o=>targetState(o.target,p)===true)?label:undefined));
    }else if(x.state===null)events.push(makeEvent(r,'MISSING',e,label));
    else if(review?.state===true)events.push(makeEvent(r,'REVIEW',e,label,undefined,r.review.label));
    else if(review?.state===null)events.push(makeEvent(r,'MISSING',e,label));
@@ -249,34 +250,39 @@ function createRuntime({rulebook,factbook,products,approval}){
   const app=events.filter(x=>x.configured_application_impact>0);
   const bonus=events.filter(x=>x.configured_bonus_impact>0||x.product_eligibility);
   const triggered=xs=>xs.filter(x=>x.status==='TRIGGERED');
-  const gaps=xs=>xs.filter(x=>['MISSING','REVIEW'].includes(x.status));
+  const gaps=xs=>xs.filter(x=>['MISSING','REVIEW'].includes(x.status)||x.pending_facts);
   const productBlockers=triggered(app).filter(x=>x.product_eligibility);
   const blockIds=productBlockers.map(x=>x.rule_id);
   const max=(xs,k)=>Math.max(0,...xs.map(x=>x[k]));
   const applicationImpact=max(app,'application_impact'),bonusImpact=productBlockers.length?3:max(bonus,'bonus_impact');
   const combine=(xs,dim)=>xs.some(x=>x[dim+'_action']==='BLOCK')?'BLOCK':xs.some(x=>x[dim+'_action']==='WAIT')?'WAIT':
    xs.some(x=>x[dim+'_action']==='RISK')?'RISK':gaps(xs).length?'UNKNOWN':'CLEAR';
-  const appAction=combine(app,'application'),bonusAction=productBlockers.length?combine(productBlockers,'application'):combine(bonus,'bonus');
+  const appAction=combine(app,'application');
+  // A product gate eliminates the new-card reward path, but cannot erase an
+  // independent bonus BLOCK. Aggregate actions after projection, not before.
+  const projectedBonus=bonus.map(x=>x.product_eligibility&&x.status==='TRIGGERED'?
+   {...x,bonus_action:x.bonus_action==='BLOCK'||x.application_action==='BLOCK'?'BLOCK':'WAIT'}:x);
+  const bonusAction=combine(projectedBonus,'bonus');
   const base=baseRisk(a,p.issuer);
   const appStatus=productBlockers.length?'PRODUCT_INELIGIBLE':appAction==='BLOCK'?'APPLICATION_INELIGIBLE':appAction==='WAIT'?'WAIT':
    appAction==='RISK'?'ELEVATED_RISK':appAction==='UNKNOWN'||base.rating==='INSUFFICIENT_DATA'?'INSUFFICIENT_DATA':'MODEL_ONLY';
   const bonusStatus=productBlockers.length?'PRODUCT_INELIGIBLE':bonusAction==='BLOCK'||bonusAction==='WAIT'?'BONUS_INELIGIBLE':bonusAction==='RISK'?'LIKELY_RESTRICTED':
    bonusAction==='UNKNOWN'?'NEEDS_REVIEW':'NO_TRIGGER_FOUND';
   const appReasons=triggered(app).filter(x=>x.application_impact===applicationImpact).map(x=>x.label);
-  const bonusReasons=triggered(bonus).filter(x=>x.bonus_impact===bonusImpact).map(x=>x.label);
+  const bonusReasons=triggered(bonus).filter(x=>x.bonus_impact===bonusImpact||x.product_eligibility).map(x=>x.label);
   const messageApp=appStatus==='PRODUCT_INELIGIBLE'?'按参考条款，你不符合这张卡的申请条件'+(appAction==='WAIT'?'，需等待限制解除':'')+'：'+appReasons.join('、'):
    appStatus==='APPLICATION_INELIGIBLE'?'不符合申请条件：'+appReasons.join('、'):
    appStatus==='WAIT'?'建议等待申请限制解除：'+appReasons.join('、'):
    appStatus==='ELEVATED_RISK'?'发现可能影响申请的情况：'+appReasons.join('、'):
    appStatus==='INSUFFICIENT_DATA'?'还有信用情况或申请信息需要确认':'目前未发现申请限制；实际获批以银行为准';
-  const messageBonus=bonusStatus==='PRODUCT_INELIGIBLE'?'按参考条款，你不符合这次开卡奖励条件，因为当前不能申请该产品':
+  const messageBonus=bonusStatus==='PRODUCT_INELIGIBLE'?'按参考条款，你不符合这次开卡奖励条件'+(bonusAction==='WAIT'?'，需等待限制解除':'')+'：'+bonusReasons.join('、'):
    bonusStatus==='BONUS_INELIGIBLE'?'按参考条款，你不符合这次开卡奖励条件'+(bonusAction==='WAIT'?'，需等待限制解除':'')+'：'+bonusReasons.join('、'):
    bonusStatus==='LIKELY_RESTRICTED'?'按参考条款，你这次可能拿不到开卡奖励：'+bonusReasons.join('、'):
    bonusStatus==='NEEDS_REVIEW'?'还有持卡历史或奖励条款需要确认':'目前未发现开卡奖励限制，最终以银行为准';
   function result(xs,dim,status,impact,action,message){
    return {status,impact,action,message,complete:gaps(xs).length===0,triggered_rules:triggered(xs).map(x=>x.rule_id),
-    missing_rules:xs.filter(x=>x.status==='MISSING').map(x=>x.rule_id),
-    unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.status,reason:x.reason}))};
+    missing_rules:xs.filter(x=>x.status==='MISSING'||x.pending_facts).map(x=>x.rule_id),
+    unresolved_rules:gaps(xs).map(x=>({rule_id:x.rule_id,status:x.pending_facts?'MISSING':x.status,reason:x.pending_facts?'已发现限制，但还有相关条件需要确认':x.reason}))};
   }
   const matrixEvents=events.filter(x=>rules.find(r=>r.id===x.rule_id)?.when?.fact&&defs[rules.find(r=>r.id===x.rule_id).when.fact]?.details_id);
   return {questionnaire:{common:approval.questions.filter(q=>empty(a[q.id])),specific:pending,editable:questions,benefits:null},
