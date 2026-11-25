@@ -1,8 +1,9 @@
 {
-  "version": "2026-11-25.1",
+  "version": "2026-11-25.2",
   "supported_issuers": [
     "AMEX",
-    "CHASE"
+    "CHASE",
+    "CITI"
   ],
   "rules": [
     {
@@ -2275,6 +2276,599 @@
       "effect": {
         "application": 0,
         "bonus": 3
+      }
+    },
+    {
+      "id": "CITI-001",
+      "label": "8 天内 Citi 个人卡申请记录",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "PERSONAL"
+      },
+      "condition": {
+        "fact": "citi_personal_application_lt_8d",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 2,
+        "bonus": 0
+      }
+    },
+    {
+      "id": "CITI-002",
+      "label": "65 天内 Citi 申请数量",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "citi_applications_65d",
+        "op": "gte",
+        "value": 2
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      }
+    },
+    {
+      "id": "CITI-003",
+      "label": "90 天内 Citi 商业卡申请记录",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "condition": {
+        "fact": "citi_business_application_lt_90d",
+        "op": "eq",
+        "value": "YES"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "WAIT"
+      }
+    },
+    {
+      "id": "CITI-004",
+      "label": "同产品 48 个月开卡奖励限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "F04_CITI_BONUS_48M",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-004",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Citi Strata",
+              "Citi Strata Student",
+              "Citi Rewards+",
+              "Citi Rewards+ Student",
+              "Citi / AAdvantage Platinum Select",
+              "Citi / AAdvantage Executive",
+              "Citi / AAdvantage Globe",
+              "AAdvantage MileUp",
+              "Citi / AAdvantage Business",
+              "Citi Premier",
+              "Citi Strata Premier",
+              "Citi Strata Elite",
+              "Citi Double Cash"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        },
+        {
+          "target": {
+            "product_name": [
+              "AT&T Points Plus Card"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "ABSENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CITI-005",
+      "label": "转卡至目标产品的 48 个月奖励限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD"
+      },
+      "condition": {
+        "fact": "F05_CITI_CONVERSION_48M",
+        "op": "includes_any",
+        "values": [
+          "$TARGET"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-005",
+      "overrides": [
+        {
+          "target": {
+            "product_name": [
+              "Citi Strata",
+              "Citi Strata Student",
+              "Citi Rewards+",
+              "Citi Rewards+ Student",
+              "Citi / AAdvantage Platinum Select",
+              "Citi / AAdvantage Executive",
+              "Citi / AAdvantage Globe",
+              "AAdvantage MileUp",
+              "Citi / AAdvantage Business",
+              "Citi Premier",
+              "Citi Strata Premier",
+              "Citi Strata Elite",
+              "Citi Double Cash"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "PRESENT"
+          }
+        },
+        {
+          "target": {
+            "product_name": [
+              "AT&T Points Plus Card"
+            ]
+          },
+          "offer_scenarios": {
+            "STANDARD": "ABSENT"
+          }
+        }
+      ]
+    },
+    {
+      "id": "CITI-PROD-001",
+      "label": "Strata / Rewards+ 系列 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi Strata",
+          "Citi Strata Student",
+          "Citi Rewards+",
+          "Citi Rewards+ Student"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Strata",
+              "Citi Strata Student",
+              "Citi Rewards+",
+              "Citi Rewards+ Student"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Strata",
+              "Citi Strata Student",
+              "Citi Rewards+",
+              "Citi Rewards+ Student"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-001",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-003",
+      "label": "AAdvantage Platinum Select 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi / AAdvantage Platinum Select"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Platinum Select"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Platinum Select"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-003",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-004",
+      "label": "AAdvantage Executive 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi / AAdvantage Executive"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Executive"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Executive"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-004",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-005",
+      "label": "AAdvantage Globe 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi / AAdvantage Globe"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Globe"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Globe"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-005",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-006",
+      "label": "AAdvantage MileUp 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "AAdvantage MileUp"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "AAdvantage MileUp"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "AAdvantage MileUp"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-006",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-007",
+      "label": "AAdvantage Business 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi / AAdvantage Business"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Business"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi / AAdvantage Business"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-007",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-008",
+      "label": "Premier / Strata Premier 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi Premier",
+          "Citi Strata Premier"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Premier",
+              "Citi Strata Premier"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Premier",
+              "Citi Strata Premier"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-008",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-009",
+      "label": "Strata Elite 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi Strata Elite"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Strata Elite"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Strata Elite"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-009",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-PROD-010",
+      "label": "Double Cash 48 个月奖励及转卡限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Citi Double Cash"
+        ]
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F04_CITI_BONUS_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Double Cash"
+            ]
+          },
+          {
+            "fact": "F05_CITI_CONVERSION_48M",
+            "op": "includes_any",
+            "values": [
+              "Citi Double Cash"
+            ]
+          }
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-010",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
+      }
+    },
+    {
+      "id": "CITI-REL-001",
+      "label": "Costco 本人有效会员资格",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "Costco Anywhere Visa Card",
+          "Costco Anywhere Visa Business Card"
+        ]
+      },
+      "condition": {
+        "fact": "costco_active_membership",
+        "op": "eq",
+        "value": "NO"
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      }
+    },
+    {
+      "id": "CITI-PROD-014",
+      "label": "AT&T Points Plus 仅能持有一个账户",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "AT&T Points Plus Card"
+        ]
+      },
+      "condition": {
+        "fact": "F03_CURRENT_CARD_HISTORY",
+        "op": "includes_any",
+        "values": [
+          "AT&T Points Plus Card"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "application_action": "BLOCK",
+        "product_gate": true
+      }
+    },
+    {
+      "id": "CITI-PROD-015",
+      "label": "AT&T Points Plus 48 个月开户优惠限制",
+      "target": {
+        "issuer": "CITI",
+        "product_type": "CREDIT_CARD",
+        "product_name": [
+          "AT&T Points Plus Card"
+        ]
+      },
+      "condition": {
+        "fact": "F12_CITI_OPENING_OFFER_48M",
+        "op": "includes_any",
+        "values": [
+          "AT&T Points Plus Card"
+        ]
+      },
+      "effect": {
+        "application": 0,
+        "bonus": 3,
+        "bonus_action": "WAIT"
+      },
+      "offer_clause": "CITI-PROD-015",
+      "offer_scenarios": {
+        "STANDARD": "PRESENT"
       }
     }
   ]

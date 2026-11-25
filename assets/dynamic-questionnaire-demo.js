@@ -430,12 +430,10 @@
     $('identity-note').textContent='身份来源：'+(result.identity.formal_nb_card_id
       ?'NB 正式版信用卡目录（仅卡片身份）':source)+
       '。'+(result.offer_context
-        ?'Amex 按选定 Offer 场景建模'+(result.offer_context.variant==='NLL'
+        ?(ISSUER_LABELS[result.identity.issuer]||result.identity.issuer)+' 按选定 Offer 场景建模'+(result.offer_context.variant==='NLL'
           ?'，已启用 NLL 特殊变量。':'。')
         +'这里是问卷假设，并非实时核实的申请条款。'
-        :result.identity.issuer==='CHASE'
-          ?'Chase 按现有规则库模拟；卡片历史身份和当前申请条款尚需分别核实。'
-          :'此页仅生成问卷，不据此判断开卡资格、当前条款或获批可能性。');
+        :(ISSUER_LABELS[result.identity.issuer]||result.identity.issuer)+' 按现有规则库模拟；卡片历史身份和当前申请条款尚需分别核实。');
     // The rule planner intentionally returns only unanswered facts, but this
     // QA page keeps all previously displayed questions editable and visible.
     const activeIds=new Set(plan.questionnaire.specific.map(q=>q.id));

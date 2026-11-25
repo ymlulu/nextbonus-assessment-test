@@ -8,9 +8,9 @@ const runtime=createRuntime({rulebook,factbook,products,approval});
 const assert=(v,label)=>{if(!v)throw Error(label);};
 const eq=(a,b,label)=>assert(JSON.stringify(a)===JSON.stringify(b),label+': '+JSON.stringify(a)+' != '+JSON.stringify(b));
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,
- F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO'},
+ F02_ISSUER_APPLICATION_HISTORY:{approved_chase_30d:0,approved_chase_business_30d:'NO',approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO'},
  F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],
- F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES'};
+ F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES'};
 const catalog=ids.products.map(p=>({...p,...products.overrides[p.product_id]}));
 const virtual=(name,business=false,lineage='NOT_UNITED_CLUB')=>({product_id:'fixture_'+name,product_name:name,issuer:'CHASE',product_type:'CREDIT_CARD',customer_type:business?'BUSINESS':'PERSONAL',product_lineage:lineage,card_form:'REVOLVING_CREDIT'});
 const fixtures=[virtual('United Club',false,'UNITED_CLUB'),virtual('Iberia Visa'),virtual('Aer Lingus Visa'),virtual('Southwest Premier Business',true)];
@@ -183,5 +183,73 @@ const partial=assess(card('Chase Aeroplan Card'),{F03_CURRENT_CARD_HISTORY:['Cha
 eq(partial.evaluation.application.complete,false,'unfinished OR application');
 eq(partial.evaluation.bonus.complete,false,'unfinished projected bonus');
 eq(partial.evaluation.application.action,'BLOCK','known blocker remains');
+
+// Citi: independent expected cases from the reviewed 17 executable rules.
+const elite=card('Citi Strata Elite'),business=card('Citi / AAdvantage Business'),globe=card('Citi / AAdvantage Globe'),strata=card('Citi Strata'),premier=card('Citi Strata Premier'),att=card('AT&T Points Plus Card');
+const cb='F04_CITI_BONUS_48M',cc='F05_CITI_CONVERSION_48M',opening='F12_CITI_OPENING_OFFER_48M';
+binary('CITI-001',elite,x=>structured('citi_personal_application_lt_8d',x),'YES','NO',...app(2));
+check('CITI-001',business,{},'ABSENT');
+numeric('CITI-002',elite,n=>structured('citi_applications_65d',n),2,3,'WAIT');
+numeric('CITI-002',business,n=>structured('citi_applications_65d',n),2,3,'WAIT');
+binary('CITI-003',business,x=>structured('citi_business_application_lt_90d',x),'YES','NO',...app(3,'WAIT'));
+check('CITI-003',elite,{},'ABSENT');
+history('CITI-004',elite,cb,['Citi Strata Elite'],...bonus(3,'WAIT'));
+history('CITI-005',elite,cc,['Citi Strata Elite'],...bonus(3,'WAIT'));
+for(const [id,names] of [
+ ['CITI-PROD-001',['Citi Strata','Citi Strata Student','Citi Rewards+','Citi Rewards+ Student']],
+ ['CITI-PROD-003',['Citi / AAdvantage Platinum Select']],
+ ['CITI-PROD-004',['Citi / AAdvantage Executive']],
+ ['CITI-PROD-005',['Citi / AAdvantage Globe']],
+ ['CITI-PROD-006',['AAdvantage MileUp']],
+ ['CITI-PROD-007',['Citi / AAdvantage Business']],
+ ['CITI-PROD-008',['Citi Strata Premier','Citi Premier']],
+ ['CITI-PROD-009',['Citi Strata Elite']],
+ ['CITI-PROD-010',['Citi Double Cash']]
+]){
+ for(const name of names){
+  const p=card(name)||{product_id:'fixture_'+name,product_name:name,issuer:'CITI',product_type:'CREDIT_CARD',customer_type:'PERSONAL'};
+  history(id,p,cb,names,...bonus(3,'WAIT'));
+  history(id,p,cc,names,...bonus(3,'WAIT'));
+  const result=check(id,p,{[cb]:[names[0]],[cc]:[names[0]]},'TRIGGERED',...bonus(3,'WAIT'));
+  eq(event(result,id).trigger_sources.length,2,id+' distinct bonus and conversion evidence');
+  const partial=check(id,p,{[cb]:[names[0]],[cc]:undefined},'TRIGGERED',...bonus(3,'WAIT'));
+  assert(event(partial,id).pending_facts,id+' incomplete conversion');
+  check(id,p,{[cb]:[names[0]]},'ABSENT',[0,0],['CLEAR','CLEAR'],{offer_rule_overrides:{[id]:'ABSENT'}});
+  check(id,p,{},'REVIEW',[0,0],['CLEAR','CLEAR'],{offer_facts:{}});
+  counter.offer+=2;
+ }
+ check(id,csp,{},'ABSENT');
+}
+// Do not infer a bank-wide AA or Strata family.
+eq(assess(globe,{[cb]:['Citi / AAdvantage Platinum Select']}).evaluation.bonus.action,'CLEAR','AA Platinum does not restrict Globe');
+eq(assess(elite,{[cb]:['Citi Strata Premier'],[cc]:['Citi Strata Premier']}).evaluation.bonus.action,'CLEAR','Premier does not restrict Elite');
+eq(assess(premier,{[cb]:['Citi Premier']}).evaluation.bonus.action,'WAIT','legacy Premier restricts Strata Premier');
+eq(assess(strata,{[cb]:['Citi Rewards+ Student']}).evaluation.bonus.action,'WAIT','Strata family includes legacy Rewards+ Student');
+eq(assess(elite,{[cc]:['Citi Strata Elite'],[cb]:['NONE']}).evaluation.bonus.action,'WAIT','conversion uses original bonus receipt window');
+eq(assess(elite,{[cc]:['NONE'],[cb]:['NONE'],citi_conversion_date:'2026-11-01'}).evaluation.bonus.action,'CLEAR','recent conversion alone cannot trigger');
+const exactAbsent={offer_facts:{rule_clause_state:{'CITI-004':'ABSENT','CITI-005':'ABSENT','CITI-PROD-009':'ABSENT'}}};
+eq(assess(elite,{[cb]:['Citi Strata Elite'],[cc]:['Citi Strata Elite']},exactAbsent).evaluation.bonus.action,'CLEAR','exact offer omits clauses');
+const unresolved=assess(elite,{}, {offer_facts:{}});
+eq(unresolved.evaluation.bonus.action,'UNKNOWN','unknown exact clauses stay unknown');
+assert(!unresolved.questionnaire.editable.some(q=>[cb,cc].includes(q.id)),'unknown offer gate is not a user fact');
+for(const name of ['Costco Anywhere Visa Card','Costco Anywhere Visa Business Card']){
+ const p=card(name);
+ binary('CITI-REL-001',p,x=>({costco_active_membership:x}),'NO','YES',...app(3,'BLOCK'));
+ eq(assess(p,{costco_active_membership:'NO'}).evaluation.bonus.action,'BLOCK','membership product gate');
+ eq(assess(p).evaluation.bonus.action,'UNKNOWN','Costco unverified offer clauses remain unknown');
+}
+history('CITI-PROD-014',att,'F03_CURRENT_CARD_HISTORY',['AT&T Points Plus Card'],...app(3,'BLOCK'));
+history('CITI-PROD-015',att,opening,['AT&T Points Plus Card'],...bonus(3,'WAIT'));
+eq(assess(att,{[cb]:['AT&T Points Plus Card']}).evaluation.bonus.action,'CLEAR','AT&T opening offer anchor is distinct from bonus receipt');
+eq(assess(att,{F03_CARD_HISTORY:['AT&T Points Plus Card']}).evaluation.application.action,'CLEAR','one-account restriction is current holding only');
+check('CITI-PROD-015',att,{[opening]:['AT&T Points Plus Card']},'ABSENT',[0,0],['CLEAR','CLEAR'],{offer_rule_overrides:{'CITI-PROD-015':'ABSENT'}});
+assert(!assess(att).questionnaire.editable.some(q=>[cb,cc].includes(q.id)),'AT&T does not reuse bonus receipt');
+for(const p of catalog.filter(p=>p.issuer==='CITI')){
+ const q=assess(p).questionnaire.editable.find(q=>q.id==='F02_ISSUER_APPLICATION_HISTORY');
+ eq(q.fields.find(f=>f.id==='citi_applications_65d').count_bands,[{value:0,label:'0–1 次'},{value:2,label:'2 次或更多'}],'application count uses attempts');
+ eq(q.fields.some(f=>f.id==='citi_personal_application_lt_8d'),p.customer_type==='PERSONAL','personal scope');
+ eq(q.fields.some(f=>f.id==='citi_business_application_lt_90d'),p.customer_type==='BUSINESS','business scope');
+}
+
 eq([...coverage].sort(),rulebook.rules.map(r=>r.id).sort(),'every executable rule must have independent positive coverage');
 console.log(JSON.stringify({suite:'bank-rules-audit',covered:coverage.size,matrix_cells:cells,fixture_only_products:fixtures.length,...counter,status:'PASS'}));

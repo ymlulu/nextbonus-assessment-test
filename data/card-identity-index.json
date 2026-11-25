@@ -22,7 +22,7 @@
       "note": "Issuer official product identity only; no offer history invented."
     }
   },
-  "count": 110,
+  "count": 116,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -165,7 +165,7 @@
     },
     {
       "product_id": "citi_aadvantage_executive",
-      "name": "Citi / AAdvantage Executive",
+      "name": "Citi AAdvantage Executive",
       "product_name": "AAdvantage Executive",
       "issuer": "CITI",
       "approval_issuer": "CITI",
@@ -178,7 +178,8 @@
       "identity_source": "EXPANSION_CANDIDATE",
       "aliases": [
         "Citi AAdvantage Executive",
-        "AAdvantage Executive"
+        "AAdvantage Executive",
+        "Citi / AAdvantage Executive"
       ]
     },
     {
@@ -201,7 +202,7 @@
     },
     {
       "product_id": "history_ot_citi_008",
-      "name": "Citi AAdvantage Platinum",
+      "name": "Citi AAdvantage Platinum Select",
       "product_name": "AAdvantage Platinum",
       "issuer": "CITI",
       "approval_issuer": "CITI",
@@ -214,7 +215,9 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Citi AAdvantage Platinum",
-        "AAdvantage Platinum"
+        "AAdvantage Platinum",
+        "Citi AAdvantage Platinum Select",
+        "Citi / AAdvantage Platinum Select"
       ]
     },
     {
@@ -751,7 +754,8 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Citi AAdvantage Globe",
-        "AAdvantage Globe"
+        "AAdvantage Globe",
+        "Citi / AAdvantage Globe"
       ]
     },
     {
@@ -1581,7 +1585,7 @@
     },
     {
       "product_id": "history_ot_citi_078",
-      "name": "Citi AAdvantage Platinum Business",
+      "name": "Citi AAdvantage Business",
       "product_name": "AAdvantage Platinum Business",
       "issuer": "CITI",
       "approval_issuer": "CITI",
@@ -1594,7 +1598,9 @@
       "identity_source": "HISTORY_ONLY",
       "aliases": [
         "Citi AAdvantage Platinum Business",
-        "AAdvantage Platinum Business"
+        "AAdvantage Platinum Business",
+        "Citi AAdvantage Business",
+        "Citi / AAdvantage Business"
       ]
     },
     {
@@ -2287,6 +2293,118 @@
         "Ink Premier"
       ],
       "application_url": "https://creditcards.chase.com/business-credit-cards/ink/premier"
+    },
+    {
+      "product_id": "citi_strata",
+      "name": "Citi Strata",
+      "product_name": "Citi Strata",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Citi Strata",
+        "Strata"
+      ]
+    },
+    {
+      "product_id": "citi_strata_student",
+      "name": "Citi Strata Student",
+      "product_name": "Citi Strata Student",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Citi Strata Student",
+        "Strata Student"
+      ]
+    },
+    {
+      "product_id": "citi_aadvantage_mileup",
+      "name": "AAdvantage MileUp",
+      "product_name": "AAdvantage MileUp",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "AAdvantage MileUp",
+        "Citi AAdvantage MileUp",
+        "MileUp"
+      ]
+    },
+    {
+      "product_id": "citi_costco_anywhere_visa",
+      "name": "Costco Anywhere Visa Card",
+      "product_name": "Costco Anywhere Visa Card",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Costco Anywhere Visa Card",
+        "Citi Costco Anywhere Visa",
+        "Costco Anywhere Visa"
+      ]
+    },
+    {
+      "product_id": "citi_costco_anywhere_business",
+      "name": "Costco Anywhere Visa Business Card",
+      "product_name": "Costco Anywhere Visa Business Card",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "BUSINESS",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Costco Anywhere Visa Business Card",
+        "Citi Costco Business",
+        "Costco Anywhere Visa Business"
+      ]
+    },
+    {
+      "product_id": "citi_att_points_plus",
+      "name": "AT&T Points Plus Card",
+      "product_name": "AT&T Points Plus Card",
+      "issuer": "CITI",
+      "approval_issuer": "CITI",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": null,
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "AT&T Points Plus Card",
+        "Citi AT&T Points Plus",
+        "AT&T Points Plus"
+      ]
     }
   ]
 }

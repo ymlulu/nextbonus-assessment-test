@@ -4,8 +4,8 @@ const root=path.resolve(__dirname,'..'),source=p=>fs.readFileSync(path.join(root
 const data={rulebook:read('bank-rules/rules.json'),factbook:read('bank-rules/facts.json'),products:read('bank-rules/products.json'),approval:read('bank-rules/approval.json'),identityIndex:read('data/card-identity-index.json')};
 const client=createClient(data);
 const base={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0',F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,
- F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
- F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],schwab_relationship:'YES',morgan_stanley_relationship:'YES'};
+ F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',citi_personal_application_lt_8d:'NO',citi_applications_65d:0,citi_business_application_lt_90d:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
+ F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],schwab_relationship:'YES',morgan_stanley_relationship:'YES',F04_CITI_BONUS_48M:['NONE'],F05_CITI_CONVERSION_48M:['NONE'],F12_CITI_OPENING_OFFER_48M:['NONE'],costco_active_membership:'YES'};
 const csp='chase_sapphire_preferred',gold='amex_gold';
 const request=(product_id,known_facts=base,extra={})=>({product_id,known_facts,...extra});
 function equalReport(r){
@@ -18,7 +18,7 @@ function equalReport(r){
 }
 for(const p of client.listCards()){
  const r=client.evaluate(request(p.product_id));equalReport(r);
- assert.equal(r.report.decision.code,'CLEAR',p.product_id);
+ assert.equal(r.report.decision.code,p.product_id.startsWith('citi_costco_')?'REVIEW':'CLEAR',p.product_id);
  assert.deepEqual(r,client.evaluate(request(p.product_id)));
  const blank=client.evaluate(request(p.product_id,{}));equalReport(blank);
  assert.equal(blank.report.decision.code,'REVIEW',p.product_id);
