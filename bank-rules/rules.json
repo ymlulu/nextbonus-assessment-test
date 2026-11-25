@@ -3663,6 +3663,26 @@
         "product_type": "CREDIT_CARD"
       },
       "dimension": "BONUS"
+    },
+    {
+      "id": "COVERAGE-WF-BUSINESS-APPLICATION",
+      "label": "Wells Fargo 商业卡的具体申请限制尚待核实",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "dimension": "APPLICATION"
+    },
+    {
+      "id": "COVERAGE-WF-BUSINESS-BONUS",
+      "label": "Wells Fargo 商业卡的具体奖励条款尚待核实",
+      "target": {
+        "issuer": "WELLS_FARGO",
+        "product_type": "CREDIT_CARD",
+        "customer_type": "BUSINESS"
+      },
+      "dimension": "BONUS"
     }
   ]
 }

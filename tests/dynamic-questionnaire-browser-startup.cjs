@@ -328,6 +328,11 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  pick('WELLS_FARGO','PERSONAL',/Active Cash/);
  selectHistory('Wells Fargo Active Cash');
  assert.ok(walk(get('assessment-result')).some(n=>/可能拿不到开卡奖励/.test(n.textContent)));
+ pick('WELLS_FARGO','BUSINESS',/Signify Business Cash/);
+ assert.ok(walk(get('questions')).some(n=>/目前没有其他需要回答的问题/.test(n.textContent)));
+ assert.ok(get('gaps').textContent.includes('COVERAGE-WF-BUSINESS-APPLICATION'));
+ assert.ok(get('gaps').textContent.includes('COVERAGE-WF-BUSINESS-BONUS'));
+ assert.ok(walk(get('assessment-result')).some(n=>/还需要确认/.test(n.textContent)));
  pick('US_BANK','PERSONAL',/Altitude Go/);
  selectHistory('U.S. Bank Altitude Go Visa Signature');
  assert.ok(walk(get('assessment-result')).some(n=>/不符合这次开卡奖励条件/.test(n.textContent)));

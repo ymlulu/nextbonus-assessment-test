@@ -314,6 +314,19 @@ for(const invalid of [undefined,0,-1,1.5,'5']){
 const wfActive=card('Wells Fargo Active Cash'),wfAuto=card('Wells Fargo Autograph'),wfJourney=card('Wells Fargo Autograph Journey'),wfBiz=card('Signify Business Cash');
 for(const p of [wfActive,wfAuto,wfJourney])binary('WF-001',p,x=>structured('wf_consumer_opened_lt_4m',x),'YES','NO',...app(2));
 check('WF-001',wfBiz,{},'ABSENT');
+for(const id of ['COVERAGE-WF-BUSINESS-APPLICATION','COVERAGE-WF-BUSINESS-BONUS']){
+ check(id,wfBiz,{},'REVIEW');
+ check(id,wfActive,{},'ABSENT');
+}
+const wfBizUnknown=assess(wfBiz);
+eq(wfBizUnknown.questionnaire.editable.length,0,'no fabricated WF business facts');
+eq(wfBizUnknown.evaluation.application.action,'UNKNOWN','business application coverage gap');
+eq(wfBizUnknown.evaluation.bonus.action,'UNKNOWN','business bonus coverage gap');
+eq(wfBizUnknown.evaluation.decision.code,'REVIEW','no false clear on uncovered product');
+const wfBizReviewed=assess(wfBiz,{}, {offer_facts:{coverage_state:{
+ 'COVERAGE-WF-BUSINESS-APPLICATION':'CONFIRMED_NO_ADDITIONAL_RULES',
+ 'COVERAGE-WF-BUSINESS-BONUS':'CONFIRMED_NO_ADDITIONAL_RULES'}}});
+eq(wfBizReviewed.evaluation.decision.code,'CLEAR','explicit reviewed coverage resolves absence of rules');
 for(const [id,p] of [['WF-PROD-001',wfActive],['WF-PROD-002',wfAuto],['WF-PROD-003',wfJourney]]){
  history(id,p,'F03_HELD_OR_OPENED_48M',[p.product_name],...bonus(2,'RISK'));
  check(id,p,{F04_BONUS_RECEIVED_48M:[p.product_name]},'CLEAR');
