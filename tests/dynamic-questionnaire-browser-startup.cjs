@@ -270,6 +270,16 @@ async function settle(){for(let i=0;i<7;i++)await new Promise(resolve=>setImmedi
  assert.ok(requestLog.some(x=>x.includes('amex-formal-product-identities.json')));
  assert.ok(requestLog.every(x=>x.startsWith('data/')||x.startsWith('bank-rules/')),'only static data requests');
  assert.ok(!requestLog.some(x=>/questionnaire-policy|rule-index|eligibility-matrix/.test(x)),'no old rule sources loaded');
+ // The current Full Report is generated from the same result, and history is optional.
+ get('customer-type').value='PERSONAL';get('customer-type').fire('change');
+ const csp=get('card-select').options.find(x=>/Sapphire Preferred/i.test(x.textContent));
+ assert.ok(csp);get('card-select').value=csp.value;get('card-select').fire('change');
+ assert.ok(walk(get('assessment-result')).some(n=>/查看完整报告/.test(n.textContent)));
+ const historyButton=walk(get('assessment-result')).find(n=>n.tag==='button'&&n.textContent==='查看历史奖励');
+ assert.ok(historyButton);assert.ok(!requestLog.includes('data/offer-history.json'));
+ historyButton.fire('click');await settle();
+ assert.ok(requestLog.includes('data/offer-history.json'));
+ assert.ok(walk(get('assessment-result')).some(n=>/参考记录日期：2026-09-/.test(n.textContent)));
  // Exercise the transient failure branch and successful retry on a fresh page.
  const retryContext={...context,window:null};
  // Reuse script/bootstrap module only after changing fetch to test the recovery path.

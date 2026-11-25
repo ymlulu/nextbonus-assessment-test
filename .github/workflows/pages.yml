@@ -28,11 +28,14 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Stage current assessment only
+        run: python scripts/stage_current_site.py --output _site
+
       - name: Upload static site once per workflow run
         if: ${{ github.run_attempt == 1 }}
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: '_site'
 
       - name: Wait for Pages artifact indexing
         env:

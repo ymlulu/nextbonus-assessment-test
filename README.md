@@ -13,9 +13,15 @@ All current eligibility rules, questions derived from them, thresholds and impac
 - [Audit and open business questions](bank-rules/AUDIT.md).
 - The earlier dynamic questionnaire prototype, issuer-specific engines and duplicate policy/index/matrix files are retired. Git history preserves them.
 
+## Current full report and browser integration
+
+The home page opens the current questionnaire. Both the page and the version-2 local bridge (`bridge.html`, channel `nextbonus-assessment-v2`) use `adapters/assessment-api-v2.js` and the same runtime. The full report directly consumes the returned decision and the application/bonus dimensions. No second eligibility computation. See [v2 contract](docs/ASSESSMENT_INTEGRATION_CONTRACT_V2.md).
+
+Reviewed reward history is loaded only on demand and shown as dated historical evidence, not a current offer. Long-term benefit valuation is outside the current application/bonus assessment scope.
+
 ## Frozen compatibility baseline — NOT the current rulebook
 
-`index.html` and `bridge.html` still use the frozen v1 six-card full-report/integration contract. The older bank rule export, fixed questionnaire, benefit valuation, offer history, rendering and manifest remain for compatibility. Do not edit that baseline to change the new questionnaire. Discover has its own copy of the old runtime; migrate that consumer separately before removing its v1 contract. See [v1 integration contract](docs/ASSESSMENT_INTEGRATION_CONTRACT_V1.md) and [offer history](OFFER_HISTORY.md). The current dynamic questionnaire does not load the compatibility baseline or calculate benefits.
+`legacy/index-v1.html` and `legacy/bridge-v1.html` retain the frozen v1 full-report/integration contract for repository-only tests. The live Pages build now publishes only the current v2 assets. The older bank rule export, fixed questionnaire, benefit valuation, offer history, rendering and manifest remain for compatibility. Do not edit that baseline to change the new questionnaire. Discover has its own copy of the old runtime; migrate that consumer separately only after the independent project is finished. See [v1 integration contract](docs/ASSESSMENT_INTEGRATION_CONTRACT_V1.md) and [offer history](OFFER_HISTORY.md). The current dynamic questionnaire does not load the compatibility baseline or calculate benefits.
 
 ## Development
 

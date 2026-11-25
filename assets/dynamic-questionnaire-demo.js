@@ -406,7 +406,7 @@
   }
   function render(){
     if(!facade||!selectedProductId)return;
-    const result=facade.plan({product_id:selectedProductId,
+    const result=facade.evaluate({product_id:selectedProductId,
       known_facts:answers,offer_variant:$('offer-variant').value});
     const status=$('summary'),list=$('questions');
     if(!result.questionnaire){
@@ -447,10 +447,13 @@
     for(const q of currentQuestions)list.append(question(q,false,result,activeIds.has(q.id)));
     const report=$('assessment-result');
     report.replaceChildren();
-    if(result.evaluation){
-      const d=result.evaluation;
+    if(result.report){
+      const full=result.report,d={issuer:full.product.issuer,offer_variant:full.offer_variant,...full.dimensions,rule_results:full.rule_results};
       const issuerLabel=ISSUER_LABELS[d.issuer]||d.issuer;
       report.append(el('h2','','这张 '+issuerLabel+' 卡适不适合现在申请？'));
+      const decision=el('div','assessment-panel');
+      decision.append(el('strong',['BLOCK','WAIT','RISK'].includes(full.decision.code)?'rule-delta':'',full.decision.label),el('p','small',full.decision.summary));
+      report.append(decision);
       const summary=el('div','assessment-summary');
       const app=el('section','assessment-panel');
       app.append(el('strong','','申请风险'));
@@ -483,16 +486,36 @@
       bonus.append(el('p','small','当前按以下条款估算：'+(d.offer_variant==='NLL'?'NLL（不含普通同卡终身限制）':'普通公开 Offer')));
       summary.append(app,bonus);report.append(summary);
       const itemized=el('details','rule-report');
-      itemized.append(el('summary','','查看每条规则的判断（'+d.rule_results.length+' 项）'));
+      itemized.append(el('summary','','查看完整报告（'+d.rule_results.length+' 条规则）'));
       for(const rule of d.rule_results){
         const desc=el('p','small',
           ruleLabel(rule.rule_id)+' · '+({TRIGGERED:rule.product_eligibility?'不符合产品申请条件':rule.hard_bonus_eligibility?'不符合开卡奖励条件':'可能受限',CLEAR:'没有触发',
             MISSING:'还没回答',REVIEW:'需要核实'})[rule.status]+' · '+rule.reason);
         itemized.append(desc);
       }
-      report.append(itemized,el('p','small',d.caveat));
-      if(result.marriott_matrix){
-        const pending=result.marriott_matrix;
+      const history=el('section','assessment-panel');
+      history.append(el('strong','','历史开卡奖励'),el('p','small','只展示已审核的历史快照，不代表现在的奖励。'));
+      const historyButton=el('button','secondary','查看历史奖励');
+      historyButton.type='button';
+      const historyContent=el('div','small');
+      historyButton.addEventListener('click',async()=>{
+        historyButton.disabled=true;historyContent.replaceChildren(el('p','small','正在读取历史奖励…'));
+        try{
+          const data=await window.NextBonusAssessmentLoaderV2.history();
+          const h=facade.getOfferHistory({product_id:full.product.product_id,offerHistory:data});
+          historyContent.replaceChildren();
+          if(!h){historyContent.append(el('p','small','暂无可用的已审核历史奖励。'));return;}
+          historyContent.append(el('p','small','参考记录日期：'+h.reference_date+' · '+h.reference_offer.offer_label));
+          for(const row of h.history.slice(-10).reverse())historyContent.append(el('p','small',row.date_label+' · '+row.bonus_label+(row.spend_requirement?' · '+row.spend_requirement:'')));
+          if(h.history.length>10)historyContent.append(el('p','small','此处展示最近 10 条已审核记录。'));
+        }catch{historyContent.replaceChildren(el('p','small','暂时无法读取历史奖励，请重试。'));}
+        finally{historyButton.disabled=false;}
+      });
+      history.append(historyButton,historyContent);itemized.append(history);
+      itemized.append(el('p','small','本评估不包含长期持卡福利价值。'));
+      report.append(itemized,el('p','small',full.caveat));
+      if(full.marriott_matrix){
+        const pending=full.marriott_matrix;
         report.append(el('p','small',(d.issuer==='CHASE'?'Marriott 申请及开卡奖励限制：':'Marriott 跨银行开卡奖励限制：')+
           ({CLEAR:'根据已填记录，这条限制不适用',TRIGGERED:'已触发持卡历史限制',
              MISSING:'还需要补充相关持卡时间',
@@ -512,22 +535,14 @@
     $('summary').textContent='正在加载卡片和申请规则…';
     $('generate').disabled=true;
     try{
-      const files=['bank-rules/rules.json','bank-rules/facts.json','bank-rules/products.json',
-        'bank-rules/approval.json','data/card-identity-index.json','data/amex-formal-product-identities.json'];
-      const [rulebook,factbook,products,approval,identityIndex,formalAmex]=
-        await Promise.all(files.map(async name=>{
-          const response=await fetch(name,{cache:'no-cache'});
-          if(!response.ok)throw Error('数据文件加载失败：'+name+' (HTTP '+response.status+')');
-          return response.json();
-        }));
-      const runtime=window.NextBonusBankRulesRuntime.createRuntime({rulebook,factbook,products,approval});
-      baseQuestionLibrary=runtime.commonQuestions;
-      Object.assign(readableRuleNames,runtime.ruleLabels);
-      facade=runtime.createFacade(window.NextBonusCardIdentityV1.createLookup(identityIndex));
+      const {client,formalAmex}=await window.NextBonusAssessmentLoaderV2.load();
+      facade=client;
+      baseQuestionLibrary=client.commonQuestions;
+      Object.assign(readableRuleNames,client.ruleLabels);
       const formalNames=new Map((formalAmex.products||[]).map(x=>[x.assessment_product_id,x.display_name]));
       cards=facade.listCards().filter(p=>p.issuer&&p.customer_type)
         .map(p=>({...p,name:formalNames.get(p.product_id)||p.name}));
-      $('version').textContent='规则库 '+runtime.version+' · '+facade.getVersion().rules_indexed+' 条 · '+cards.length+' 张卡';
+      $('version').textContent='规则库 '+client.getVersion().release_id+' · '+client.getVersion().rules_indexed+' 条 · '+cards.length+' 张卡';
       populateBanks();
       // Start at the most mature coverage area, but never silently choose
       // a specific card or execute an unrelated old evaluation.

@@ -37,7 +37,15 @@ jobs:
         run: node tests/bank-rules-audit.cjs
       - name: Smoke-test actual questionnaire browser bootstrap and cascading selectors
         run: node tests/dynamic-questionnaire-browser-startup.cjs
-      - name: Verify Phase 6.1 integration contract
+      - name: Verify current v2 report, local bridge and dated offer snapshots
+        run: node tests/assessment-v2-contract.cjs
+      - name: Stage and verify current-only Pages assets
+        run: |
+          python scripts/stage_current_site.py --output "$RUNNER_TEMP/assessment-site"
+          test -f "$RUNNER_TEMP/assessment-site/bridge.html"
+          test ! -e "$RUNNER_TEMP/assessment-site/engines/bank-rule-engine.js"
+          test ! -e "$RUNNER_TEMP/assessment-site/legacy"
+      - name: Verify frozen Phase 6.1 integration contract
         run: node tests/phase6-1-integration-contract.cjs
       - name: Verify static bridge contract
         run: node tests/static-bridge-contract.cjs
