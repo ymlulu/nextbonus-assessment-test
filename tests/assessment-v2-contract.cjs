@@ -59,7 +59,16 @@ assert.deepEqual(changed.questionnaire.questionnaire.editable.find(q=>q.id==='F0
   check(id,{F04_BONUS_HISTORY:[name]},'WAIT');
   check(id,{F01_RECENT_NEW_ACCOUNTS:5},'WAIT');
  }
- assert.equal(client.plan({input:'Chase IHG Premier Select'}).questionnaire,null,'Distinct IHG product stays unresolved');
+ assert.equal(client.plan({input:'Chase IHG Premier Select'}).identity.product_id,'chase_ihg_premier_select');
+ for(const target of ['chase_ihg_one_rewards_premier','history_ot_chase_044']){
+  check(target,{F03_CURRENT_CARD_HISTORY:['IHG One Rewards Premier Select']},'BLOCK');
+  check(target,{F04_BONUS_HISTORY:['IHG One Rewards Premier Select']},'WAIT');
+ }
+ check('chase_ihg_premier_select',{F03_CURRENT_CARD_HISTORY:['IHG One Rewards Premier Select']},'BLOCK');
+ check('chase_ihg_premier_select',{F04_BONUS_HISTORY:['IHG One Rewards Premier Select']},'WAIT');
+ for(const other of ['IHG One Rewards Premier','IHG One Rewards Traveler','IHG One Rewards Premier Business']){
+  check('chase_ihg_premier_select',{F03_CURRENT_CARD_HISTORY:[other],F04_BONUS_HISTORY:[other]},'CLEAR');
+ }
 
 // Offer history and timing are explicitly dated optional snapshots, not current eligibility inputs.
 const history=client.getOfferHistory({product_id:'amex_platinum',offerHistory:read('data/offer-history.json')});

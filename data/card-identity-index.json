@@ -38,9 +38,14 @@
         "chase_iberia"
       ],
       "note": "Product identities from existing Discover card catalog and article references only; no new bank terms, current issuance assertion or invented offer history."
+    },
+    "ihg_premier_select": {
+      "reviewed_on": "2026-11-25",
+      "source": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier-select",
+      "note": "Distinct product; not legacy IHG Select or existing Premier."
     }
   },
-  "count": 126,
+  "count": 127,
   "products": [
     {
       "product_id": "amex_platinum",
@@ -2630,6 +2635,27 @@
         "Chase Iberia Visa Signature"
       ],
       "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-iberia-credit-card-review/",
+      "product_lineage": "NOT_UNITED_CLUB"
+    },
+    {
+      "product_id": "chase_ihg_premier_select",
+      "name": "Chase IHG Premier Select",
+      "product_name": "IHG One Rewards Premier Select",
+      "issuer": "CHASE",
+      "approval_issuer": "CHASE",
+      "product_type": "CREDIT_CARD",
+      "customer_type": "PERSONAL",
+      "card_form": "REVOLVING_CREDIT",
+      "brand": null,
+      "generation": null,
+      "offer_timing_id": null,
+      "identity_source": "EXPANSION_CANDIDATE",
+      "aliases": [
+        "Chase IHG Premier Select",
+        "IHG Premier Select",
+        "IHG One Rewards Premier Select"
+      ],
+      "article_url": "https://www.uscreditcards101.com/zh/cn/article/chase-ihg-premier-select/",
       "product_lineage": "NOT_UNITED_CLUB"
     }
   ]

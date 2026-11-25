@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25.6",
+  "version": "2026-11-25.7",
   "supported_issuers": [
     "AMEX",
     "CHASE",
@@ -718,7 +718,8 @@
         "op": "includes_any",
         "values": [
           "IHG One Rewards Traveler",
-          "IHG One Rewards Premier"
+          "IHG One Rewards Premier",
+          "IHG One Rewards Premier Select"
         ],
         "action": "BLOCK"
       }
@@ -742,7 +743,8 @@
         "op": "includes_any",
         "values": [
           "IHG One Rewards Traveler",
-          "IHG One Rewards Premier"
+          "IHG One Rewards Premier",
+          "IHG One Rewards Premier Select"
         ],
         "action": "WAIT"
       }
@@ -1221,6 +1223,40 @@
           "$TARGET"
         ],
         "action": "BLOCK"
+      }
+    },
+    {
+      "id": "CHASE-PROD-019",
+      "target": {
+        "issuer": "CHASE",
+        "product_name": [
+          "IHG One Rewards Premier Select"
+        ]
+      },
+      "effect": {
+        "application": 3,
+        "bonus": 0,
+        "product_gate": true
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "F03_CURRENT_CARD_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "BLOCK"
+          },
+          {
+            "fact": "F04_BONUS_HISTORY",
+            "op": "includes_any",
+            "values": [
+              "$TARGET"
+            ],
+            "action": "WAIT"
+          }
+        ]
       }
     },
     {
