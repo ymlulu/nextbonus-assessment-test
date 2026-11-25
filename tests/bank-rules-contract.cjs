@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'..'),source=p=>fs.readFileSync(path.join(root
 const data={rulebook:read('bank-rules/rules.json'),factbook:read('bank-rules/facts.json'),products:read('bank-rules/products.json'),approval:read('bank-rules/approval.json')};
 const index=read('data/card-identity-index.json'),formal=read('data/amex-formal-product-identities.json'),lookup=createLookup(index);
 const runtime=createRuntime(data),facade=runtime.createFacade(lookup),plan=(product_id,known_facts={},opts={})=>facade.plan({product_id,known_facts,...opts});
-const common={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',a3:'N0',a4:'N0'};
+const common={a1:'Y2_PLUS',a2:'SCORE_740_PLUS',recent_new_accounts_12m:0,recent_applications_6m:0};
 const base={...common,F01_RECENT_NEW_ACCOUNTS:0,F06_REPORTED_NEW_ACCOUNTS:0,F10_ISSUER_PORTFOLIO_COUNT:0,F10_CHARGE_PORTFOLIO_COUNT:0,
  F02_ISSUER_APPLICATION_HISTORY:{approved_revolving_90d:0,same_product_applied_or_approved_90d:'NO',approved_chase_30d:0,approved_chase_business_30d:'NO'},
  F03_CARD_HISTORY:['NONE'],F03_CURRENT_CARD_HISTORY:['NONE'],F04_BONUS_HISTORY:['NONE'],F04_EVER_BONUS_HISTORY:['NONE'],F07_MARRIOTT_HISTORY:['NONE'],schwab_relationship:'YES',morgan_stanley_relationship:'YES'};
@@ -90,10 +90,13 @@ assert.equal(generic.assess({product:p,answers:{F01_RECENT_NEW_ACCOUNTS:3}}).eva
 rejects(d=>{d.rulebook.coverage_checks[0].dimension='UNKNOWN';},/INVALID_COVERAGE_CHECK/);
 rejects(d=>{d.rulebook.coverage_checks[0].id='BOFA-001';},/INVALID_COVERAGE_CHECK/);
 rejects(d=>{find(d,'CAP1-007').offer_clause=undefined;},/INVALID_OFFER_THRESHOLD/);
+rejects(d=>{d.approval.activity_facts.push('unknown_fact');},/INVALID_APPROVAL_FACTS/);
+rejects(d=>{d.approval.activity_bands[1].min=0;},/INVALID_APPROVAL_BANDS/);
+rejects(d=>{d.factbook.count_relations[0].shorter='recent_applications_6m';},/INVALID_COUNT_RELATION/);
 const html=source('dynamic-questionnaire.html'),ui=source('assets/dynamic-questionnaire-demo.js'),engine=source('engines/bank-rules-runtime.js');
 assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1]),['adapters/card-identity-v1.js','engines/bank-rules-runtime.js','adapters/assessment-api-v2.js','assets/assessment-loader-v2.js','assets/dynamic-questionnaire-demo.js']);
 for(const s of [ui,engine])assert.doesNotMatch(s,/\b(?:AMEX|CHASE|CITI|BOFA|CAP1|WF|DISC|BARC|USB|BILT)-(?:PROD-|FL-|REL-|BIZ-)?\d{3}\b/);
 for(const s of [engine,source('adapters/card-identity-v1.js')])assert.doesNotMatch(s,/localStorage|sessionStorage|XMLHttpRequest|sendBeacon|fetch\(/);
 const retired=["adapters/amex-offer-context-v1.js","adapters/amex-questionnaire-v1.js","adapters/card-questionnaire-facade-v1.js","adapters/chase-questionnaire-v1.js","adapters/dynamic-questionnaire-v1.js","engines/amex-decision-v1.js","engines/chase-decision-v1.js","engines/marriott-matrix-v1.js","data/amex-questionnaire-policy.json","data/chase-questionnaire-policy.json","data/dynamic-questionnaire-rule-index.json","data/marriott-eligibility-matrix.json"];
 for(const p of retired){assert.ok(!fs.existsSync(path.join(root,p)),'retired duplicate still exists: '+p);assert.ok(!ui.includes(p),'old source loaded: '+p);}
-console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:21,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));
+console.log(JSON.stringify({suite:'bank-rules-contract',supported_cards:facade.listCards().length,invalid_data_cases:24,retired_sources:retired.length,new_issuer_data_only:true,status:'PASS'}));

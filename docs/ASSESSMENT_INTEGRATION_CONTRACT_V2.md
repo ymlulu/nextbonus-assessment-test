@@ -20,3 +20,7 @@ Overall decision priority: BLOCK, WAIT, REVIEW if facts/clauses incomplete, RISK
 `bridge.html` uses `nextbonus-assessment-v2`. Allowed-origin window messages: {channel,request_id,method,params}. For plan/evaluate, params may contain request. Response: {channel,request_id,ok,result} or error. The bridge delegates to the same local client. It makes only fixed static-data GETs and returns results to the originating window. No HTTP evaluation endpoint.
 
 The old v1 contract remains a frozen regression baseline in git, no longer part of Pages publication. A v1 client must not send its fixed Q5/Q6 answers to v2; migration is a separate future task. Discover remains unchanged.
+
+### Unified fact inputs (release 2026-11-25.4)
+
+The editable schema includes all common and bank-specific questions; use section and base_credit, not a separate commonQuestions array. Pending common/specific are disjoint subsets of editable. Use recent_new_accounts_12m and recent_applications_6m (numeric) in place of a3/a4 (legacy categorical keys are not accepted as new facts). The first now measures actual opened accounts rather than approvals. Numeric answers are exact nonnegative integers or ranges {min,max}, where max:null means no upper bound. A condition spanning an unresolved threshold is MISSING. Compare only configured comparable count_relations. diagnostics.answer_conflicts describes impossible count combinations; affected facts are excluded until corrected. No user answers transmitted.
