@@ -519,7 +519,8 @@
     "USB-PROD-003": "Altitude Connect 5 年同卡新户奖励限制",
     "USB-PROD-004": "Cash+ 原 Cash Rewards 账户或升级奖励限制",
     "BILT-001": "Bilt Card 2.0 系列终身奖励限制",
-    "BILT-003": "最近一次 Bilt 申请被拒不足 45 天"
+    "BILT-003": "最近一次 Bilt 申请被拒不足 45 天",
+    "CHASE-PROD-019": "IHG Premier Select 同卡持有及 24 个月奖励限制"
   },
   "review_labels": {
     "CHASE-001": "含副卡的信用报告账户达到门槛，但本人主卡未达到；需核实银行是否排除副卡",

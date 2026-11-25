@@ -101,15 +101,15 @@ check('CHASE-005',cash,{F03_CARD_HISTORY:['OTHER_CHASE_NO_FEE_BUSINESS']},'REVIE
 for(const [id,n] of [['CHASE-006','Ink Business Preferred'],['CHASE-007','Ink Business Premier'],['CHASE-008','Sapphire Reserve for Business']])history(id,card(n),'F03_CARD_HISTORY',[n],...bonus(2,'RISK'));
 const ihg=['IHG One Rewards Traveler','IHG One Rewards Premier'];
 for(const n of ihg){
- history('CHASE-PROD-001',card(n),'F03_CURRENT_CARD_HISTORY',ihg,...app(3,'BLOCK'));
- history('CHASE-PROD-002',card(n),'F04_BONUS_HISTORY',ihg,...app(3,'WAIT'));
+ history('CHASE-PROD-001',card(n),'F03_CURRENT_CARD_HISTORY',[...ihg,'IHG One Rewards Premier Select'],...app(3,'BLOCK'));
+ history('CHASE-PROD-002',card(n),'F04_BONUS_HISTORY',[...ihg,'IHG One Rewards Premier Select'],...app(3,'WAIT'));
 }
 const southwest=['Southwest Plus','Southwest Premier','Southwest Priority'];
 const combos=[
  ['CHASE-PROD-005',southwest,southwest],['CHASE-PROD-006',['World of Hyatt Personal']],['CHASE-PROD-007',['Chase Aeroplan Card']],
  ['CHASE-PROD-011',['Freedom Rise','Freedom Flex','Freedom Unlimited']],['CHASE-PROD-012',['United Gateway','United Explorer','United Quest']],
  ['CHASE-PROD-013',['United Club']],['CHASE-PROD-014',['British Airways Visa','Iberia Visa','Aer Lingus Visa']],
- ['CHASE-PROD-015',['World of Hyatt Business Credit Card']],['CHASE-PROD-016',['Southwest Premier Business','Southwest Performance Business']]
+ ['CHASE-PROD-019',['IHG One Rewards Premier Select']],['CHASE-PROD-015',['World of Hyatt Business Credit Card']],['CHASE-PROD-016',['Southwest Premier Business','Southwest Performance Business']]
 ];
 for(const [id,names,scope] of combos){
  const business=['CHASE-PROD-015','CHASE-PROD-016'].includes(id),effect=business?bonus:app;
